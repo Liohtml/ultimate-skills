@@ -1,0 +1,36 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "ultimate-skills",
+  "version": "1.0.0",
+  "description": "A curated marketplace of the best Claude Code skills for engineering, product, design, and research — distilled from five community skill repos into one opinionated, deduplicated set.",
+  "owner": {
+    "name": "Ultimate Skills (curated)",
+    "url": "https://github.com/lionel-machire/ultimate-skills"
+  },
+  "plugins": [
+    {
+      "name": "engineering",
+      "source": "./engineering",
+      "category": "engineering",
+      "description": "Production-grade engineering workflow: spec, plan, build incrementally, test, debug, review, harden, and ship."
+    },
+    {
+      "name": "product",
+      "source": "./product",
+      "category": "product",
+      "description": "Product management craft: discovery, strategy, prioritization, PRDs, pricing, metrics, and adversarial review."
+    },
+    {
+      "name": "design",
+      "source": "./design",
+      "category": "design",
+      "description": "Anti-slop design & frontend taste: design direction, image-to-code, redesigns, and production UI engineering."
+    },
+    {
+      "name": "research",
+      "source": "./research",
+      "category": "research",
+      "description": "Rigorous research & academic writing pipelines (deep-research, paper writing, peer review). NOTE: CC-BY-NC-4.0 — non-commercial."
+    }
+  ]
+}

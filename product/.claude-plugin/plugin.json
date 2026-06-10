@@ -1,0 +1,11 @@
+{
+  "name": "product",
+  "version": "1.0.0",
+  "description": "Product management skills — continuous discovery, strategy red-teaming, prioritization frameworks, PRDs, pricing, A/B analysis, positioning, and metrics.",
+  "author": { "name": "Ultimate Skills (curated)", "url": "https://github.com/lionel-machire/ultimate-skills" },
+  "homepage": "https://github.com/lionel-machire/ultimate-skills",
+  "repository": "https://github.com/lionel-machire/ultimate-skills",
+  "license": "MIT",
+  "keywords": ["skills", "product-management", "discovery", "strategy", "prioritization", "pricing", "metrics", "gtm"],
+  "skills": "./skills"
+}
