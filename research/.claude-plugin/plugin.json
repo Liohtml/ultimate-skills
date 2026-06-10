@@ -1,10 +1,10 @@
 {
   "name": "research",
   "version": "1.0.0",
-  "description": "Rigorous research & academic-writing pipelines — universal deep-research, multi-agent paper writing, peer-review simulation, and the full research orchestrator. Self-contained set (no broken cross-references).",
+  "description": "Rigorous research & academic-writing pipelines — universal deep-research, multi-agent paper writing, peer-review simulation, and the full research orchestrator. Self-contained across the 4 research skills; some notes cite the upstream project's design docs for context only.",
   "author": { "name": "Cheng-I Wu (original) — curated by Ultimate Skills", "url": "https://github.com/Imbad0202/academic-research-skills" },
-  "homepage": "https://github.com/lionel-machire/ultimate-skills",
-  "repository": "https://github.com/lionel-machire/ultimate-skills",
+  "homepage": "https://github.com/Liohtml/ultimate-skills",
+  "repository": "https://github.com/Liohtml/ultimate-skills",
   "license": "CC-BY-NC-4.0",
   "keywords": ["skills", "research", "academic", "deep-research", "writing", "peer-review"],
   "skills": "./skills"

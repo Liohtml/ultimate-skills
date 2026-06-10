@@ -5,7 +5,7 @@ Production-grade engineering workflow skills for AI coding agents — the full l
 
 ## Install
 ```bash
-/plugin marketplace add lionel-machire/ultimate-skills
+/plugin marketplace add Liohtml/ultimate-skills
 /plugin install engineering@ultimate-skills
 ```
 

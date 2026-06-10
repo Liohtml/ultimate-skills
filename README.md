@@ -19,7 +19,7 @@ This is a *curation*, not original work. Every skill keeps its original author a
 
 ```bash
 # Add this marketplace (from GitHub)
-/plugin marketplace add lionel-machire/ultimate-skills
+/plugin marketplace add Liohtml/ultimate-skills
 
 # …or from a local clone
 /plugin marketplace add /path/to/ultimate-skills

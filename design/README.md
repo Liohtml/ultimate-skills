@@ -5,7 +5,7 @@ Design and frontend-**taste** skills that fight generic "AI slop" output: brief-
 
 ## Install
 ```bash
-/plugin marketplace add lionel-machire/ultimate-skills
+/plugin marketplace add Liohtml/ultimate-skills
 /plugin install design@ultimate-skills
 ```
 

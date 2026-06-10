@@ -5,7 +5,7 @@ Product-management craft for the whole arc — **continuous discovery, strategy 
 
 ## Install
 ```bash
-/plugin marketplace add lionel-machire/ultimate-skills
+/plugin marketplace add Liohtml/ultimate-skills
 /plugin install product@ultimate-skills
 ```
 

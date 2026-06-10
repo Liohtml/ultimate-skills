@@ -1,11 +1,10 @@
 {
-  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "ultimate-skills",
   "version": "1.0.0",
   "description": "A curated marketplace of the best Claude Code skills for engineering, product, design, and research — distilled from five community skill repos into one opinionated, deduplicated set.",
   "owner": {
     "name": "Ultimate Skills (curated)",
-    "url": "https://github.com/lionel-machire/ultimate-skills"
+    "url": "https://github.com/Liohtml/ultimate-skills"
   },
   "plugins": [
     {

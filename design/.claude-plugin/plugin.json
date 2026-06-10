@@ -2,9 +2,9 @@
   "name": "design",
   "version": "1.0.0",
   "description": "Design & frontend-taste skills — brief-aware design direction, image-to-code, redesign audits, design-reference image generation, and production UI engineering.",
-  "author": { "name": "Ultimate Skills (curated)", "url": "https://github.com/lionel-machire/ultimate-skills" },
-  "homepage": "https://github.com/lionel-machire/ultimate-skills",
-  "repository": "https://github.com/lionel-machire/ultimate-skills",
+  "author": { "name": "Ultimate Skills (curated)", "url": "https://github.com/Liohtml/ultimate-skills" },
+  "homepage": "https://github.com/Liohtml/ultimate-skills",
+  "repository": "https://github.com/Liohtml/ultimate-skills",
   "license": "MIT",
   "keywords": ["skills", "design", "frontend", "ui", "taste", "image-to-code", "accessibility"],
   "skills": "./skills"

@@ -2,9 +2,9 @@
   "name": "engineering",
   "version": "1.0.0",
   "description": "Production-grade engineering skills for AI coding agents — spec, plan, build incrementally, test-drive, debug to root cause, review, harden, optimize, and ship.",
-  "author": { "name": "Ultimate Skills (curated)", "url": "https://github.com/lionel-machire/ultimate-skills" },
-  "homepage": "https://github.com/lionel-machire/ultimate-skills",
-  "repository": "https://github.com/lionel-machire/ultimate-skills",
+  "author": { "name": "Ultimate Skills (curated)", "url": "https://github.com/Liohtml/ultimate-skills" },
+  "homepage": "https://github.com/Liohtml/ultimate-skills",
+  "repository": "https://github.com/Liohtml/ultimate-skills",
   "license": "MIT",
   "keywords": ["skills", "engineering", "tdd", "debugging", "code-review", "security", "ci-cd", "performance"],
   "skills": "./skills"

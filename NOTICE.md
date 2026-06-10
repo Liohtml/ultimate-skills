@@ -15,7 +15,12 @@ skill) is in [`PROVENANCE.csv`](./PROVENANCE.csv).
 | [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill) | Leonxlnx | MIT | `design` | 5 |
 | [Imbad0202/academic-research-skills](https://github.com/Imbad0202/academic-research-skills) | Cheng-I Wu | **CC-BY-NC-4.0** | `research` | 4 |
 
-Verbatim copies of each upstream LICENSE are in [`LICENSES/`](./LICENSES/).
+Verbatim copies of each upstream LICENSE are in [`LICENSES/`](./LICENSES/),
+with one exception: [multica-ai/andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills)
+ships **no standalone LICENSE file** — its MIT grant is asserted only in the
+upstream README ("License: MIT"). `LICENSES/andrej-karpathy-skills.LICENSE` is
+therefore a reconstruction of the standard MIT text under that README-asserted
+grant, not a verbatim upstream copy.
 
 ## ⚠️ Mixed licensing — read before commercial use
 

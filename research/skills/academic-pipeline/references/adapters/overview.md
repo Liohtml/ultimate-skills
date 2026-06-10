@@ -13,7 +13,7 @@ An **adapter** is a program (in any language) that reads a user-owned corpus sou
 1. **`passport.yaml`** with a top-level `literature_corpus` array conforming to `literature_corpus_entry.schema.json`.
 2. **`rejection_log.yaml`** conforming to `rejection_log.schema.json`, always emitted (empty when no rejections).
 
-ARS provides three Python reference adapters in [`scripts/adapters/`](../../../scripts/adapters/). Users are expected to write their own adapters for non-reference sources. The three reference adapters are starting points, not production tools.
+No reference adapters are bundled in this plugin. Users are expected to write their own adapters for their corpus sources, following the contract described below.
 
 ## 2. Why a contract, not a plugin API
 
@@ -126,7 +126,7 @@ Custom adapters are welcome and expected. Recommended conventions:
 
 - Set `obtained_via: "other"` on each entry, and set `adapter_name` to a clear string (e.g., `"notion-adapter-v1"`, `"my-custom-sqlite-reader"`).
 - Set `adapter_version` to a semver-ish string so downstream tools can diagnose output changes.
-- Follow the same CLI shape as the three reference adapters (`--input`, `--passport`, `--rejection-log`) if you want to slot into similar tooling.
+- Follow a consistent CLI shape (`--input`, `--passport`, `--rejection-log`) if you want to slot into similar tooling.
 
 Common user-written adapter families include:
 
@@ -142,7 +142,7 @@ Before committing passport output to any workflow:
 2. Run your adapter twice on the same input and diff the outputs (after stripping `generated_at` / `obtained_at`). Any non-timestamp difference is a determinism bug.
 3. Feed a known-bad entry to confirm it lands in the rejection log rather than silently vanishing or crashing.
 
-The three reference adapters have pytest coverage under `scripts/adapters/tests/` — copying that pattern for your own adapter is a good starting point.
+Give your own adapter pytest coverage so you can catch determinism and rejection-log regressions early.
 
 ## 10. Relationship to other ARS artifacts
 
