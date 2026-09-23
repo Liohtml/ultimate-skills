@@ -1,6 +1,6 @@
 ---
 name: pricing-strategy
-description: "Analyze and design pricing strategies including pricing models, competitive pricing analysis, willingness-to-pay estimation, and price elasticity. Use when setting prices, evaluating pricing models, preparing for a pricing change, or comparing freemium vs paid approaches."
+description: "Analyze and design pricing strategies including pricing models, competitive pricing analysis, willingness-to-pay estimation, and price elasticity. Use when setting prices, evaluating pricing models, preparing for a pricing change, or comparing freemium vs paid approaches. For unit economics (LTV:CAC, payback) use saas-metrics-coach; for researching competitor pricing use competitor-analysis; for the market category that frames price expectations use product-positioning."
 ---
 
 ## Pricing Strategy

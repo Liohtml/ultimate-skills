@@ -1,11 +1,11 @@
 {
   "name": "product",
-  "version": "1.0.0",
-  "description": "Product management skills — continuous discovery, strategy red-teaming, prioritization frameworks, PRDs, pricing, A/B analysis, positioning, and metrics.",
+  "version": "1.1.0",
+  "description": "Product management skills: continuous discovery, positioning, strategy building (Rumelt kernel) and red-teaming, prioritization, PRDs, evidence-labelled competitor analysis, pricing, SaaS unit economics, A/B analysis, analysis QA before sharing, and metrics.",
   "author": { "name": "Ultimate Skills (curated)", "url": "https://github.com/Liohtml/ultimate-skills" },
   "homepage": "https://github.com/Liohtml/ultimate-skills",
   "repository": "https://github.com/Liohtml/ultimate-skills",
-  "license": "MIT",
-  "keywords": ["skills", "product-management", "discovery", "strategy", "prioritization", "pricing", "metrics", "gtm"],
+  "license": "MIT AND Apache-2.0",
+  "keywords": ["skills", "product-management", "discovery", "strategy", "positioning", "prioritization", "pricing", "metrics", "saas-metrics", "unit-economics", "data-qa", "competitive-analysis", "gtm"],
   "skills": "./skills"
 }

@@ -1,0 +1,22 @@
+{
+  "name": "security-cc-by-sa",
+  "version": "1.0.0",
+  "description": "Share-alike security-testing skills (CC-BY-SA-4.0), isolated from the permissive plugins: deterministic supply-chain dependency risk auditing and variant analysis (find the other instances of a bug you already found, with CodeQL/Semgrep starters). Adapted from Trail of Bits' skills.",
+  "author": {
+    "name": "Ultimate Skills (curated)",
+    "url": "https://github.com/Liohtml/ultimate-skills"
+  },
+  "homepage": "https://github.com/Liohtml/ultimate-skills",
+  "repository": "https://github.com/Liohtml/ultimate-skills",
+  "license": "CC-BY-SA-4.0",
+  "keywords": [
+    "security",
+    "supply-chain",
+    "dependency-audit",
+    "variant-analysis",
+    "codeql",
+    "semgrep",
+    "share-alike"
+  ],
+  "skills": "./skills"
+}

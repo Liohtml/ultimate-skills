@@ -1,6 +1,6 @@
 ---
 name: frontend-ui-engineering
-description: Builds production-quality UIs. Use when building or modifying user-facing interfaces. Use when creating components, implementing layouts, managing state, or when the output needs to look and feel production-quality rather than AI-generated.
+description: Engineering discipline for production-quality, accessible, responsive user-facing UI - component architecture, state placement, design-system adherence, keyboard/ARIA/focus basics, loading/empty/error states, responsive verification. Use when building or modifying interfaces, pages and components, implementing layouts, managing UI state, or when output must look production-quality rather than AI-generated. For visual direction of new marketing pages use design-taste-frontend; for dashboard/product-UI craft use interface-design; to review finished UI code use web-interface-review; for a formal WCAG 2.2 audit use accessibility-audit; for animation use motion-craft.
 ---
 
 # Frontend UI Engineering
@@ -114,6 +114,17 @@ Global store (Zustand, Redux)    → Complex client state shared app-wide
 **Avoid prop drilling deeper than 3 levels.** If you're passing props through components that don't use them, introduce context or restructure the component tree.
 
 ## Design System Adherence
+
+### Reference-led UI quality
+
+When the product needs a distinct visual direction, collect evidence before choosing a layout:
+
+1. Search a trusted reference catalogue or use references supplied by the product team.
+2. Study two or three relevant screens. Record decisions about hierarchy, density, navigation, controls, responsive behavior, and interaction states.
+3. Turn those decisions into a short design contract before implementation. Name the screen's job, primary action, required states, responsive rules, and patterns to reject.
+4. Rebuild the useful structure in the product's own components, tokens, content, and visual language. Never copy another product's branding, proprietary text, imagery, or exact layout.
+
+Use references as evidence, not as templates. If references are unavailable, document the assumptions and verify the result against the product's existing design system.
 
 ### Avoid the AI Aesthetic
 
@@ -292,6 +303,12 @@ function useToggleTask() {
 }
 ```
 
+## See Also
+
+- For detailed accessibility requirements and testing tools, see [../../references/accessibility-checklist.md](../../references/accessibility-checklist.md). For a formal WCAG 2.2 A/AA audit (axe injection, keyboard and screen-reader passes, Pass/Fail/NT per criterion) use the `accessibility-audit` skill.
+- For a lint-style `file:line` review of the finished UI code (focus, forms, touch, typography, i18n, hydration) use `web-interface-review`.
+- For animation and micro-interaction decisions use `motion-craft`; for product-UI visual hierarchy and tokens use `interface-design`.
+
 ## Common Rationalizations
 
 | Rationalization | Reality |
@@ -319,6 +336,7 @@ After building UI:
 - [ ] All interactive elements are keyboard accessible (Tab through the page)
 - [ ] Screen reader can convey the page's content and structure
 - [ ] Responsive: works at 320px, 768px, 1024px, 1440px
-- [ ] Loading, error, and empty states all handled
+- [ ] Loading, empty, error, success, and permission states handled when applicable
 - [ ] Follows the project's design system (spacing, colors, typography)
+- [ ] The rendered result passes a final UI-specific finish-gate review (e.g. `web-interface-review` on the changed files)
 - [ ] No accessibility warnings in dev tools or axe-core

@@ -1,6 +1,6 @@
 ---
 name: prioritization-frameworks
-description: "Reference guide to 9 prioritization frameworks with formulas, when-to-use guidance, and templates — RICE, ICE, Kano, MoSCoW, Opportunity Score, and more. Use when selecting a prioritization method, comparing frameworks like RICE vs ICE, or learning how different prioritization approaches work."
+description: "Reference guide to 9 prioritization frameworks with formulas, when-to-use guidance, and templates — RICE, ICE, Kano, MoSCoW, Opportunity Score, and more. Use when selecting a prioritization method, comparing frameworks like RICE vs ICE, scoring a backlog, or learning how different prioritization approaches work. To structure discovery before prioritizing use opportunity-solution-tree; to define the metric that value is measured against use north-star-metric."
 ---
 
 ## Prioritization Frameworks Reference

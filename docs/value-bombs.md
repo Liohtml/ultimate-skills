@@ -1,7 +1,87 @@
 # Value Bombs: Kandidaten für die nächste Kurationsrunde
 
 > Stand: 2026-09-23 · Kuratiert aus den Ergebnissen von 4 Scout-Agenten (engineering, product, design, research-and-docs).
-> Dieses Dokument ist eine **Empfehlung**. Bisher wurde noch nichts in die Plugins übernommen.
+> Ursprünglich eine **Empfehlung**. **Stand der Umsetzung (Welle 2, 2026-09-23):** Welle 1 und der Großteil von Welle 2 sind umgesetzt. Den Status jedes Kandidaten zeigt Abschnitt 0. Die Abschnitte 1 bis 5 bleiben als ursprüngliche Analyse unverändert, deshalb stehen dort teils noch die Upstream-Namen.
+
+## 0. Umsetzungsstatus
+
+Legende: ✅ integriert (eigener Skill) · 🔀 in einen bestehenden Skill gemergt · ⏸ zurückgestellt · ❌ verworfen. Pfade und Commits je Quelle stehen in [`PROVENANCE.csv`](../PROVENANCE.csv).
+
+| Rang | Kandidat | Status | Ergebnis im Katalog | Anmerkung / Grund |
+|---:|---|---|---|---|
+| 1 | `diagnosing-bugs` | 🔀 | `engineering/debugging-and-error-recovery` | Feedback-Loop-Phase, Hypothesen und getaggte Logs gemergt, dazu `hitl-loop.template.sh`. Aus obra `systematic-debugging` kam nur `find-polluter.sh` mit. |
+| 2 | `web-interface-guidelines` | ✅ | `design/web-interface-review` | Regeln eingebettet und auf `e3d624b` gepinnt, kein WebFetch zur Laufzeit. |
+| 3 | `verification-before-completion` | ✅ | `engineering/verification-before-completion` | Ton entschärft, Inhalt behalten. |
+| 4 | `mcp-builder` | ✅ | `engineering/mcp-builder` | Apache-2.0. Veraltete Default-Modell-ID und Parallel-`tool_use`-Bug in `evaluation.py` behoben. |
+| 5 | `subagent-driven-development` | ✅ | `engineering/subagent-driven-development` | Von anderen superpowers-Skills entkoppelt, Workspace heißt jetzt `.sdd/`, Reviewer-Prompt gebündelt. |
+| 6 | `review-animations` (+ `animate`) | ✅ | `design/motion-craft` | Build- und Review-Modus, `disable-model-invocation` entfernt. |
+| 7 | `interface-design` | ✅ | `design/interface-design` | Die Slash-Commands sind jetzt `references/`. |
+| 8 | `humanizer` | ✅ | `writing/humanizer` | Neues Plugin `writing`. |
+| 9 | `minto-pyramid` | ✅ | `writing/minto-pyramid` | tyroneross `pyramid-audit` gekürzt als `references/audit-report.md` (Apache-2.0) übernommen. Die Buch-Zitatanker wurden nicht übernommen. |
+| 10 | `validate-data` | ✅ | `product/validate-data` | Apache-2.0. Connector- und Slash-Command-Reste entfernt. |
+| 11 | `obviously-awesome` | ✅ | `product/product-positioning` | Umbenannt, Affiliate-Links entfernt. |
+| 12 | `iterate-pr` (+ `receiving-code-review`) | ✅ | `engineering/iterate-pr` | Bot-Liste konfigurierbar (`PR_REVIEW_BOTS`). receiving-code-review liegt als Referenz bei. |
+| 13 | `gha-security-review` | ✅ | `security/gha-security-review` | Liegt im neuen Plugin `security` statt in `engineering`, dort ist die Audit-Seite zu Hause. |
+| 14 | `good-strategy-bad-strategy` | ✅ | `product/strategy-kernel` | Umbenannt, gepaart mit `strategy-red-team`. |
+| 15 | `wcag-2.2-aa` (+ masuP9) | ✅ | `design/accessibility-audit` | Umbenannt, weil Punkte in Skill-Namen nicht erlaubt sind. masuP9-Modi gemergt. Die W3C-Spec wird nicht mitgeliefert, nur verlinkt. |
+| 16 | `saas-metrics-coach` | ✅ | `product/saas-metrics-coach` | Benchmarks als Heuristik gekennzeichnet. |
+| 17 | `copy-editing` + `product-marketing` | ✅ / ❌ | `writing/copy-editing` | `product-marketing` verworfen: überschneidet sich mit `product-positioning`/`value-proposition` und hängt an der Kontextdatei-Konvention. |
+| 18 | `supabase-postgres-best-practices` | ✅ | `engineering/postgres-best-practices` | Herstellerneutral umbenannt. Neon-Referenzen zu Backup, Upgrades und Migrationssicherheit (Apache-2.0) gemergt. |
+| 19 | `startup-competitors` (Teile) | 🔀 | `product/competitor-analysis` | Evidenz-Labels, Honesty-Regeln und Verification-Pass. |
+| 20 | `long-horizon-prompting` | ✅ | `engineering/long-horizon-prompting` | `claim-*`-IDs entfernt. `cdc-prompt-annotated.md` nicht übernommen (wörtliche Kopie des OpenAI-Prompts), nur verlinkt. |
+| 21 | `citation-management` | ⏸ | – | Das Plugin `research-tools` (MIT) wurde in Welle 2 nicht angelegt. |
+| 22 | `customer-research` | ❌ | – | Überschneidet sich mit `interview-script` und `user-personas`. |
+| 23 | `impeccable` (craft-floor + critique) | 🔀 | `design/redesign-existing-projects` | Zwei Referenzdateien, Apache-2.0, mit Änderungsvermerk. |
+| 24 | `frontend-slides` | ✅ | `design/frontend-slides` | Ohne `deploy.sh` und `bold-template-pack`. |
+| 25 | `writing-skills` / `skill-creator` | ❌ | – | skill-creator ist in Claude Code bereits eingebaut. Ein `meta`-Plugin lohnt sich nicht. |
+| 26 | `property-based-testing`, `differential-review`, `fp-check` | ❌ | – | CC-BY-SA. `fp-check` und `differential-review` sind Solidity-lastig und überschneiden sich mit `vuln-triage`. Das Share-Alike-Plugin heißt jetzt `security-cc-by-sa` und enthält stattdessen `supply-chain-risk-auditor` und `variant-analysis`. |
+| 27 | `variance-analysis` | ❌ | – | FP&A-Nische. |
+| 28 | `scientific-critical-thinking` | ⏸ | – | Wartet auf `research-tools`. |
+| 29 | `markitdown` | ⏸ | – | Dünner Wrapper, wartet auf `research-tools`. |
+
+**Zusätzlich integriert (aus den Design- und Security-Scouts, nicht in der ursprünglichen Rangliste):**
+- `design/image-generation`: Basis ist openai/skills `imagegen` (Apache-2.0), für Claude Code umgeschrieben, dazu ein eigenes Gemini-Skript. Gemergt wurden jezweb `ai-image-generator` (Provider-Routing), wuyoscar `craft.md` (Prompt-Handwerk, ohne Galerie) und replicate `prompt-images` (Apache-2.0).
+- `design/icon-set-generator` (jezweb).
+- Plugin `security`, alle Skills mit Autorisierungs- und Scope-Gates: `threat-model`, `static-vuln-scan` und `vuln-triage` (anthropics/defending-code-reference-harness, Apache-2.0), `skill-scanner` (getsentry, Apache-2.0), `web-pentest` und `llm-app-security-audit` (briiirussell, MIT).
+- Plugin `security-cc-by-sa`: `supply-chain-risk-auditor` und `variant-analysis` (trailofbits, CC-BY-SA-4.0).
+
+**Zusätzlich verworfen:**
+
+*Image Generation*
+- `banana-claude`: ca. 22k Zeilen Python. Nur die Ideen „Pixel-Review“ und „Text im Bild ist Daten“ wurden in eigenen Worten übernommen.
+- `nano-banana-pro` (jlouage): API-Key im argv, liest `~/.claude/.env`.
+- fal `character-design`: Lizenz nur im README behauptet, an die genmedia-CLI gebunden.
+- openai/plugins `imagegen-website-concepts`: MIT nur im Manifest. Nur Ideen, paraphrasiert in `image-to-code/references/concept-fidelity.md`.
+- wuyoscar `gallery-*.md`: Drittanbieter-Prompts.
+- robonuggets, devonjones, op7418, rknall: keine Lizenz.
+
+*Design*
+- `favicon-gen` / `web-asset-generator`: geringer Hebel, 766 Zeilen.
+- anthropics `frontend-design`: Duplikat von `design-taste-frontend`.
+
+*Security*
+- getsentry `security-review`: Referenzen unter CC-BY-SA, 7 referenzierte Dateien fehlen upstream.
+- abelreqma `modern-threat-modeling`: Überschneidung mit `threat-model`.
+- agamm `owasp-security`: Überschneidung mit `security-and-hardening`.
+- briiirussell `siem-detection` und `red-team-engagement`: Nische bzw. zu offensiv.
+- trailofbits `static-analysis`/semgrep: braucht die CLI, dupliziert die Starter von `variant-analysis`.
+- `semgrep/skills`: keine OSI-Lizenz.
+- transilienceai: Umgehung von Allowlists.
+- Masriyan, trilwu: stark offensiv.
+- timothybrush: keine Lizenz.
+- Eyadkelleh: gebündelte Payloads.
+- anthropics `patch`: noch nicht bewertet.
+
+*Writing*
+- kemalcanyapali `business-writing`: kapitelweise Nacherzählung des Minto-Buchs („OCR pages“), rechtliches Risiko.
+- IrtezaAsadRizvi `karpathy-article-writing`: imitiert die Stimme einer realen Person.
+- die übrigen 5 tyroneross-Skills: Duplikate.
+
+**Offene Pflegepunkte:**
+- `mcp-builder` (Default-Modell, MCP-Spec/SDK) etwa halbjährlich prüfen.
+- Modell-IDs in `image-generation` vor dem ersten Live-Call prüfen.
+- Die datierten Vendor- und arXiv-Claims in `long-horizon-prompting` bei jedem Update prüfen.
+- `frontend-slides` `export-pdf.sh` installiert Playwright ungepinnt.
 
 ## 1. Kurzfazit und Methode
 

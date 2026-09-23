@@ -1,11 +1,28 @@
 {
   "name": "engineering",
-  "version": "1.0.0",
-  "description": "Production-grade engineering skills for AI coding agents — spec, plan, build incrementally, test-drive, debug to root cause, review, harden, optimize, and ship.",
-  "author": { "name": "Ultimate Skills (curated)", "url": "https://github.com/Liohtml/ultimate-skills" },
+  "version": "1.1.0",
+  "description": "Production-grade engineering skills for AI coding agents: spec, plan, build incrementally or via reviewed subagents, test-drive, debug from a red feedback loop, verify before claiming done, review, iterate PRs to green, harden, optimize, design Postgres schemas and migrations, and build MCP servers.",
+  "author": {
+    "name": "Ultimate Skills (curated)",
+    "url": "https://github.com/Liohtml/ultimate-skills"
+  },
   "homepage": "https://github.com/Liohtml/ultimate-skills",
   "repository": "https://github.com/Liohtml/ultimate-skills",
-  "license": "MIT",
-  "keywords": ["skills", "engineering", "tdd", "debugging", "code-review", "security", "ci-cd", "performance"],
+  "license": "MIT AND Apache-2.0",
+  "keywords": [
+    "skills",
+    "engineering",
+    "tdd",
+    "debugging",
+    "verification",
+    "code-review",
+    "pull-requests",
+    "subagents",
+    "mcp",
+    "postgres",
+    "security",
+    "ci-cd",
+    "performance"
+  ],
   "skills": "./skills"
 }

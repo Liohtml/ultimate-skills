@@ -28,7 +28,7 @@ jobs:
       - name: Claude Code plugin validate (marketplace + each plugin)
         run: |
           set -e
-          for target in . engineering product design research; do
+          for target in . $(ls -d */.claude-plugin/plugin.json | cut -d/ -f1); do
             echo "::group::claude plugin validate --strict $target"
             npx -y @anthropic-ai/claude-code plugin validate --strict "$target"
             echo "::endgroup::"

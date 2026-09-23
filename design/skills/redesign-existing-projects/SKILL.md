@@ -1,17 +1,22 @@
 ---
 name: redesign-existing-projects
-description: Upgrades existing websites and apps to premium quality. Audits current design, identifies generic AI patterns, and applies high-end design standards without breaking functionality. Works with any CSS framework or vanilla CSS. Use when an existing UI codebase needs a redesign; for new, greenfield interfaces use design-taste-frontend.
+description: Upgrades an existing website or web app to premium quality without breaking functionality - scan the stack, diagnose generic AI patterns (typography, color, layout, states, content, components, icons, code quality, strategic omissions), optionally score it first with a Nielsen-heuristic critique and persona walk-through, fix in a risk-ordered sequence, and verify against a craft floor. Works with any CSS framework or vanilla CSS. Use when an existing marketing site, landing page or app UI needs a redesign, visual upgrade or design critique. For new greenfield pages use design-taste-frontend; for dashboards and product-UI craft use interface-design; for a code-level UI lint use web-interface-review; for animation feel use motion-craft.
 ---
 
 # Redesign Skill
+
+> Critique and craft-floor material adapted from [pbakaus/impeccable](https://github.com/pbakaus/impeccable) (Apache-2.0, Copyright 2025 Paul Bakaus), modified; see the two reference files for what changed.
 
 ## How This Works
 
 When applied to an existing project, follow this sequence:
 
-1. **Scan** — Read the codebase. Identify the framework, styling method (Tailwind, vanilla CSS, styled-components, etc.), and current design patterns.
-2. **Diagnose** — Run through the audit below. List every generic pattern, weak point, and missing state you find.
+1. **Scan** — Read the codebase. Identify the framework, styling method (Tailwind, vanilla CSS, styled-components, etc.), and current design patterns. Look at the running page at desktop and mobile widths when you can.
+2. **Diagnose** — Run through the audit below. List every generic pattern, weak point, and missing state you find. When the user asks for a critique, a score, or a prioritized plan before changes, first run the heuristic critique in [references/heuristics-critique.md](references/heuristics-critique.md) (Nielsen 0–4 scoring, cognitive load, persona red flags, P0–P3 issues) and let the user pick what to fix.
 3. **Fix** — Apply targeted upgrades working with the existing stack. Do not rewrite from scratch. Improve what's there.
+4. **Verify** — Check the built result against [references/craft-floor.md](references/craft-floor.md) (contrast, depth, spacing, type measure, motion, states, browser surfaces, copy, brief coverage) and its "Refuse" list before calling the redesign done.
+
+For product UI (dashboards, admin, settings, data tables) the craft rules in `interface-design` apply instead of the marketing-page upgrades below. Motion changes follow `motion-craft`.
 
 ## Design Audit
 
@@ -64,7 +69,7 @@ Check for these problems and fix them:
 
 - **No hover states on buttons.** Add background shift, slight scale, or translate on hover.
 - **No active/pressed feedback.** Add a subtle `scale(0.98)` or `translateY(1px)` on press to simulate a physical click.
-- **Instant transitions with zero duration.** Add smooth transitions (200-300ms) to all interactive elements.
+- **Instant transitions with zero duration.** Add transitions to interactive elements within the `motion-craft` budgets (roughly 100-250ms, strong custom ease-out, `transform`/`opacity` only) - but never on keyboard-repeated or 100+/day actions.
 - **Missing focus ring.** Ensure visible focus indicators for keyboard navigation. This is an accessibility requirement, not optional.
 - **No loading states.** Replace generic circular spinners with skeleton loaders that match the layout shape.
 - **No empty states.** An empty dashboard showing nothing is a missed opportunity. Design a composed "getting started" view.
@@ -147,7 +152,7 @@ When upgrading a project, pull from these high-impact techniques to replace gene
 ### Motion Upgrades
 - **Smooth scroll with inertia.** Decouple scrolling from browser defaults for a heavier, cinematic feel.
 - **Staggered entry.** Elements cascade in with slight delays, combining Y-axis translation with opacity fade. Never mount everything at once.
-- **Spring physics.** Replace linear easing with spring-based motion for a natural, weighty feel on all interactive elements.
+- **Spring physics.** Use spring-based motion where movement is gesture-driven, interruptible, or should feel alive (drawers, drag, toggles); keep crisp eased transitions elsewhere.
 - **Scroll-driven reveals.** Content entering through expanding masks, wipes, or draw-on SVG paths tied to scroll progress.
 
 ### Surface Upgrades

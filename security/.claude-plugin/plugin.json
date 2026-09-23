@@ -1,0 +1,26 @@
+{
+  "name": "security",
+  "version": "1.0.0",
+  "description": "Authorized security auditing & pentesting toolkit for AI coding agents: code-grounded threat modeling, read-only static vulnerability scanning, adversarial triage of any scanner's findings, GitHub Actions workflow review, agent-skill/plugin scanning, LLM/agent app auditing, and scope-gated web application pentesting. Auditing and testing only — every offensive skill requires explicit written authorization and scope.",
+  "author": {
+    "name": "Ultimate Skills (curated)",
+    "url": "https://github.com/Liohtml/ultimate-skills"
+  },
+  "homepage": "https://github.com/Liohtml/ultimate-skills",
+  "repository": "https://github.com/Liohtml/ultimate-skills",
+  "license": "MIT AND Apache-2.0",
+  "keywords": [
+    "security",
+    "threat-modeling",
+    "vulnerability-scanning",
+    "triage",
+    "pentesting",
+    "web-security",
+    "github-actions",
+    "llm-security",
+    "prompt-injection",
+    "skill-scanner",
+    "appsec"
+  ],
+  "skills": "./skills"
+}

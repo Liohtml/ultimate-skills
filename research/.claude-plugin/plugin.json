@@ -1,6 +1,6 @@
 {
   "name": "research",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Rigorous research & academic-writing pipelines — universal deep-research, multi-agent paper writing, peer-review simulation, and the full research orchestrator. Self-contained: shared protocols and JSON contracts are vendored in shared/; upstream helper scripts and design docs are referenced as optional/advisory links only.",
   "author": { "name": "Cheng-I Wu (original) — curated by Ultimate Skills", "url": "https://github.com/Imbad0202/academic-research-skills" },
   "homepage": "https://github.com/Liohtml/ultimate-skills",

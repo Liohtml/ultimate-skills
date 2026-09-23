@@ -1,11 +1,11 @@
 {
   "name": "design",
-  "version": "1.0.0",
-  "description": "Design & frontend-taste skills — brief-aware design direction, image-to-code, redesign audits, design-reference image generation, and production UI engineering.",
+  "version": "1.1.0",
+  "description": "Design & frontend craft: brief-aware direction for marketing pages, product-UI/dashboard design, image generation (OpenAI / Gemini) with image-first concepts and image-to-code, redesign audits with heuristic critique, motion rules, UI-code review, WCAG 2.2 audits, SVG icon sets, HTML slide decks, and production UI engineering.",
   "author": { "name": "Ultimate Skills (curated)", "url": "https://github.com/Liohtml/ultimate-skills" },
   "homepage": "https://github.com/Liohtml/ultimate-skills",
   "repository": "https://github.com/Liohtml/ultimate-skills",
-  "license": "MIT",
-  "keywords": ["skills", "design", "frontend", "ui", "taste", "image-to-code", "accessibility"],
+  "license": "MIT AND Apache-2.0",
+  "keywords": ["skills", "design", "frontend", "ui", "ux", "taste", "dashboard", "product-ui", "image-generation", "gpt-image", "nano-banana", "gemini", "image-to-code", "motion", "animation", "accessibility", "wcag", "ui-review", "icons", "svg", "slides", "presentation"],
   "skills": "./skills"
 }

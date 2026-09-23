@@ -1,6 +1,6 @@
 ---
 name: karpathy-guidelines
-description: Behavioral guidelines to reduce common LLM coding mistakes. Use when writing, reviewing, or refactoring code to avoid overcomplication, make surgical changes, surface assumptions, and define verifiable success criteria. For a structured review or refactor use code-review-and-quality or code-simplification.
+description: "Four behavioral rules against common LLM coding mistakes: think before coding (surface assumptions, ask when unclear), simplicity first, surgical changes that touch only what the task needs, and goal-driven execution with verifiable success criteria. Use as lightweight default conduct for everyday coding tasks, or when an agent tends to over-engineer, rewrite unrelated code or guess at ambiguous requirements. For a structured pre-merge review use code-review-and-quality; for refactoring for clarity use code-simplification; for adversarial checks of individual decisions use doubt-driven-development."
 license: MIT
 ---
 

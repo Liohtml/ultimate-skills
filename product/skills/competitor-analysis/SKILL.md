@@ -1,6 +1,6 @@
 ---
 name: competitor-analysis
-description: "Analyze competitors with strengths, weaknesses, and differentiation opportunities. Identifies direct competitors and maps the competitive landscape. Use when doing competitive research, preparing a competitive brief, or finding differentiation opportunities."
+description: "Research and profile a product's direct competitors (typically 5, plus status-quo and adjacent alternatives): positioning, strengths, weaknesses, pricing and go-to-market, per-competitor threat rating, differentiation opportunities and a positioning recommendation, with every claim labelled [Data]/[Estimate]/[Assumption]/[Opinion], a mandatory red/yellow flags section and a verification pass for contradictions, stale data and false corroboration. Use when doing competitive research, preparing a competitive brief or landscape, comparing pricing across competitors, or looking for differentiation gaps. For choosing the market category and positioning itself use product-positioning; for the customer-value statement use value-proposition; for setting your own prices use pricing-strategy."
 ---
 
 # Competitor Analysis
@@ -39,6 +39,7 @@ Conduct web research to identify direct competitors. If the user provides market
 - Market positions: leaders, challengers, niche players
 - Estimated market share or positioning
 - Notable adjacent or indirect competitors
+- Status-quo alternatives (doing nothing, spreadsheets, agencies, in-house builds) and what triggers a switch
 
 For each of the 5 competitors:
 
@@ -73,6 +74,7 @@ For each of the 5 competitors:
 - Existing customer base and switching costs
 - Strategic partnerships or ecosystems
 - Recent product updates or strategic moves
+- Threat rating: High / Medium / Low, with the evidence behind it
 
 **Differentiation Opportunities for $ARGUMENTS**
 
@@ -90,6 +92,23 @@ For each of the 5 competitors:
 - Competitive threats to monitor
 - 12-18 month competitive risks and opportunities
 
+**Flags and Verification**
+- Red flags and yellow flags
+- Data gaps (what could not be found)
+- Verification note (see Evidence and Verification below)
+
+## Evidence and Verification
+
+> Includes material adapted from ferdinandobons/startup-skill `startup-competitors` (MIT); see [references/evidence-and-verification.md](references/evidence-and-verification.md).
+
+Load [references/evidence-and-verification.md](references/evidence-and-verification.md) before writing the report. In short:
+
+- Label every major claim **[Data]** (with source and date), **[Estimate]** (with assumptions), **[Assumption]** or **[Opinion]**. Write "not found" rather than guess; mark data older than 18 months.
+- Acknowledge real competitor strengths, look for disconfirming evidence, represent review sentiment proportionally, and include the status quo ("do nothing", spreadsheets, in-house) as an alternative.
+- Rate each competitor's threat High / Medium / Low with the reason.
+- End with **Red flags** and **Yellow flags** (write "No flags identified" if there are none).
+- Before presenting, run the verification pass (unlabelled claims, contradictions, confidence vs. evidence, stale data, same-source "corroboration", every opportunity backed by two pieces of evidence) and fix or surface critical issues.
+
 ## Best Practices
 
 - Research current competitor websites, pricing pages, and customer reviews
@@ -101,6 +120,13 @@ For each of the 5 competitors:
 - Look for emerging competitors or new market entrants
 - Flag competitors gaining traction or gaining market share
 - Consider long-term competitive dynamics and market shifts
+
+## Related skills
+
+- **product-positioning**: turn the landscape into a positioning decision (alternatives, only-we attributes, best-fit customers, category).
+- **value-proposition**: articulate the customer value you will deliver against these alternatives.
+- **pricing-strategy**: set your own pricing using the competitive pricing collected here.
+- **strategy-red-team**: attack the strategy that this analysis leads to.
 
 ---
 

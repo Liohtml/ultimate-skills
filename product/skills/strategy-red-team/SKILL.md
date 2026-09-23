@@ -1,6 +1,6 @@
 ---
 name: strategy-red-team
-description: "Red-team a PRD, roadmap, or strategy by attacking its load-bearing assumptions before reality does. Steelmans then attacks each claim, ranks failure modes by impact × likelihood × cheapness-to-test, and returns the cheapest test and kill criteria for each. Use when pressure-testing a strategy or roadmap, challenging the assumptions a plan rests on, or preparing a doc for executive review. For launch-readiness risk triage (what could go wrong at go-live), use pre-mortem."
+description: "Red-team a PRD, roadmap, or strategy by attacking its load-bearing assumptions before reality does. Steelmans then attacks each claim, ranks failure modes by impact × likelihood × cheapness-to-test, and returns the cheapest test and kill criteria for each. Use when pressure-testing a strategy or roadmap, challenging the assumptions a plan rests on, or preparing a doc for executive review. For launch-readiness risk triage (what could go wrong at go-live), use pre-mortem. To build a strategy, or to test whether a document is a strategy at all (diagnosis, guiding policy, coherent actions), use strategy-kernel first."
 ---
 
 # Strategy Red-Team: Attack the Assumptions Before Reality Does

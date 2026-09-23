@@ -1,6 +1,6 @@
 ---
 name: create-prd
-description: "Create a Product Requirements Document using a comprehensive 8-section template covering problem, objectives, segments, value propositions, solution, and release planning. Use when writing a PRD, documenting product requirements, preparing a feature spec, or reviewing an existing PRD."
+description: "Create or review a Product Requirements Document with an 8-section template: summary, contacts, background, objective with key results, market segments, value propositions, solution (UX, key features, technology, assumptions) and release plan. Use when writing a PRD, documenting product requirements for stakeholders, preparing a feature brief, or reviewing an existing PRD. For an engineering spec that drives implementation (tech stack, commands, boundaries, tasks) use spec-driven-development; to stress-test the PRD's assumptions use strategy-red-team, and for launch risk use pre-mortem; for the value-proposition section in depth use value-proposition."
 ---
 
 # Create a Product Requirements Document

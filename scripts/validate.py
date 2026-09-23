@@ -12,11 +12,18 @@ Checks
     plugin dir on disk is listed in the marketplace
   * relative markdown links in all *.md files resolve (http(s)/mailto/#anchor
     links are ignored; see LINK_ALLOWLIST for known placeholders)
+  * PROVENANCE.csv: required columns; every row points at an existing skill;
+    every skill has exactly one `base` row (plus any `merged` rows); commits
+    are full SHAs (or "unmatched"); upstream_status/role use known values; and
+    each row's source_license is part of its plugin's plugin.json license
+    expression (keeps share-alike / non-commercial material out of the
+    permissive plugins)
 Warnings (non-fatal)
   * SKILL.md longer than 500 lines
 
 Exit code 1 if any error was found, 0 otherwise.
 """
+import csv
 import json
 import os
 import re
@@ -187,9 +194,64 @@ def check_links():
                         err(f"{r}:{line}: broken link -> {target}")
 
 
+PROV_COLS = ["plugin", "skill", "source_repo", "source_license", "source_path",
+             "source_commit", "upstream_status", "role"]
+PROV_STATUS = {"identical-to-head", "modified-locally", "older-than-head"}
+PROV_ROLES = {"base", "merged"}
+
+
+def check_provenance(plugins):
+    path = ROOT / "PROVENANCE.csv"
+    if not path.is_file():
+        err("PROVENANCE.csv: missing")
+        return
+    with open(path, encoding="utf-8", newline="") as fh:
+        reader = csv.DictReader(fh)
+        missing = [c for c in PROV_COLS if c not in (reader.fieldnames or [])]
+        if missing:
+            err(f"PROVENANCE.csv: missing column(s) {', '.join(missing)}")
+            return
+        rows = list(reader)
+    licenses = {}
+    for plugin in plugins:
+        try:
+            lic = json.loads((plugin / ".claude-plugin" / "plugin.json").read_text(encoding="utf-8")).get("license", "")
+        except (OSError, json.JSONDecodeError):
+            lic = ""
+        licenses[plugin.name] = set(re.split(r"\s+(?:AND|OR)\s+", lic.strip("() "))) if lic else set()
+    base_rows = {}
+    for i, r in enumerate(rows, start=2):
+        where = f"PROVENANCE.csv:{i}"
+        key = (r["plugin"], r["skill"])
+        if not (ROOT / r["plugin"] / "skills" / r["skill"] / "SKILL.md").is_file():
+            err(f"{where}: no skill {r['plugin']}/skills/{r['skill']}/SKILL.md")
+        if not re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", r["source_repo"] or ""):
+            err(f"{where}: source_repo {r['source_repo']!r} is not owner/repo")
+        if not (r["source_path"] or "").strip():
+            err(f"{where}: empty source_path")
+        if not re.fullmatch(r"[0-9a-f]{40}|unmatched", r["source_commit"] or ""):
+            err(f"{where}: source_commit {r['source_commit']!r} is not a full SHA or 'unmatched'")
+        if r["upstream_status"] not in PROV_STATUS:
+            err(f"{where}: upstream_status {r['upstream_status']!r} not in {sorted(PROV_STATUS)}")
+        if r["role"] not in PROV_ROLES:
+            err(f"{where}: role {r['role']!r} not in {sorted(PROV_ROLES)}")
+        if r["role"] == "base":
+            base_rows[key] = base_rows.get(key, 0) + 1
+        allowed = licenses.get(r["plugin"])
+        if allowed and r["source_license"] not in allowed:
+            err(f"{where}: source_license {r['source_license']!r} is not part of plugin "
+                f"'{r['plugin']}' license ({' AND '.join(sorted(allowed))})")
+    for skill_md in sorted(ROOT.glob("*/skills/*/SKILL.md")):
+        key = (skill_md.parent.parent.parent.name, skill_md.parent.name)
+        n = base_rows.get(key, 0)
+        if n != 1:
+            err(f"PROVENANCE.csv: {key[0]}/{key[1]} has {n} 'base' row(s) (expected exactly 1)")
+
+
 def main():
     plugins = check_skills()
     check_marketplace(plugins)
+    check_provenance(plugins)
     check_links()
     n_skills = len(list(ROOT.glob("*/skills/*/SKILL.md")))
     for w in warnings:

@@ -1,7 +1,7 @@
 {
   "name": "ultimate-skills",
-  "version": "1.0.0",
-  "description": "A curated marketplace of the best Claude Code skills for engineering, product, design, and research — distilled from five community skill repos into one opinionated, deduplicated set.",
+  "version": "1.1.0",
+  "description": "A curated, deduplicated marketplace of 68 Claude Code skills in 7 plugins (engineering, product, design, writing, security, security-cc-by-sa, research), distilled from 34 community skill repos with per-skill provenance. Most plugins are MIT/Apache-2.0; security-cc-by-sa is share-alike (CC-BY-SA-4.0) and research is non-commercial (CC-BY-NC-4.0).",
   "owner": {
     "name": "Ultimate Skills (curated)",
     "url": "https://github.com/Liohtml/ultimate-skills"
@@ -11,25 +11,43 @@
       "name": "engineering",
       "source": "./engineering",
       "category": "engineering",
-      "description": "Production-grade engineering workflow: spec, plan, build incrementally, test, debug, review, harden, and ship."
+      "description": "Production engineering loop (MIT/Apache-2.0): spec, plan, build incrementally or via reviewed subagents, TDD, debugging from a red feedback loop, verify-before-done, code review, iterate a PR to green, harden, optimize, Postgres schemas and safe migrations, MCP server building, long-horizon agent prompts."
     },
     {
       "name": "product",
       "source": "./product",
       "category": "product",
-      "description": "Product management craft: discovery, strategy, prioritization, PRDs, pricing, metrics, and adversarial review."
+      "description": "Product management (MIT/Apache-2.0): discovery, positioning, Rumelt strategy kernel and red-teaming, prioritization, PRDs, evidence-labelled competitor analysis, pricing, SaaS unit economics, A/B analysis, analysis QA before sharing, and metrics."
     },
     {
       "name": "design",
       "source": "./design",
       "category": "design",
-      "description": "Anti-slop design & frontend taste: design direction, image-to-code, redesigns, and production UI engineering."
+      "description": "Anti-slop design and frontend craft (MIT/Apache-2.0): marketing-page direction, product-UI/dashboard design, real image generation (OpenAI / Gemini) with image-first concepts and image-to-code, redesign critique, motion rules, lint-style UI review, WCAG 2.2 audits, SVG icon sets, HTML slide decks, production UI engineering."
+    },
+    {
+      "name": "writing",
+      "source": "./writing",
+      "category": "writing",
+      "description": "Prose (MIT/Apache-2.0): conclusion-first decision documents with the Minto Pyramid (plus a structure audit), Seven Sweeps copy editing for marketing copy, and a humanizer pass that strips AI-sounding patterns without adding or losing facts."
+    },
+    {
+      "name": "security",
+      "source": "./security",
+      "category": "security",
+      "description": "Authorized security auditing and pentesting (MIT/Apache-2.0): code-grounded threat modeling, read-only static vulnerability scanning, adversarial triage of any scanner's findings, GitHub Actions review, agent skill/plugin scanning, LLM app audits, and scope-gated web pentesting."
+    },
+    {
+      "name": "security-cc-by-sa",
+      "source": "./security-cc-by-sa",
+      "category": "security",
+      "description": "Share-alike security testing (CC-BY-SA-4.0, isolated from the permissive plugins): supply-chain dependency risk auditing for npm/PyPI/Go and variant analysis with CodeQL/Semgrep starters. Adapted from Trail of Bits."
     },
     {
       "name": "research",
       "source": "./research",
       "category": "research",
-      "description": "Rigorous research & academic writing pipelines (deep-research, paper writing, peer review). NOTE: CC-BY-NC-4.0 — non-commercial."
+      "description": "Rigorous research and academic writing pipelines: deep research, multi-agent paper writing, peer-review simulation, full research orchestrator. NOTE: CC-BY-NC-4.0, non-commercial use only."
     }
   ]
 }

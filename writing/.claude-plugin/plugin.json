@@ -1,0 +1,11 @@
+{
+  "name": "writing",
+  "version": "1.0.0",
+  "description": "Prose skills: structure decision documents conclusion-first with the Minto Pyramid (plus a verdict-style structure audit), edit marketing copy with the Seven Sweeps, and strip AI-sounding patterns in a final humanizer pass without adding or losing facts.",
+  "author": { "name": "Ultimate Skills (curated)", "url": "https://github.com/Liohtml/ultimate-skills" },
+  "homepage": "https://github.com/Liohtml/ultimate-skills",
+  "repository": "https://github.com/Liohtml/ultimate-skills",
+  "license": "MIT AND Apache-2.0",
+  "keywords": ["skills", "writing", "prose", "editing", "copy-editing", "minto-pyramid", "pyramid-principle", "scqa", "exec-summary", "memo", "humanizer", "ai-writing", "marketing-copy"],
+  "skills": "./skills"
+}

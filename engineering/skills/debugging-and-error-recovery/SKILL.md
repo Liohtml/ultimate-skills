@@ -1,9 +1,11 @@
 ---
 name: debugging-and-error-recovery
-description: Guides systematic root-cause debugging. Use when tests fail, builds break, behavior doesn't match expectations, or you encounter any unexpected error. Use when you need a systematic approach to finding and fixing the root cause rather than guessing.
+description: Guides systematic root-cause debugging built on a tight, red-capable feedback loop. Use when tests fail, builds break, something that worked yesterday broke, behavior doesn't match expectations, a bug report or performance regression arrives, or you hit any unexpected error. Enforces reproduce-before-hypothesising (a named, already-run command that goes red on the exact symptom), 3-5 ranked falsifiable hypotheses, tagged throwaway instrumentation, and a regression test at the correct seam. For writing the regression test itself use test-driven-development; for a PR whose CI is red use iterate-pr; for profiling-led speed work without a known regression use performance-optimization; before claiming the fix works use verification-before-completion.
 ---
 
 # Debugging and Error Recovery
+
+> Includes material adapted from [mattpocock/skills `diagnosing-bugs`](https://github.com/mattpocock/skills/tree/c55ee46073ed923f86ce59a5eb3b6d895095d1b7/skills/engineering/diagnosing-bugs) (MIT) and a helper script from [obra/superpowers](https://github.com/obra/superpowers) (MIT).
 
 ## Overview
 
@@ -31,24 +33,45 @@ When anything unexpected happens:
 6. RESUME only after verification passes
 ```
 
-**Don't push past a failing test or broken build to work on the next feature.** Errors compound. A bug in Step 3 that goes unfixed makes Steps 4-10 wrong.
+**Don't push past a failing test or broken build to work on the next feature.** Errors compound. A bug in Step 3 that goes unfixed makes Steps 4-6 wrong.
+
+**Redact first.** This process has you show commands, outputs and captured artifacts. Replace every secret with `<REDACTED>` before showing it. Build loops against environment variables so credentials stay in the environment, not in what you print. Captured artifacts (HAR files, request dumps) carry auth headers: quote only the lines that carry the signal. If the redacted output is not enough to diagnose, say so and ask.
 
 ## The Triage Checklist
 
 Work through these steps in order. Do not skip steps.
 
-### Step 1: Reproduce
+### Step 1: Build a Feedback Loop (Reproduce)
 
-Make the failure happen reliably. If you can't reproduce it, you can't fix it with confidence.
+**This is the step that decides the outcome.** With a **tight** pass/fail signal that goes red on *this* bug, bisection, hypothesis-testing and instrumentation all just consume it and you will find the cause. Without one, no amount of reading code will save you. Spend disproportionate effort here, and be creative.
 
-```
-Can you reproduce the failure?
-├── YES → Proceed to Step 2
-└── NO
-    ├── Gather more context (logs, environment details)
-    ├── Try reproducing in a minimal environment
-    └── If truly non-reproducible, document conditions and monitor
-```
+**Ways to construct a loop, in roughly this order:**
+
+1. **Failing test** at whatever seam reaches the bug: unit, integration, e2e.
+2. **curl / HTTP script** against a running dev server.
+3. **CLI invocation** with a fixture input, diffing stdout against a known-good snapshot.
+4. **Headless browser script** (Playwright / Puppeteer, or the browser-testing-with-devtools skill) asserting on DOM, console or network.
+5. **Replay a captured trace**: save a real request / payload / event log to disk and replay it through the code path in isolation.
+6. **Throwaway harness**: a minimal subset of the system (one service, mocked deps) that hits the bug path with one call.
+7. **Property / fuzz loop**: for "sometimes wrong output", run 1000 random inputs and look for the failure mode.
+8. **Bisection harness**: if the bug appeared between two known states (commit, dataset, version), automate "boot at state X, check" so `git bisect run` can drive it (see Step 2).
+9. **Differential loop**: run the same input through old vs new version (or two configs) and diff outputs.
+10. **Human-in-the-loop script** (last resort): if a human must click, drive *them* with [`scripts/hitl-loop.template.sh`](scripts/hitl-loop.template.sh) so the loop is still structured and their observations come back as `KEY=VALUE` lines.
+
+**Tighten the loop.** Once you have *a* loop, treat it as a product: make it faster (cache setup, skip unrelated init, narrow scope), sharper (assert on the specific symptom, not "didn't crash") and more deterministic (pin time, seed RNG, isolate the filesystem, freeze the network). A 30-second flaky loop is barely better than none; a 2-second deterministic one is a superpower.
+
+**Completion criterion.** Step 1 is done only when you can name **one command** (script path, test invocation, curl) that you have **already run at least once** (show the invocation and its redacted output) and that is:
+
+- [ ] **Red-capable**: drives the actual bug path and asserts the **user's exact symptom**, so it goes red on this bug and green once fixed. Not a different failure that happens to be nearby.
+- [ ] **Deterministic**: same verdict every run (for flaky bugs: a pinned, high reproduction rate).
+- [ ] **Fast**: seconds, not minutes.
+- [ ] **Agent-runnable**: unattended; a human only via the HITL script.
+
+If you catch yourself reading code to build a theory before this command exists, stop: jumping straight to a hypothesis is the exact failure this step prevents. **No red-capable command, no hypotheses (Step 3b).**
+
+**Non-deterministic bugs.** The goal is not a clean repro but a **higher reproduction rate**. Loop the trigger 100x, parallelise, add stress, narrow timing windows, inject sleeps. A 50% flake is debuggable; 1% is not, so keep raising the rate.
+
+**When you genuinely cannot build a loop**, stop and say so explicitly. List what you tried, then ask for (a) access to an environment that reproduces it, (b) a redacted captured artifact (HAR file, log dump, core dump, screen recording with timestamps), or (c) permission to add temporary production instrumentation. Do not proceed to hypothesise without a loop.
 
 **When a bug is non-reproducible:**
 
@@ -72,7 +95,7 @@ Cannot reproduce on demand:
     └── Document the conditions observed and revisit when it recurs
 ```
 
-For test failures:
+For test failures (npm shown — substitute the repository's own test command, per the test-driven-development skill's Discover the Stack First section):
 ```bash
 # Run the specific failing test
 npm test -- --grep "test name"
@@ -83,6 +106,8 @@ npm test -- --verbose
 # Run in isolation (rules out test pollution)
 npm test -- --testPathPattern="specific-file" --runInBand
 ```
+
+**Some test leaves files or state behind** (a stray directory, a dirty fixture, a leaked temp DB) that breaks later tests? Find the polluter by running test files one at a time until the artifact appears: [`scripts/find-polluter.sh`](scripts/find-polluter.sh) `'<path-that-appears>' 'src/**/*.test.ts'` (set `TEST_CMD` to your runner, default `npm test`).
 
 ### Step 2: Localize
 
@@ -105,7 +130,7 @@ git bisect start
 git bisect bad                    # Current commit is broken
 git bisect good <known-good-sha> # This commit worked
 # Git will checkout midpoint commits; run your test at each
-git bisect run npm test -- --grep "failing test"
+git bisect run npm test -- --grep "failing test"  # substitute the repository's focused-test command
 ```
 
 ### Step 3: Reduce
@@ -116,7 +141,17 @@ Create the minimal failing case:
 - Simplify the input to the smallest example that triggers the failure
 - Strip the test to the bare minimum that reproduces the issue
 
-A minimal reproduction makes the root cause obvious and prevents fixing symptoms instead of causes.
+Cut inputs, callers, config, data and steps **one at a time**, re-running the loop after each cut. Done when **every remaining element is load-bearing**: removing any one of them turns the loop green. A minimal reproduction shrinks the hypothesis space and becomes the clean regression test in Step 5.
+
+### Step 3b: Hypothesise (3-5, ranked, falsifiable)
+
+Generate **3-5 ranked hypotheses before testing any of them**; a single hypothesis anchors on the first plausible idea. Each must state the prediction it makes:
+
+> "If <X> is the cause, then <changing Y> will make the bug disappear / <changing Z> will make it worse."
+
+If you cannot state the prediction, the hypothesis is a vibe: sharpen or discard it. **Show the ranked list to the user before testing** when they are reachable; they often re-rank instantly ("we just deployed a change to #3") or have already ruled some out. Don't block on it if they are away.
+
+Then test one hypothesis at a time: every probe maps to a specific prediction, and you **change one variable at a time** (see Instrumentation Guidelines for how to probe).
 
 ### Step 4: Fix the Root Cause
 
@@ -149,11 +184,13 @@ it('finds tasks with special characters in title', async () => {
 });
 ```
 
-This test will prevent the same bug from recurring. It should fail without the fix and pass with it.
+This test will prevent the same bug from recurring. Write it **before the fix**: turn the minimised repro into a failing test, watch it fail, apply the fix, watch it pass, then re-run the Step 1 loop against the original (un-minimised) scenario.
+
+**Only at a correct seam.** A correct seam exercises the real bug pattern as it occurs at the call site. If the only available seam is too shallow (a single-caller test when the bug needs multiple callers, a unit test that can't replicate the chain that triggered it), a test there gives false confidence. **If no correct seam exists, that itself is the finding**: record it, because the architecture is preventing the bug from being locked down.
 
 ### Step 6: Verify End-to-End
 
-After fixing, verify the complete scenario:
+After fixing, verify the complete scenario with the repository's own commands (npm shown):
 
 ```bash
 # Run the specific test
@@ -254,6 +291,15 @@ Add logging only when it helps. Remove it when done.
 - The log is only useful during development (not in production)
 - It contains sensitive data (always remove these)
 
+**How to probe (in order of preference):**
+1. Debugger / REPL inspection if the environment supports it. One breakpoint beats ten logs.
+2. Targeted logs at the boundaries that distinguish your hypotheses.
+3. Never "log everything and grep".
+
+**Tag every temporary debug log** with a unique prefix, e.g. `[DEBUG-a4f2]`. Cleanup becomes a single `grep -rn 'DEBUG-a4f2'`. Untagged logs survive; tagged logs die.
+
+**Performance regressions:** logs are usually the wrong tool. Establish a baseline measurement first (timing harness, `performance.now()`, profiler, query plan), then bisect. Measure first, fix second; see performance-optimization for profiling technique.
+
 **Permanent instrumentation (keep):**
 - Error boundaries with error reporting
 - API error logging with request context
@@ -263,6 +309,7 @@ Add logging only when it helps. Remove it when done.
 
 | Rationalization | Reality |
 |---|---|
+| "I'll read the code first and build a theory" | Without a red-capable command you can't tell a right theory from a wrong one. Build the loop first. |
 | "I know what the bug is, I'll just fix it" | You might be right 70% of the time. The other 30% costs hours. Reproduce first. |
 | "The failing test is probably wrong" | Verify that assumption. If the test is wrong, fix the test. Don't just skip it. |
 | "It works on my machine" | Environments differ. Check CI, check config, check dependencies. |
@@ -297,4 +344,7 @@ After fixing a bug:
 - [ ] A regression test exists that fails without the fix
 - [ ] All existing tests pass
 - [ ] Build succeeds
-- [ ] The original bug scenario is verified end-to-end
+- [ ] The original bug scenario is verified end-to-end (the Step 1 loop is green)
+- [ ] The regression test sits at a correct seam, or the missing seam is documented
+- [ ] All tagged `[DEBUG-...]` instrumentation is removed (grep the prefix) and throwaway harnesses are deleted or clearly parked
+- [ ] The hypothesis that turned out correct is stated in the commit / PR message so the next debugger learns
