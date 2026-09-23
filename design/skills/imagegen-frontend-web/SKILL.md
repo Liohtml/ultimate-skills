@@ -1,7 +1,11 @@
 ---
 name: imagegen-frontend-web
-description: Elite frontend image-direction skill for generating premium, conversion-aware website design references. CRITICAL OUTPUT RULE — generate ONE separate horizontal image FOR EVERY section. A landing page with 8 sections produces 8 images. Never compress multiple sections into one image. Enforces composition variety (not always left-text / right-image), background-image freedom, varied CTAs, varied hero scales (giant / mid / mini minimalist), narrative concept spine, second-read moments, and a single consistent palette across all images. Optimized for landing pages, marketing sites, and product comps that developers or coding models can accurately recreate.
+description: Elite frontend image-direction skill that produces premium, conversion-aware website design-reference images only (no code). Use when the user wants mockups/comps; for the full image-first workflow ending in implemented code, use image-to-code. Requires an image-generation tool or MCP server; without one, fall back to design-taste-frontend. CRITICAL OUTPUT RULE — generate ONE separate horizontal image FOR EVERY section. A landing page with 8 sections produces 8 images. Never compress multiple sections into one image. Enforces composition variety (not always left-text / right-image), background-image freedom, varied CTAs, varied hero scales (giant / mid / mini minimalist), narrative concept spine, second-read moments, and a single consistent palette across all images. Optimized for landing pages, marketing sites, and product comps that developers or coding models can accurately recreate.
 ---
+
+# PREREQUISITES
+
+This skill requires an image-generation tool or MCP server (Claude Code has no native image generation). If no image-generation tool is available, say so plainly, do not pretend to generate images or describe images that do not exist, and fall back to the `design-taste-frontend` skill (text-based design direction) instead.
 
 # HARD OUTPUT RULE — READ FIRST
 

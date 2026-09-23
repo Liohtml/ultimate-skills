@@ -2,7 +2,7 @@
 
 **Status**: Released in v3.6.5 (both Phase 1 consumers wired)
 **Applies to**: any agent in this repo that reads `literature_corpus[]` from a Material Passport
-**Authoritative spec**: [`docs/design/2026-04-26-ars-v3.6.5-consumer-integration-design.md`](../../docs/design/2026-04-26-ars-v3.6.5-consumer-integration-design.md)
+**Authoritative spec**: [`docs/design/2026-04-26-ars-v3.6.5-consumer-integration-design.md`](https://github.com/Imbad0202/academic-research-skills/blob/95929c00fc066730b40cf268fd1250b04f00356a/docs/design/2026-04-26-ars-v3.6.5-consumer-integration-design.md)
 
 ## What this document covers
 

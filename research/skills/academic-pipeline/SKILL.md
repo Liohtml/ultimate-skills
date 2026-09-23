@@ -318,6 +318,8 @@ academic-pipeline is the orchestrator skill that coordinates the full ARS pipeli
 
 In Mode B, **single-phase agents (Bucket A per `docs/design/2026-05-18-ars-v3.9.2-agent-phase-classification.md`) in the downstream skills (deep-research, academic-paper, academic-paper-reviewer) stay strictly within their assigned phase for writes**. The 5 agents in academic-pipeline itself are all cross-phase / meta by design (Bucket C/D) — they have no fence by design:
 
+> **Path note (Ultimate Skills):** `shared/...` paths refer to this plugin's vendored [`../../shared/`](../../shared/) directory. `scripts/*.py` validators and `docs/design/...` specs live only in the upstream repo ([Imbad0202/academic-research-skills@95929c0](https://github.com/Imbad0202/academic-research-skills/tree/95929c00fc066730b40cf268fd1250b04f00356a)); they are optional/advisory and not required to run this skill.
+
 - `pipeline_orchestrator_agent` (D — orchestrator, full pipeline visibility)
 - `state_tracker_agent` (D — meta state, all phases)
 - `integrity_verification_agent` (C — Stage 2.5 / 4.5 cross-skill gate)

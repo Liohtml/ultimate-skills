@@ -1,6 +1,6 @@
 ---
 name: code-review-and-quality
-description: Conducts multi-axis code review. Use before merging any change. Use when reviewing code written by yourself, another agent, or a human. Use when you need to assess code quality across multiple dimensions before it enters the main branch.
+description: Conducts multi-axis code review. Use when reviewing a diff or pull request before merge, whether written by yourself, another agent, or a human. Use when you need to assess code quality across multiple dimensions before it enters the main branch. For in-flight checks of individual decisions use doubt-driven-development; for behavior-preserving cleanup use code-simplification.
 ---
 
 # Code Review and Quality

@@ -37,6 +37,19 @@ grant, not a verbatim upstream copy.
   near-duplicates (e.g. the `brainstorm-*` / `identify-assumptions-*` clusters,
   classic-framework fill-ins, redundant taste-style presets).
 - Renamed each skill **directory to match its `SKILL.md` frontmatter `name:`**
-  (Claude Code plugin requirement). SKILL.md bodies are otherwise unmodified.
+  (Claude Code plugin requirement).
+- **Local modifications** (all listed in [`CHANGELOG.md`](./CHANGELOG.md);
+  `PROVENANCE.csv` records the upstream commit each skill was taken from and
+  whether it was modified locally):
+  - Rewrote several frontmatter `description:` fields to remove trigger
+    collisions and over-broad triggers, adding cross-pointers between skills.
+  - `image-to-code` / `imagegen-frontend-web`: replaced Codex-specific wording
+    with agent-neutral wording and documented the image-generation prerequisite
+    and fallback.
+  - Marked references to upstream skills that are not part of this curation.
+  - `research/`: vendored the upstream `shared/` files the skills reference into
+    `research/shared/` (verbatim except rewritten relative links; see
+    `research/shared/README.md`), fixed broken links and added notes that the
+    upstream helper scripts and design docs are not included.
 - Regrouped skills by discipline into four plugins; authored fresh
   marketplace/plugin manifests and READMEs.

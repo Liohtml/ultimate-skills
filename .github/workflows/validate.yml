@@ -1,0 +1,35 @@
+name: validate
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Repo checks (frontmatter, manifests, relative links)
+        run: python3 scripts/validate.py
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # `claude plugin validate` runs offline and needs no login / API key.
+      - name: Claude Code plugin validate (marketplace + each plugin)
+        run: |
+          set -e
+          for target in . engineering product design research; do
+            echo "::group::claude plugin validate --strict $target"
+            npx -y @anthropic-ai/claude-code plugin validate --strict "$target"
+            echo "::endgroup::"
+          done
