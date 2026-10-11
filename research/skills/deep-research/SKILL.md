@@ -52,13 +52,8 @@ Guide my research on the impact of declining birth rates on private universities
 
 ### Trigger Keywords
 
-**English**: research, deep research, literature review, systematic review, meta-analysis, PRISMA, evidence synthesis, fact-check, methodology, APA report, academic analysis, policy analysis, WHY HOW WHAT papers, 3W literature scan, guide my research, help me think through, monitor this topic, set up alerts
-
-**Español**: investigación profunda, revisión de literatura, revisión sistemática, metaanálisis, síntesis de evidencia, verificación de datos, informe APA, comparación de artículos WHY HOW WHAT, escaneo de tres vías, guía mi investigación, ayúdame a razonar, monitorear este tema, configurar alertas
-
-**繁體中文**: 研究, 深度研究, 文獻回顧, 文獻探討, 系統性回顧, 後設分析, 證據綜整, 事實查核, 三段式文獻掃描, WHY HOW WHAT 論文比較, 研究方法, 學術分析, 政策分析, 引導我的研究, 幫我釐清, 監測這個主題, 設定追蹤
-
-**한국어**: 심층 연구, 문헌 조사, 문헌 고찰, 체계적 문헌고찰, 메타분석, 근거 종합, 사실 확인, 팩트체크, 연구 방법 설계, 학술 분석, 연구 방향을 잡아줘, 연구 주제 정하는 것을 도와줘, 무엇을 연구할지 모르겠어, 이 주제 계속 모니터링해줘
+Multilingual trigger keyword lists (English, Spanish, Traditional Chinese, Korean) for research, literature/systematic review, meta-analysis, PRISMA, evidence synthesis, fact-check, APA report, WHY/HOW/WHAT (3W) scan, guided research and topic monitoring/alerts.
+Read [`references/skill_overview_details.md`](references/skill_overview_details.md) when deciding whether a request in one of these languages should trigger this skill.
 
 ### Socratic Mode Activation
 
@@ -337,38 +332,8 @@ PRISMA 2020-compliant systematic review with optional meta-analysis. Follows 5-p
 
 ## Three-Way Scan Mode (WHY / HOW / WHAT)
 
-Use `three-way-scan` when the user needs a disciplined shortlist of papers compared in a stable frame, but does **not** yet need a full literature review report.
-
-- **WHY**: what problem or bottleneck the paper addresses and why it matters
-- **HOW**: what strategy, method, or technical route the paper uses
-- **WHAT**: what the paper found, built, or still leaves unresolved
-
-This mode is intentionally lighter than `lit-review`. It prioritizes:
-
-1. candidate retrieval
-2. deduplication
-3. compact per-paper extraction
-4. cross-paper synthesis of shared WHY, divergent HOW, and remaining gaps
-
-Recommended per-paper output:
-
-```markdown
-## <paper title>
-Source: <provider> | Year: <year> | Link: <url>
-
-- WHY: ...
-- HOW: ...
-- WHAT: ...
-```
-
-Then add:
-
-- common `WHY`
-- divergent `HOW`
-- strongest `WHAT`
-- unresolved global gap
-
-If the user later wants a broader evidence matrix, thematic synthesis, or PRISMA-like coverage, escalate from `three-way-scan` to `lit-review` or `systematic-review`.
+Use `three-way-scan` for a disciplined paper shortlist compared per paper by WHY (problem and why it matters) / HOW (strategy or method) / WHAT (findings, artifacts, open gaps), followed by a cross-paper synthesis (common WHY, divergent HOW, strongest WHAT, unresolved global gap). It is lighter than `lit-review`; escalate to `lit-review` or `systematic-review` when the user needs a broader evidence matrix, thematic synthesis or PRISMA-like coverage.
+Read [`references/three_way_scan_mode.md`](references/three_way_scan_mode.md) when running `three-way-scan` mode (retrieval priorities and the per-paper output template).
 
 ---
 
@@ -401,35 +366,9 @@ Optional post-research monitoring for new publications in the research area.
 
 ## Handoff Protocol: deep-research → academic-paper
 
-After research is complete, the following materials can be handed off to `academic-paper`:
-
-1. **Research Question Brief** (from research_question_agent)
-2. **Methodology Blueprint** (from research_architect_agent)
-3. **Annotated Bibliography** (from bibliography_agent)
-4. **Synthesis Report** (from synthesis_agent)
-5. **[If socratic mode] INSIGHT Collection and Research Plan Summary**
-6. **Preregistration handoff** — exactly one builder-produced
-   `preregistration-artifact/1.0` sidecar (including an unavailable receipt) and,
-   when `status=provided`, its explicitly named companion bytes
-
-**Trigger**: User says "now help me write a paper" or "write a paper based on this"
-
-`academic-paper`'s `intake_agent` will automatically detect available materials and skip redundant steps:
-- Has RQ Brief -> skip topic scoping
-- Has Bibliography -> skip literature search
-- Has Synthesis -> accelerate findings / discussion writing
-- Has preregistration sidecar -> strict-validate it and its named companion,
-  then carry both byte-for-byte; never rebuild it from prose or a template
-
-The non-shell `research_architect_agent` supplies only the explicit caller
-declaration and companion handle. Before handoff, a shell-capable dispatcher
-must run the named deterministic `build-preregistration-artifact` subcommand in
-`scripts/build_cross_document_consistency_advisory.py`, with caller-held RFC3339
-`declared_at`. Only that builder may create or update the sidecar. A later
-explicit user supply creates a new builder-produced sidecar; omission or silent
-substitution is invalid.
-
-See `examples/handoff_to_paper.md` for a detailed handoff example.
+When the user asks to write a paper from the research, hand `academic-paper` the RQ Brief, Methodology Blueprint, Annotated Bibliography, Synthesis Report, (socratic mode) INSIGHT Collection and Research Plan Summary, and exactly one builder-produced `preregistration-artifact/1.0` sidecar (an unavailable receipt still counts; plus its explicitly named companion bytes when `status=provided`).
+Only the deterministic `build-preregistration-artifact` builder, run by a shell-capable dispatcher (the non-shell `research_architect_agent` supplies only the caller declaration and companion handle), may create or update that sidecar; `academic-paper` intake strict-validates it and its companion and carries both byte-for-byte, never rebuilding them from prose or a template, and omission or silent substitution is invalid.
+Read [`references/handoff_and_integration.md`](references/handoff_and_integration.md) when handing off to `academic-paper` (intake skip rules, builder invocation contract, example).
 
 ---
 
@@ -441,88 +380,29 @@ See `academic-pipeline/SKILL.md` for the complete workflow.
 
 ## Agent File References
 
-| Agent | Definition File |
-|-------|----------------|
-| research_question_agent | `agents/research_question_agent.md` |
-| research_architect_agent | `agents/research_architect_agent.md` |
-| bibliography_agent | `agents/bibliography_agent.md` |
-| source_verification_agent | `agents/source_verification_agent.md` |
-| synthesis_agent | `agents/synthesis_agent.md` |
-| report_compiler_agent | `agents/report_compiler_agent.md` |
-| editor_in_chief_agent | `agents/editor_in_chief_agent.md` |
-| devils_advocate_agent | `agents/devils_advocate_agent.md` |
-| ethics_review_agent | `agents/ethics_review_agent.md` |
-| socratic_mentor_agent | `agents/socratic_mentor_agent.md` |
-| risk_of_bias_agent | `agents/risk_of_bias_agent.md` |
-| meta_analysis_agent | `agents/meta_analysis_agent.md` |
-| monitoring_agent | `agents/monitoring_agent.md` |
+Each agent in the Agent Team table is defined in `agents/<agent_name>.md` (e.g. `agents/research_question_agent.md`).
+Read [`references/skill_overview_details.md`](references/skill_overview_details.md) when you need the full agent-to-definition-file table.
 
 ---
 
 ## Reference Files
 
-| Reference | Purpose | Used By |
-|-----------|---------|---------|
-| `references/apa7_style_guide.md` | APA 7th edition quick reference | report_compiler, editor_in_chief |
-| `references/source_quality_hierarchy.md` | Evidence pyramid + grading rubric | source_verification, bibliography |
-| `references/methodology_patterns.md` | Research design templates | research_architect |
-| `references/logical_fallacies.md` | 30+ fallacies catalog | devils_advocate |
-| `references/ethics_checklist.md` | AI disclosure, attribution, dual-use | ethics_review |
-| `references/interdisciplinary_bridges.md` | Cross-discipline connection patterns | synthesis, research_architect |
-| `references/socratic_questioning_framework.md` | 6 types of Socratic questions + 30+ prompt patterns | socratic_mentor |
-| `references/failure_paths.md` | 12 failure scenarios with triggers and recovery paths | all agents |
-| `references/mode_selection_guide.md` | Mode selection flowchart and comparison table | orchestrator |
-| `references/irb_decision_tree.md` | Portable human-subjects navigation aid; not an authority, universal taxonomy, or pathway determination | ethics_review, research_architect |
-| `shared/references/human_subjects_authority_protocol.md` | Exact authority selection, replay validation, actor/consumer filtering, and fail-closed resolved-context gate | ethics_review, research_architect |
-| `shared/human_subjects_authority_registry.json` | Bounded jurisdiction profiles with exact requirement IDs, authority anchors, obligated actors, and consumer scopes | ethics_review, research_architect |
-| `shared/contracts/human_subjects/resolved_authority_context.schema.json` | Pointer-only resolved-context shape; consumers still require deterministic replay validation | ethics_review, research_architect |
-| `shared/references/review_pathway_rule_trace_protocol.md` | Candidate-name ownership, exact selected-profile predicate partition, replay, render, surface lint, and non-consumer boundary (#669) | ethics_review, research_architect |
-| `shared/contracts/human_subjects/review_pathway_trace_request.schema.json` | Closed caller-owned candidate mapping; every selected-profile `pathway_trace` requirement is accounted for exactly once | dispatching layer |
-| `shared/contracts/human_subjects/review_pathway_rule_trace.schema.json` | Closed candidate-only predicate trace; replay and surface lint remain mandatory | ethics_review, research_architect |
-| `shared/references/submission_packet_manifest_protocol.md` | Deterministic packet inventory, authority replay, status, and non-authorization boundary (#667) | ethics_review, research_architect |
-| `shared/contracts/human_subjects/submission_packet_manifest.schema.json` | Pointer-only deterministic packet-manifest shape; consumers still require exact replay validation | ethics_review, research_architect |
-| `shared/references/authority_content_coverage_advisory_protocol.md` | Replay-bound authority-profile content observations, evidence-row/1.1 provenance, and noninterference boundary (#681) | ethics_review, research_architect |
-| `shared/contracts/human_subjects/content_coverage_advisory.schema.json` | Closed `LLM-ADVISORY` carrier; consumers still require finalizer replay validation | ethics_review, research_architect |
-| `shared/contracts/evidence/evidence_row_v1_1.schema.json` | Requirement/expectation/artifact-bound bounded excerpt rows for the #681 advisory surface | ethics_review |
-| `references/equator_reporting_guidelines.md` | EQUATOR reporting guideline mapping | research_architect, report_compiler |
-| `references/preregistration_guide.md` | Preregistration decision tree + platforms + checklist | research_architect |
-| `shared/references/cross_document_consistency_advisory_protocol.md` | Exact preregistration sidecar ownership/replay plus #672 advisory and #660 coexistence boundaries | research_architect, academic-paper intake, pipeline orchestrator |
-| `shared/contracts/passport/preregistration_artifact.schema.json` | Closed persistent preregistration handoff receipt; companion bytes remain separately named | dispatching layer, intake, pipeline orchestrator |
-| `references/systematic_review_toolkit.md` | Cochrane v6.4, PRISMA 2020, RoB 2, ROBINS-I, I² guide, GRADE, protocol registration | risk_of_bias, meta_analysis, bibliography, report_compiler |
-| `references/literature_monitoring_strategies.md` | Google Scholar alerts, PubMed alerts, RSS feeds, Retraction Watch, citation tracking, monitoring cadence | monitoring_agent |
-| `references/argumentation_reasoning_framework.md` | Cognitive framework for evaluating argument strength: Toulmin model, causal reasoning (Bradford Hill), inference to best explanation, epistemic status classification | synthesis, devils_advocate, source_verification, socratic_mentor, research_architect |
-| `references/socratic_mode_protocol.md` | Full 5-layer Socratic dialogue flow, management rules, auto-end conditions | socratic_mentor, research_question |
-| `references/systematic_review_protocol.md` | Full PRISMA pipeline, checkpoint rules, meta-analysis procedures | risk_of_bias, meta_analysis, bibliography, report_compiler |
-| `references/cross_agent_quality_definitions.md` | Peer-reviewed source tiers, currency standards, severity definitions | all agents |
-| `references/changelog.md` | Full version history | — |
+Topic references in `references/`: `apa7_style_guide.md`, `source_quality_hierarchy.md`, `methodology_patterns.md`, `logical_fallacies.md`, `ethics_checklist.md`, `interdisciplinary_bridges.md`, `argumentation_reasoning_framework.md`, `socratic_mode_protocol.md`, `socratic_questioning_framework.md`, `failure_paths.md`, `mode_selection_guide.md`, `equator_reporting_guidelines.md`, `preregistration_guide.md`, `systematic_review_protocol.md`, `systematic_review_toolkit.md`, `literature_monitoring_strategies.md`, `cross_agent_quality_definitions.md`, `changelog.md`; source-lookup API protocols `semantic_scholar_api_protocol.md`, `crossref_api_protocol.md`, `openalex_api_protocol.md`, `arxiv_api_protocol.md` (used by `bibliography_agent` / `source_verification_agent`) and `chinese_literature_api_protocol.md` (standalone client, not wired into the verification gate). Human subjects: `references/irb_decision_tree.md` is a portable navigation aid only, never an authority, universal taxonomy or pathway determination; authority selection, replay validation and the fail-closed resolved-context gate live in `shared/references/human_subjects_authority_protocol.md` (#666), next to the pathway rule trace (#669), packet manifest (#667), content coverage (#681) and cross-document/preregistration-sidecar (`cross_document_consistency_advisory_protocol.md`) protocols in `shared/references/`, their schemas in `shared/contracts/`.
+Read [`references/skill_overview_details.md`](references/skill_overview_details.md) when you need the purpose of a reference file or which agents use it.
 
 ---
 
 ## Templates
 
-| Template | Purpose |
-|----------|---------|
-| `templates/research_brief_template.md` | Quick mode output format |
-| `templates/literature_matrix_template.md` | Source x Theme analysis matrix |
-| `templates/evidence_assessment_template.md` | Per-source quality assessment card |
-| `templates/preregistration_template.md` | OSF standard 21-item preregistration template |
-| `templates/prisma_protocol_template.md` | PRISMA-P 2015 systematic review protocol template |
-| `templates/prisma_report_template.md` | PRISMA 2020 systematic review report template (27 items) |
+Output templates in `templates/`: `research_brief_template.md` (quick mode output format), `literature_matrix_template.md` (source × theme matrix), `evidence_assessment_template.md` (per-source quality card), `preregistration_template.md` (OSF 21-item preregistration), `prisma_protocol_template.md` (PRISMA-P 2015 protocol) and `prisma_report_template.md` (PRISMA 2020 report, 27 items).
+Read [`references/skill_overview_details.md`](references/skill_overview_details.md) when producing one of these outputs (full template table).
 
 ---
 
 ## Examples
 
-| Example | Demonstrates |
-|---------|-------------|
-| `examples/exploratory_research.md` | Full 6-phase pipeline walkthrough |
-| `examples/systematic_review.md` | PRISMA-style literature review |
-| `examples/policy_analysis.md` | Applied comparative policy research |
-| `examples/socratic_guided_research.md` | Complete Socratic mode multi-turn dialogue (12 rounds) |
-| `examples/handoff_to_paper.md` | deep-research full mode handoff to academic-paper |
-| `examples/review_mode.md` | Review mode: 3-agent review pipeline for policy recommendation text |
-| `examples/fact_check_mode.md` | Fact-check mode: source verification of HEI claims with per-claim verdicts |
-| `examples/idea_diversity_coverage_gap_advisory.md` | #257 Socratic wording-pattern + lit-review distributional-skew advisories |
+Worked examples in `examples/` cover the full 6-phase pipeline, systematic review, policy analysis, Socratic dialogue, handoff to `academic-paper`, review mode, fact-check mode and the #257 idea-diversity advisories.
+Read [`references/skill_overview_details.md`](references/skill_overview_details.md) when you need a worked example for a mode.
 
 ---
 
@@ -566,38 +446,22 @@ Unified definitions across all agents. ⚠️ IRON RULE: **CRITICAL severity** =
 
 ## Integration with Other Skills
 
-This skill is domain-agnostic but can be combined with domain-specific skills:
-
-```
-deep-research + tw-hei-intelligence     -> Evidence-based HEI policy research
-deep-research + report-to-website       -> Interactive research report
-deep-research + podcast-script-generator -> Research podcast
-deep-research + academic-paper          -> Full research-to-publication pipeline
-deep-research (socratic) + academic-paper (plan) -> Guided research + paper planning
-deep-research (systematic-review) + academic-paper -> PRISMA systematic review paper
-```
+Domain-agnostic; combinable with domain-specific skills (e.g. `academic-paper` for research-to-publication, socratic + `academic-paper` plan, systematic-review + `academic-paper` for a PRISMA paper).
+Read [`references/handoff_and_integration.md`](references/handoff_and_integration.md) when combining this skill with another skill.
 
 ---
 
 ## Model Tiering (#517, optional)
 
-When `ARS_MODEL_TIERING` is set, the dispatching session routes this skill's agents per `shared/model_tiering.md` (canonical: the full 39-agent judgment/execution table + rules). Compact rule:
-
-- **Unset (default):** every agent inherits the session model — byte-equivalent pre-#517 behavior.
-- **`economy`** (frontier-tier session): execution-type agents dispatch ONE tier below the session model — floor Opus-class, never lower; judgment-type agents stay on the session model. No-op at or below the floor (announce once).
-- **`quality-boost`** (below-frontier session): judgment-type agents at the checkpoint surfaces (Stage 2.5/4.5 gates; the opt-in Stage 4→5 claim–ref audit; final review) jump UP to the frontier tier (however many tiers away — not a single increment); nothing is ever downgraded. No-op at the frontier (announce once).
-- Unknown values → warn once, behave as unset. Tiers are relative positions, never hard-pinned model ids. When a direction is active, route repeated same-stage calls to the SAME worker so its prompt cache accumulates; unset means dispatch shapes stay byte-equivalent too.
+Applies only when `ARS_MODEL_TIERING` is set (`economy` or `quality-boost`); unset (default) means every agent inherits the session model, and unknown values warn once and behave as unset.
+Read [`references/handoff_and_integration.md`](references/handoff_and_integration.md) when `ARS_MODEL_TIERING` is set (routing rules; canonical table in `shared/model_tiering.md`).
 
 ---
 
 ## Version Info
 
-| Item | Content |
-|------|---------|
-| Skill Version | 2.12.1 |
-| Last Updated | 2026-08-15 |
-| Maintainer | Cheng-I Wu |
-| Dependent Skills | academic-paper v1.0+ (downstream) |
+Skill version, last-updated date, maintainer and downstream dependencies (mirrors `metadata` in the frontmatter).
+Read [`references/skill_overview_details.md`](references/skill_overview_details.md) when you need the maintainer or dependency versions.
 
 ---
 

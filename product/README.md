@@ -3,7 +3,7 @@
 ## Overview
 Product-management craft for the whole arc: **continuous discovery, positioning, strategy building and red-teaming, prioritization, PRDs, competitor analysis, pricing, SaaS unit economics, A/B analysis, analysis QA, and metrics**. The thin one-shot generators and near-duplicate variants from the source sets were cut; these are the high-depth, repeat-use skills.
 
-Curated from [phuryn/pm-skills](https://github.com/phuryn/pm-skills) (MIT), [wondelai/skills](https://github.com/wondelai/skills) (MIT: `product-positioning`, `strategy-kernel`), [alirezarezvani/claude-skills](https://github.com/alirezarezvani/claude-skills) (MIT: `saas-metrics-coach`), [anthropics/knowledge-work-plugins](https://github.com/anthropics/knowledge-work-plugins) (Apache-2.0: `validate-data`) and [ferdinandobons/startup-skill](https://github.com/ferdinandobons/startup-skill) (MIT: evidence and verification rules merged into `competitor-analysis`).
+Curated from [phuryn/pm-skills](https://github.com/phuryn/pm-skills) (MIT), [wondelai/skills](https://github.com/wondelai/skills) (MIT: `product-positioning`, `strategy-kernel`), [alirezarezvani/claude-skills](https://github.com/alirezarezvani/claude-skills) (MIT: `saas-metrics-coach`), [anthropics/knowledge-work-plugins](https://github.com/anthropics/knowledge-work-plugins) (Apache-2.0: `validate-data`; rewritten `write-spec` and `synthesize-research` material merged into `create-prd` and `user-personas`) and [ferdinandobons/startup-skill](https://github.com/ferdinandobons/startup-skill) (MIT: evidence and verification rules merged into `competitor-analysis`).
 
 ## Install
 ```bash
@@ -26,5 +26,7 @@ Skills trigger automatically on matching tasks, or invoke one by name (e.g. "use
 
 `saas-metrics-coach` ships three small Python 3 scripts (standard library only, no network, no environment variables).
 
+`create-prd`, `user-personas`, `prioritization-frameworks` and `value-proposition` keep the core workflow in `SKILL.md` and load templates, calibration scales, worked examples and review rubrics from `references/` only when needed. Their examples and numbers are fictional and labelled as such.
+
 ## License
-MIT, except `validate-data`, which is Apache-2.0 (license text in its folder, modifications marked). Copies of every upstream license used by this plugin are in [`LICENSES/`](./LICENSES/); see [`../NOTICE.md`](../NOTICE.md) for attribution and [`../PROVENANCE.csv`](../PROVENANCE.csv) for per-skill sources.
+MIT, except `validate-data`, which is Apache-2.0, and the Apache-2.0 material merged into `create-prd` and `user-personas` (license text in each of these skill folders, modifications marked). Copies of every upstream license used by this plugin are in [`LICENSES/`](./LICENSES/); see [`../NOTICE.md`](../NOTICE.md) for attribution and [`../PROVENANCE.csv`](../PROVENANCE.csv) for per-skill sources.

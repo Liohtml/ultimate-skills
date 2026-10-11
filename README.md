@@ -1,6 +1,6 @@
 # Ultimate Skills
 
-**One opinionated, deduplicated marketplace of the best Claude Code skills.** **68 skills in 7 plugins** (**engineering · product · design · writing · security · security-cc-by-sa · research**), taken from **34 community skill repos**. They were chosen from about 90 scouted repos: the first wave kept 39 of 109 skills from five repos, and the second wave added 29 skills and merged material from further sources into existing ones.
+**One opinionated, deduplicated marketplace of the best Claude Code skills.** **68 skills in 7 plugins** (**engineering · product · design · writing · security · security-cc-by-sa · research**), taken from **34 community skill repos**. They were chosen from about 90 scouted repos: the first wave kept 39 of 109 skills from five repos, the second wave added 29 skills and merged material from further sources into existing ones, and the third wave added no skills but deepened four product skills, split the three largest research skills and replaced `humanizer`'s Wikipedia-quoted examples with original ones.
 
 This is a *curation*, not original work. Every skill keeps its original author and license: see [`NOTICE.md`](./NOTICE.md) and [`PROVENANCE.csv`](./PROVENANCE.csv), which has one row per upstream source of every skill. Selection criteria: a checkable mechanism rather than generic advice, a verified redistributable license, little overlap with the other skills, and low token and tooling cost. Rejected candidates and the reasons are in [`docs/value-bombs.md`](./docs/value-bombs.md).
 
@@ -65,7 +65,7 @@ MIT + Apache-2.0 · [plugin README](./engineering/README.md)
 | `git-workflow-and-versioning` | Commits, branching, conflicts, releases, bisect-driven debugging. |
 | `ci-cd-and-automation` | Quality-gated build and deploy pipelines, rollout and rollback. |
 | `documentation-and-adrs` | ADRs, READMEs and changelogs that record the context behind decisions. |
-| `security-and-hardening` | Builder-side hardening: input handling, auth, secrets, storage, integrations (incl. LLM). |
+| `security-and-hardening` | Builder-side hardening for code you are writing: input handling, auth, secrets, storage, dependencies, LLM features. Auditing an existing system: `security` plugin. |
 | `performance-optimization` | Measure-first optimization, budgets, Core Web Vitals, backend and database hot paths. |
 | `postgres-best-practices` | Postgres rules with incorrect-vs-correct SQL, plus safe migrations, backup/restore and upgrades. |
 | `mcp-builder` | Build MCP servers LLMs can actually use, then measure that with a QA-pair evaluation. |
@@ -80,14 +80,14 @@ MIT + Apache-2.0 · [plugin README](./product/README.md)
 | `strategy-red-team` | Steelman, then attack a PRD's or roadmap's load-bearing assumptions. |
 | `pre-mortem` | Imagine the launch failed; triage Tigers / Paper Tigers / Elephants. |
 | `product-positioning` | April Dunford's 5-step positioning, with a canvas and a 0–10 score. |
-| `value-proposition` | 6-part JTBD value-proposition design. |
+| `value-proposition` | 6-part JTBD value proposition grounded in labelled evidence and switching forces; fit check, differentiation, value hypotheses with cheapest tests, messaging handoff. |
 | `competitor-analysis` | Competitive landscape with evidence labels, threat ratings and a verification pass. |
 | `pricing-strategy` | Pricing models, value metric, Van Westendorp, experiments. |
 | `opportunity-solution-tree` | Torres-style discovery: outcome → opportunities → solutions → experiments. |
 | `interview-script` | Mom-Test / JTBD customer-discovery interview script. |
-| `user-personas` | Research-grounded personas with JTBD, pains and gains. |
-| `prioritization-frameworks` | 9 frameworks (RICE, ICE, Kano, MoSCoW…) with formulas and when to use each. |
-| `create-prd` | 8-section Product Requirements Document. |
+| `user-personas` | Evidence-gated behavioural personas with JTBD and switching forces; proto-persona labelling, validation and refresh. |
+| `prioritization-frameworks` | Pick and apply the right method (RICE, ICE, cost of delay / WSJF, Kano, MoSCoW…) with calibrated scales, worked examples and a session playbook. |
+| `create-prd` | Evidence-first 8-section PRD with metrics and guardrails, MoSCoW acceptance criteria and a rollout plan; also reviews PRDs. |
 | `intended-vs-implemented` | Audit the gap between intended behavior and shipped code. |
 | `north-star-metric` | Define the NSM and its input-metric constellation by business game. |
 | `saas-metrics-coach` | ARR, churn, CAC, LTV, NRR and payback from raw numbers with scripts; benchmarked health check. |
@@ -172,4 +172,4 @@ The curation, manifests and docs are MIT. Each skill stays under its upstream li
 ## Maintenance
 
 - `python3 scripts/validate.py` checks frontmatter (name = directory, description ≤ 1024 chars), manifests, relative links, `PROVENANCE.csv` (one base row per skill, and each license must fit its plugin's license) and SKILL.md length. CI also runs `claude plugin validate --strict` on the marketplace and every plugin.
-- `python3 scripts/check_upstream.py [--skill NAME] [--repo OWNER/REPO]` reports every provenance row whose upstream paths changed since the recorded commit.
+- `python3 scripts/check_upstream.py [--skill NAME] [--repo OWNER/REPO]` reports every provenance row whose upstream paths changed since the recorded commit. Skills that diverge from upstream on purpose get a `note:` line: `deep-research`, `academic-paper` and `academic-pipeline` were split locally, so map upstream changes with [`research/MERGE_MAPS.md`](./research/MERGE_MAPS.md); `humanizer` must not take upstream's Wikipedia-quoted examples back.

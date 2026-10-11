@@ -223,4 +223,4 @@ Example assessments:
 
 ## Change note (Apache-2.0 §4b)
 
-Modified from upstream commit `c2f99a5`: description rewritten with cross-pointers; script invocation changed to `${CLAUDE_SKILL_DIR}` with a `python3` fallback to `uv run`; skill-discovery order puts plugin layouts first; untrusted-data and expected-false-positive notes added; `allowed-tools` frontmatter dropped. `scripts/scan_skill.py` and the reference files are unchanged.
+Modified from upstream commit `c2f99a5`: description rewritten with cross-pointers; script invocation changed to `${CLAUDE_SKILL_DIR}` with a `python3` fallback to `uv run`; skill-discovery order puts plugin layouts first; untrusted-data and expected-false-positive notes added; `allowed-tools` frontmatter dropped. `scripts/scan_skill.py` gained argparse `--help` and a JSON error when PyYAML is missing (scan logic and output format unchanged); the reference files are unchanged.

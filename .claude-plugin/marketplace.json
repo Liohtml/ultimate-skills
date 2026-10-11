@@ -1,6 +1,6 @@
 {
   "name": "ultimate-skills",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "A curated, deduplicated marketplace of 68 Claude Code skills in 7 plugins (engineering, product, design, writing, security, security-cc-by-sa, research), distilled from 34 community skill repos with per-skill provenance. Most plugins are MIT/Apache-2.0; security-cc-by-sa is share-alike (CC-BY-SA-4.0) and research is non-commercial (CC-BY-NC-4.0).",
   "owner": {
     "name": "Ultimate Skills (curated)",
@@ -17,7 +17,7 @@
       "name": "product",
       "source": "./product",
       "category": "product",
-      "description": "Product management (MIT/Apache-2.0): discovery, positioning, Rumelt strategy kernel and red-teaming, prioritization, PRDs, evidence-labelled competitor analysis, pricing, SaaS unit economics, A/B analysis, analysis QA before sharing, and metrics."
+      "description": "Product management (MIT/Apache-2.0): discovery, evidence-gated personas, positioning, value propositions with switching forces, Rumelt strategy kernel and red-teaming, prioritization incl. cost of delay/WSJF, evidence-first PRDs with metrics and rollout plans, evidence-labelled competitor analysis, pricing, SaaS unit economics, A/B analysis, analysis QA before sharing, and metrics."
     },
     {
       "name": "design",

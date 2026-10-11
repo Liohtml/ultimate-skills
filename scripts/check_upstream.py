@@ -38,6 +38,17 @@ Exit code: 0 = nothing changed, 1 = at least one row changed/missing,
 
 After syncing, update the row's source_commit / upstream_status in
 PROVENANCE.csv.
+
+Locally restructured skills: the diffs above are upstream-vs-upstream, so their
+line numbers and file layout are upstream's, not ours. Some skills diverge on
+purpose and cannot take an upstream diff 1:1:
+  * research/deep-research, research/academic-paper, research/academic-pipeline:
+    SKILL.md sections were moved verbatim into references/ (wave 3). Map each
+    upstream hunk to its new file with research/MERGE_MAPS.md before applying.
+  * writing/humanizer: all examples, pattern descriptions and watch lists are
+    original text (the upstream examples quote CC BY-SA Wikipedia text). Merge
+    only rule or taxonomy changes; never re-import upstream examples.
+For these rows the report prints a "note:" line under CHANGED (see SYNC_NOTES).
 """
 import argparse
 import csv
@@ -47,6 +58,19 @@ import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+
+_RESEARCH_SPLIT = ("SKILL.md was split locally (sections moved verbatim into references/); "
+                   "map upstream hunks with research/MERGE_MAPS.md")
+# (plugin, skill) -> hint printed under a CHANGED row whose local copy diverges
+# from upstream on purpose, so the upstream diff cannot be applied 1:1.
+SYNC_NOTES = {
+    ("research", "deep-research"): _RESEARCH_SPLIT,
+    ("research", "academic-paper"): _RESEARCH_SPLIT,
+    ("research", "academic-pipeline"): _RESEARCH_SPLIT,
+    ("writing", "humanizer"): ("examples, pattern descriptions and watch lists are original text; "
+                               "merge rule/taxonomy changes only, never upstream examples "
+                               "(they quote CC BY-SA Wikipedia text)"),
+}
 
 
 def git(*args, cwd=None, check=True):
@@ -158,6 +182,9 @@ def main():
               f"({base[:10]}..HEAD in {repo}: {'; '.join(subs)})")
         for line in log.splitlines():
             print(f"              {line}")
+        note = SYNC_NOTES.get((r["plugin"], r["skill"]))
+        if note:
+            print(f"              note: {note}")
         if a.diff:
             for f in focus:
                 print(git("diff", base, "HEAD", "--", f, cwd=dest).stdout)

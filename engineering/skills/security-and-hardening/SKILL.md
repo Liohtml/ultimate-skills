@@ -1,6 +1,6 @@
 ---
 name: security-and-hardening
-description: "Secure-coding discipline while building or changing code: threat-model-first, always/ask-first/never boundaries, and hardening controls for injection and XSS, access control, authentication and sessions, headers and CORS, input validation and uploads, SSRF, rate limiting, secrets, vetting new dependencies, personal data and privacy (GDPR, CCPA) and AI/LLM features, checked against the OWASP Top Ten. Use when writing or modifying a feature that accepts untrusted data, handles logins or sessions, stores personal data, calls third-party services or adds a package. For a full threat model use threat-model; to scan an existing codebase for vulnerabilities use static-vuln-scan; to audit the whole dependency tree use supply-chain-risk-auditor; to audit shipped AI features use llm-app-security-audit; to test a live app use web-pentest."
+description: "Secure-coding discipline while building or changing code: threat-model-first, always/ask-first/never boundaries, and hardening controls for injection and XSS, access control, authentication and sessions, headers and CORS, input validation and uploads, SSRF, rate limiting, secrets, vetting new dependencies, personal data and privacy (GDPR, CCPA) and AI/LLM features, checked against the OWASP Top Ten. Use when writing or modifying a feature that accepts untrusted data, handles logins or sessions, stores personal data, calls third-party services or adds a package. Not for auditing or testing an existing system; that is the security plugin: for a full threat model use threat-model; to scan an existing codebase for vulnerabilities use static-vuln-scan; to audit the whole dependency tree use supply-chain-risk-auditor (security-cc-by-sa); to audit shipped AI features use llm-app-security-audit; to test a live app use web-pentest."
 ---
 
 # Security and Hardening
@@ -18,7 +18,11 @@ Security-first development practices for web applications. Treat every external 
 - Adding file uploads, webhooks, or callbacks
 - Handling payment or PII data
 
+Scope: this skill hardens code you are writing now. To audit or test a system that already exists, use the `security` plugin (`threat-model`, `static-vuln-scan`, `vuln-triage`, `web-pentest`, `llm-app-security-audit`) or `supply-chain-risk-auditor` (`security-cc-by-sa` plugin).
+
 ## Process: Threat Model First
+
+For a full, code-grounded threat model of an existing system (written to `THREAT_MODEL.md`), use `threat-model` (`security` plugin).
 
 Controls bolted on without a threat model are guesses. Before hardening, spend five minutes thinking like an attacker:
 
@@ -132,6 +136,8 @@ Pattern: [Secrets management](references/hardening-patterns.md#secrets-managemen
 
 ### Dependencies and supply chain
 
+For a full audit of the whole dependency tree (advisories, abandoned upstreams, publisher concentration, install scripts), use `supply-chain-risk-auditor` (`security-cc-by-sa` plugin).
+
 1. **Find the installation boundary and manager.** Use the workspace root that owns the lockfile, or an independent nested project only when it is outside that workspace. Corroborate `packageManager` (when present), the lockfile, and CI; stop on disagreement or competing lockfiles. Pin the manager version.
 2. **Block dependency scripts before first execution.** Bootstrap with scripts disabled or a documented fail-closed policy, inspect the pending script source, approve only the minimum, commit the policy, then verify with a clean frozen/immutable install. Never blanket-approve.
 3. **Run the native audit against the committed lockfile before every release.** Triage critical/high by **reachability** (runtime, build, test, deploy paths) and fix availability. Never apply forced remediation (`npm audit fix --force` or equivalent) automatically, since forced fixes may cross declared dependency ranges; preview, read changelogs, test each upgrade. Document every deferral with a reason and a review date.
@@ -153,6 +159,8 @@ Classification table: [Data classification](references/hardening-patterns.md#dat
 
 ### AI / LLM features
 
+For a full audit of AI/LLM features that already exist (prompt injection, tool scope, output handling), use `llm-app-security-audit` (`security` plugin).
+
 Calling an LLM — chatbots, summarizers, agents, RAG — adds a new attack surface; map it to the [OWASP Top 10 for LLM Applications (2025)](https://genai.owasp.org/llm-top-10/):
 
 - **Model output is untrusted input** (LLM05). Never into `eval`, SQL, a shell, `innerHTML`, or a file path; parse defensively, validate against a schema, then encode.
@@ -162,6 +170,8 @@ Calling an LLM — chatbots, summarizers, agents, RAG — adds a new attack surf
 Pattern: [LLM output handling](references/hardening-patterns.md#llm-output-handling).
 
 ## Review Checklist
+
+For a full vulnerability scan of an existing codebase, use `static-vuln-scan` (`security` plugin); for a live application, `web-pentest`.
 
 Before sign-off, walk `../../references/security-checklist.md`: it covers authentication, authorization, input, data protection and privacy, headers and CORS, dependencies and supply chain, AI/LLM, and error handling, plus the OWASP quick-reference tables.
 

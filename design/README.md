@@ -33,7 +33,7 @@ Design and frontend-craft skills that fight generic "AI slop" output and turn ta
 ## Prerequisites
 - **Image generation** needs one of: an image-generation MCP server/tool in the session, `OPENAI_API_KEY` + `pip install openai` (GPT Image), or `GEMINI_API_KEY` (Gemini, standard library only). Without any of them the image skills say so and fall back to text-based direction via `design-taste-frontend`. Live calls are billed to the user's API account; the skill asks before batches.
 - `accessibility-audit` injects axe-core from a public CDN into the page under test (or a locally vendored copy).
-- `frontend-slides` PDF export needs Node.js (installs Playwright + Chromium into a temp dir); PPTX import needs `python-pptx`.
+- `frontend-slides` PDF export needs Node.js. It reuses an installed Playwright that can launch Chromium, otherwise installs a pinned Playwright (1.63.0, override with `SLIDES_PLAYWRIGHT_VERSION`) into a temp dir; Chromium is downloaded once into Playwright's cache unless `SLIDES_CHROMIUM_PATH` points at an existing Chrome. The preview server listens on 127.0.0.1 only. PPTX import needs `python-pptx`.
 
 ## License
 MIT for most skills; Apache-2.0 for material from `openai/skills` (`image-generation`, which ships its own `LICENSE.txt`), `replicate/skills` (an `image-generation` reference) and `pbakaus/impeccable` (two `redesign-existing-projects` references), each marked as modified. Copies of every upstream license used by this plugin are in [`LICENSES/`](./LICENSES/); see [`../NOTICE.md`](../NOTICE.md), [`../PROVENANCE.csv`](../PROVENANCE.csv) and each skill's attribution line for sources.

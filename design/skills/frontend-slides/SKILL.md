@@ -5,7 +5,7 @@ description: Build distinctive, animation-rich HTML slide decks as a single self
 
 # Frontend Slides
 
-> Adapted from [zarazhangrui/frontend-slides](https://github.com/zarazhangrui/frontend-slides) (MIT, (c) 2025 Zara Zhang) at commit `9906a34`. Changes: the bold-template pack and the Vercel hosting script/phase are not included (previews now mix presets with a custom design); supporting files moved into `references/`, `assets/` and `scripts/`; description rewritten.
+> Adapted from [zarazhangrui/frontend-slides](https://github.com/zarazhangrui/frontend-slides) (MIT, (c) 2025 Zara Zhang) at commit `9906a34`. Changes: the bold-template pack and the Vercel hosting script/phase are not included (previews now mix presets with a custom design); supporting files moved into `references/`, `assets/` and `scripts/`; description rewritten; `scripts/export-pdf.sh` pins Playwright, reuses an installed Playwright/Chromium, serves the deck on 127.0.0.1 only and resolves relative output paths correctly.
 
 Create zero-dependency, animation-rich HTML presentations that run entirely in the browser.
 
@@ -233,7 +233,7 @@ If the user selected a self-generated custom wildcard, treat that preview's CSS 
 
 When converting PowerPoint files:
 
-1. **Extract content** — Run `python3 scripts/extract-pptx.py <input.pptx> <output_dir>` from this skill's folder (install python-pptx if needed: `pip install python-pptx`)
+1. **Extract content** — Run `python3 ${CLAUDE_SKILL_DIR}/scripts/extract-pptx.py <input.pptx> <output_dir>` (install python-pptx if needed: `pip install python-pptx`). The `CLAUDE_SKILL_DIR` placeholder (here and in Phase 6) is this skill's folder, the one containing this SKILL.md; if it still appears literally as `${...}` (older Claude Code, other runtimes), replace it with that folder's path before running the command.
 2. **Confirm with user** — Present extracted slide titles, content summaries, and image counts
 3. **Style selection** — Proceed to Phase 2 for style discovery
 4. **Generate HTML** — Convert to chosen style, preserving all text, images (from assets/), slide order, and speaker notes (as HTML comments)
@@ -266,35 +266,36 @@ This captures each slide as a screenshot and combines them into a PDF. Perfect f
 1. **Run the export script:**
 
    ```bash
-   bash scripts/export-pdf.sh <path-to-html> [output.pdf]
+   bash ${CLAUDE_SKILL_DIR}/scripts/export-pdf.sh <path-to-html> [output.pdf]
    ```
 
-   If no output path is given, the PDF is saved next to the HTML file.
+   If no output path is given, the PDF is saved next to the HTML file. Add `--no-open` in headless or remote sessions; otherwise the script opens the PDF in the system viewer.
 
 2. **What happens behind the scenes** (explain briefly to the user):
    - A headless browser opens the presentation at 1920×1080 (standard widescreen)
    - It screenshots each slide one by one
    - All screenshots are combined into a single PDF
-   - The script needs Playwright (a browser automation tool) — it will install automatically if missing
+   - The script needs Playwright (a browser automation tool). It reuses an installed Playwright that can launch Chromium; otherwise it installs a pinned version (`SLIDES_PLAYWRIGHT_VERSION`, default in the script) into a temp dir, never globally
 
 3. **If Playwright installation fails:**
-   - The most common issue is Chromium not downloading. Run: `npx playwright install chromium`
+   - The most common issue is Chromium not downloading. The script prints the exact `npx --yes playwright@<version> install chromium` command to retry
+   - If Chrome or Chromium is already installed, set `SLIDES_CHROMIUM_PATH=/path/to/chrome` to skip the browser download
    - If that fails too, it may be a network/firewall issue. Ask the user to try on a different network.
 
-4. **Deliver the PDF** — The script auto-opens it. Tell the user:
+4. **Deliver the PDF** — The script auto-opens it unless `--no-open` was passed. Tell the user:
    - The file location and size
    - That it works everywhere — email, Slack, Notion, Google Docs, print
    - Animations are replaced by their final visual state (still looks great, just static)
 
 **⚠ PDF export gotchas:**
 
-- **First run is slow.** The script installs Playwright and downloads a Chromium browser (~150MB) into a temp directory. This happens once per run. Warn the user it may take 30-60 seconds the first time — subsequent exports within the same session are faster.
+- **First run can be slow.** Without a usable installed Playwright, the script installs Playwright into a temp dir on every run and, the first time, downloads Chromium (~150MB) into Playwright's browser cache (`PLAYWRIGHT_BROWSERS_PATH` or the per-user cache), where later runs reuse it. Warn the user the first export may take 30-60 seconds.
 - **Slides must use `class="slide"`.** The export script finds slides by querying `.slide` elements. If the presentation uses a different class name, the script will report "0 slides found" and fail. All presentations generated by this skill use `.slide`, so this only matters for externally-created HTML.
 - **Local images must be loadable via HTTP.** The script starts a local server and loads the HTML through it (so Google Fonts and relative image paths work). If images use absolute filesystem paths (e.g., `src="/Users/name/photo.png"`) instead of relative paths (e.g., `src="photo.png"`), they won't load. Generated presentations always use relative paths, but converted or user-provided decks might not — check and fix if needed.
 - **Local images appear in the PDF** as long as they are in the same directory as (or relative to) the HTML file. The export script serves the HTML's parent directory over HTTP, so relative paths like `src="photo.png"` resolve correctly — including filenames with spaces. If images still don't appear, check: (1) the image files actually exist at the referenced path, (2) the paths are relative, not absolute filesystem paths like `/Users/name/photo.png`.
 - **Large presentations produce large PDFs.** Each slide is captured as a full 1920×1080 PNG screenshot. An 18-slide deck can produce a ~20MB PDF. If the PDF exceeds 10MB, ask the user: _"The PDF is [size]. Would you like me to compress it? It'll look slightly less sharp but the file will be much smaller."_ If yes, re-run the export with the `--compact` flag:
   ```bash
-  bash scripts/export-pdf.sh <path-to-html> [output.pdf] --compact
+  bash ${CLAUDE_SKILL_DIR}/scripts/export-pdf.sh <path-to-html> [output.pdf] --compact
   ```
   This renders at 1280×720 instead of 1920×1080, typically cutting file size by 50-70% with minimal visual difference.
 
@@ -309,4 +310,4 @@ This captures each slide as a screenshot and combines them into a PDF. Perfect f
 | [references/html-template.md](references/html-template.md) | HTML structure, JS features, code quality standards | Phase 3 (generation) |
 | [references/animation-patterns.md](references/animation-patterns.md) | CSS/JS animation snippets and effect-to-feeling guide | Phase 3 (generation) |
 | `scripts/extract-pptx.py` | PPTX content extraction (needs `python-pptx`) | Phase 4 (conversion) |
-| `scripts/export-pdf.sh` | Export slides to PDF (needs Node.js; installs Playwright + Chromium into a temp dir) | Phase 6 (export) |
+| `scripts/export-pdf.sh` | Export slides to PDF (needs Node.js; reuses an installed Playwright or installs a pinned one into a temp dir; `--help` lists options) | Phase 6 (export) |

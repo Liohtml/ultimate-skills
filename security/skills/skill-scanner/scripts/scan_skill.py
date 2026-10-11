@@ -11,11 +11,19 @@ obfuscation, dangerous code, secrets, and excessive permissions.
 
 Usage:
     uv run scan_skill.py <skill-directory>
+    python3 scan_skill.py <skill-directory>   # needs pyyaml installed
+    python3 scan_skill.py --help
 
 Output: JSON to stdout with structured findings.
+
+Modified by ultimate-skills (Apache-2.0 section 4b): argparse-based --help and
+argument handling, and a JSON error instead of a traceback when PyYAML is
+missing. Scanning logic and output format are unchanged from upstream
+getsentry/skills commit c2f99a5.
 """
 from __future__ import annotations
 
+import argparse
 import base64
 import json
 import re
@@ -23,7 +31,10 @@ import sys
 from pathlib import Path
 from typing import Any
 
-import yaml
+try:
+    import yaml
+except ImportError:  # reported from main() so that --help works without PyYAML
+    yaml = None
 
 
 # --- Pattern Definitions ---
@@ -656,12 +667,41 @@ def scan_skill(skill_dir: Path) -> dict[str, Any]:
     }
 
 
-def main():
-    if len(sys.argv) < 2:
-        print("Usage: scan_skill.py <skill-directory>", file=sys.stderr)
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        prog="scan_skill.py",
+        description=(
+            "Static security scan of one agent skill directory (the folder that "
+            "contains SKILL.md): prompt injection, obfuscation, secrets, dangerous "
+            "script patterns, structural attacks and allowed-tools permissions. "
+            "Read-only: it makes no network calls and never executes the scanned skill."
+        ),
+        epilog=(
+            "Output: one JSON object on stdout with the keys skill_name, skill_dir, "
+            "structure, frontmatter, tools, findings, finding_counts, total_findings, "
+            "urls and description_body_overlap. "
+            "Findings never change the exit status. Errors are a JSON "
+            '{"error": ...} object on stdout: exit 1 when the target is not a '
+            "directory or PyYAML is missing, exit 0 when the directory has no "
+            "readable SKILL.md (upstream behaviour). Invalid arguments exit 2."
+        ),
+    )
+    parser.add_argument(
+        "skill_dir",
+        metavar="skill-directory",
+        help="path to the skill directory to scan (the folder containing SKILL.md)",
+    )
+    return parser
+
+
+def main(argv: list[str] | None = None):
+    args = build_parser().parse_args(argv)
+
+    if yaml is None:
+        print(json.dumps({"error": "PyYAML is required: run with `uv run` (installs it from the PEP 723 header) or `pip install pyyaml`"}))
         sys.exit(1)
 
-    skill_dir = Path(sys.argv[1]).resolve()
+    skill_dir = Path(args.skill_dir).resolve()
     if not skill_dir.is_dir():
         print(json.dumps({"error": f"Not a directory: {skill_dir}"}))
         sys.exit(1)

@@ -5,7 +5,7 @@ Prose craft for the text agents produce every day: memos, recommendations, statu
 
 1. **minto-pyramid**: get the *order* right. Conclusion first, grouped reasons, evidence, with SCQA. It asks before rewriting a draft you only shared, declines timelines, runbooks and tutorials, and never adds facts. Operation 6 returns a structure audit with a Share as-is / Minor edits / Restructure verdict.
 2. **copy-editing**: for marketing and conversion copy, the Seven Sweeps (clarity, voice, so-what, prove-it, specificity, emotion, zero risk), an optional expert-panel score and a content-refresh checklist. Missing proof points are flagged, not invented.
-3. **humanizer**: the final pass. It removes AI-sounding patterns (not-X-but-Y, one-line closers, forced triads, dash overuse, stock AI words, bold labels, chatbot residue) and checks that no fact was added or lost.
+3. **humanizer**: the final pass. It removes AI-sounding patterns (not-X-but-Y, one-line closers, forced triads, dash overuse, stock AI words, bold labels, chatbot residue) and checks that no fact was added or lost. Its before/after examples are original; Wikipedia's "Signs of AI writing" informs only the pattern categories (see [`../NOTICE.md`](../NOTICE.md)).
 
 Curated from [millwright-labs/minto-pyramid-skill](https://github.com/millwright-labs/minto-pyramid-skill) (MIT), [tyroneross/pyramid-principle](https://github.com/tyroneross/pyramid-principle) (Apache-2.0, audit reference only), [coreyhaines31/marketingskills](https://github.com/coreyhaines31/marketingskills) (MIT) and [blader/humanizer](https://github.com/blader/humanizer) (MIT).
 

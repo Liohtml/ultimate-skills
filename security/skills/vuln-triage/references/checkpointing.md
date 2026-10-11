@@ -2,6 +2,8 @@
 
 > Part of the `vuln-triage` skill. Adapted from [anthropics/defending-code-reference-harness](https://github.com/anthropics/defending-code-reference-harness/tree/d3bea6b5793b5f3d59a75ebe69a58efa88383145/.claude/skills/triage) (Apache-2.0); modified by ultimate-skills (split out of the upstream SKILL.md).
 
+> **Paths:** `${CLAUDE_SKILL_DIR}` is not expanded in this file. Replace it with this skill's directory (the "Base directory for this skill" path, i.e. the parent of this `references/` folder) before running any command below.
+
 Runs before Phase 0 and after every phase.
 
 On large finding batches a full run can exhaust context or hit rate limits

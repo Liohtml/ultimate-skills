@@ -5,6 +5,10 @@
 > **Re-read note:** If you need this file mid-session and the Read tool
 > reports "file unchanged", the prior result was evicted from context; reload
 > with `cat ${CLAUDE_SKILL_DIR}/references/schema.md` via Bash.
+>
+> **Paths:** `${CLAUDE_SKILL_DIR}` is not expanded in this file. Replace it with this
+> skill's directory (the "Base directory for this skill" path, i.e. the parent of
+> this `references/` folder) before running any command below.
 
 Both interview mode and bootstrap mode of the `threat-model` skill write
 this file to `<target-dir>/THREAT_MODEL.md`. The format is markdown so humans

@@ -31,6 +31,7 @@ product,prioritization-frameworks,phuryn/pm-skills,MIT,pm-skills/pm-execution/sk
 product,ab-test-analysis,phuryn/pm-skills,MIT,pm-skills/pm-data-analytics/skills/ab-test-analysis,8607e3b077817f89bf4a9b623246219734ac3be0,modified-locally,base
 product,pricing-strategy,phuryn/pm-skills,MIT,pm-skills/pm-product-strategy/skills/pricing-strategy,8607e3b077817f89bf4a9b623246219734ac3be0,modified-locally,base
 product,create-prd,phuryn/pm-skills,MIT,pm-skills/pm-execution/skills/create-prd,8607e3b077817f89bf4a9b623246219734ac3be0,modified-locally,base
+product,create-prd,anthropics/knowledge-work-plugins,Apache-2.0,knowledge-work-plugins/product-management/skills/write-spec,1bd42820da111e5f0206e570bf5228a1c35839c7,modified-locally,merged
 product,pre-mortem,phuryn/pm-skills,MIT,pm-skills/pm-execution/skills/pre-mortem,8607e3b077817f89bf4a9b623246219734ac3be0,modified-locally,base
 product,interview-script,phuryn/pm-skills,MIT,pm-skills/pm-product-discovery/skills/interview-script,8607e3b077817f89bf4a9b623246219734ac3be0,modified-locally,base
 product,north-star-metric,phuryn/pm-skills,MIT,pm-skills/pm-marketing-growth/skills/north-star-metric,8607e3b077817f89bf4a9b623246219734ac3be0,modified-locally,base
@@ -39,6 +40,7 @@ product,competitor-analysis,phuryn/pm-skills,MIT,pm-skills/pm-market-research/sk
 product,competitor-analysis,ferdinandobons/startup-skill,MIT,startup-skill/startup-competitors/references/honesty-protocol.md;startup-skill/startup-competitors/references/verification-agent.md,a5f97c317b93caedbb49d28f20e9ec283b2ec087,modified-locally,merged
 product,intended-vs-implemented,phuryn/pm-skills,MIT,pm-skills/pm-ai-shipping/skills/intended-vs-implemented,8607e3b077817f89bf4a9b623246219734ac3be0,modified-locally,base
 product,user-personas,phuryn/pm-skills,MIT,pm-skills/pm-market-research/skills/user-personas,8607e3b077817f89bf4a9b623246219734ac3be0,modified-locally,base
+product,user-personas,anthropics/knowledge-work-plugins,Apache-2.0,knowledge-work-plugins/product-management/skills/synthesize-research,1bd42820da111e5f0206e570bf5228a1c35839c7,modified-locally,merged
 product,product-positioning,wondelai/skills,MIT,skills/obviously-awesome,c172996495bed0fcd26896a9416b2093fd7073f0,modified-locally,base
 product,strategy-kernel,wondelai/skills,MIT,skills/good-strategy-bad-strategy,c172996495bed0fcd26896a9416b2093fd7073f0,modified-locally,base
 product,validate-data,anthropics/knowledge-work-plugins,Apache-2.0,knowledge-work-plugins/data/skills/validate-data,1bd42820da111e5f0206e570bf5228a1c35839c7,modified-locally,base

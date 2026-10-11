@@ -33,7 +33,7 @@ threat's likelihood score.
 
 **Invocation:** `threat-model [bootstrap-then-interview|bootstrap|interview] <target-dir> [--vulns <file>] [--design-doc <file>] [--seed <THREAT_MODEL.md>] [--depth recon|full] [--fresh]`
 
-`${CLAUDE_SKILL_DIR}` below means this skill's own directory (the folder containing this SKILL.md). If your runtime does not expand that variable, substitute the absolute path to it — e.g. `${CLAUDE_PLUGIN_ROOT}/skills/threat-model` in a plugin install.
+Commands below use the `CLAUDE_SKILL_DIR` placeholder for this skill's own directory (the folder containing this SKILL.md, printed as "Base directory for this skill" when the skill loads); `scripts/` and `references/` paths are relative to it. Claude Code fills the placeholder in inside this file, but not inside `references/*.md` or in older versions: wherever it still appears literally as `${...}`, replace it with that directory (plugin install: `${CLAUDE_PLUGIN_ROOT}/skills/threat-model`) before running the command; the shell would expand it to an empty string.
 
 ---
 
@@ -181,4 +181,5 @@ all paths rewritten to `${CLAUDE_SKILL_DIR}`; slash-command and `$ARGUMENTS`
 wording neutralized; references to the upstream `vuln-pipeline`, harness
 `recon`/`judge` stages and `docs/*.md` removed and the authorization framing
 inlined in Step 0; `allowed-tools` frontmatter dropped; optional ATT&CK/ATLAS
-mapping note and cross-links to this marketplace's skills added.
+mapping note, cross-links to this marketplace's skills and
+`CLAUDE_SKILL_DIR` expansion notes (SKILL.md and each reference file) added.

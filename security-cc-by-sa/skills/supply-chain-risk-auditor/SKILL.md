@@ -49,6 +49,11 @@ The scripts enforce two rules worth knowing before you read their output:
 3. Collect, then render. Put outputs somewhere outside the audited repository unless
    asked otherwise:
 
+   `${CLAUDE_SKILL_DIR}` is this skill's own directory (the folder containing this SKILL.md,
+   shown as "Base directory for this skill" when it loads). If it appears literally instead of
+   being filled in, replace it with that directory (plugin install:
+   `${CLAUDE_PLUGIN_ROOT}/skills/supply-chain-risk-auditor`) before running the commands.
+
    ```sh
    uv run ${CLAUDE_SKILL_DIR}/scripts/collect.py <project-dir> --json <out-dir>/findings.json
    uv run ${CLAUDE_SKILL_DIR}/scripts/render.py <out-dir>/findings.json --out <out-dir>/report.md

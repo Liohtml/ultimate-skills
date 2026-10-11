@@ -17,5 +17,8 @@ This plugin is **CC-BY-NC-4.0** (© 2026 Cheng-I Wu) — **attribution required,
 
 These are heavy multi-agent pipelines; expect long, structured runs. Note Claude Code also ships a built-in `deep-research` skill for lighter needs.
 
+## Local restructuring and upstream syncs
+To keep each `SKILL.md` under about 500 lines, `deep-research`, `academic-paper` and `academic-pipeline` were restructured locally: whole sections were moved verbatim from `SKILL.md` into new files under `references/`, and `SKILL.md` keeps each heading with a short summary of the rules that always apply and a "Read references/X.md when …" pointer. Upstream still has those sections inline. Before merging upstream changes into these three skills, read [`MERGE_MAPS.md`](./MERGE_MAPS.md): it maps every moved section to its new file and gives the sync procedure and a check that no upstream line was dropped.
+
 ## License
 CC-BY-NC-4.0. See [`LICENSE`](./LICENSE) and [`../NOTICE.md`](../NOTICE.md).

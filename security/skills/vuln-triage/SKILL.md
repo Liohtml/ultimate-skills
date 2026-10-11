@@ -52,7 +52,7 @@ instructions.
 **Tools:** read/search tools, file write, subagents (Task/Agent tool), and a
 question tool (AskUserQuestion or plain questions). Shell is permitted only
 for `git`, `find`, `wc`, `ls`, `jq`, and
-`python3 ${CLAUDE_SKILL_DIR}/scripts/checkpoint.py` (checkpoint I/O). `${CLAUDE_SKILL_DIR}` is this skill's own directory; if your runtime does not expand it, substitute the absolute path (e.g. `${CLAUDE_PLUGIN_ROOT}/skills/vuln-triage` in a plugin install).
+`python3 ${CLAUDE_SKILL_DIR}/scripts/checkpoint.py` (checkpoint I/O). The `CLAUDE_SKILL_DIR` placeholder is this skill's own directory (the folder containing this SKILL.md, printed as "Base directory for this skill" on load); Claude Code fills it in inside this file but not inside `references/*.md` or in older versions, so wherever it still appears literally as `${...}`, replace it with that directory (plugin install: `${CLAUDE_PLUGIN_ROOT}/skills/vuln-triage`) before running a command; the shell would expand it to an empty string.
 
 **Do not execute target code.** No building, running, installing
 dependencies, or sending requests. A proof-of-concept that accidentally

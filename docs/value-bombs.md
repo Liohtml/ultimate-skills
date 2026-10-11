@@ -1,7 +1,7 @@
 # Value Bombs: Kandidaten für die nächste Kurationsrunde
 
 > Stand: 2026-09-23 · Kuratiert aus den Ergebnissen von 4 Scout-Agenten (engineering, product, design, research-and-docs).
-> Ursprünglich eine **Empfehlung**. **Stand der Umsetzung (Welle 2, 2026-09-23):** Welle 1 und der Großteil von Welle 2 sind umgesetzt. Den Status jedes Kandidaten zeigt Abschnitt 0. Die Abschnitte 1 bis 5 bleiben als ursprüngliche Analyse unverändert, deshalb stehen dort teils noch die Upstream-Namen.
+> Ursprünglich eine **Empfehlung**. **Stand der Umsetzung (Welle 2, 2026-09-23):** Welle 1 und der Großteil von Welle 2 sind umgesetzt. Den Status jedes Kandidaten zeigt Abschnitt 0. **Welle 3 (2026-10-11)** brachte keine neuen Skills, sondern vertiefte bestehende (siehe Abschnitt 0 und [`CHANGELOG.md`](../CHANGELOG.md)). Die Abschnitte 1 bis 5 bleiben als ursprüngliche Analyse unverändert, deshalb stehen dort teils noch die Upstream-Namen.
 
 ## 0. Umsetzungsstatus
 
@@ -16,7 +16,7 @@ Legende: ✅ integriert (eigener Skill) · 🔀 in einen bestehenden Skill gemer
 | 5 | `subagent-driven-development` | ✅ | `engineering/subagent-driven-development` | Von anderen superpowers-Skills entkoppelt, Workspace heißt jetzt `.sdd/`, Reviewer-Prompt gebündelt. |
 | 6 | `review-animations` (+ `animate`) | ✅ | `design/motion-craft` | Build- und Review-Modus, `disable-model-invocation` entfernt. |
 | 7 | `interface-design` | ✅ | `design/interface-design` | Die Slash-Commands sind jetzt `references/`. |
-| 8 | `humanizer` | ✅ | `writing/humanizer` | Neues Plugin `writing`. |
+| 8 | `humanizer` | ✅ | `writing/humanizer` | Neues Plugin `writing`. Welle 3: alle Vorher/Nachher-Beispiele durch eigene ersetzt, weil die Upstream-Beispiele aus Wikipedias CC-BY-SA-Seite „Signs of AI writing“ zitiert waren. |
 | 9 | `minto-pyramid` | ✅ | `writing/minto-pyramid` | tyroneross `pyramid-audit` gekürzt als `references/audit-report.md` (Apache-2.0) übernommen. Die Buch-Zitatanker wurden nicht übernommen. |
 | 10 | `validate-data` | ✅ | `product/validate-data` | Apache-2.0. Connector- und Slash-Command-Reste entfernt. |
 | 11 | `obviously-awesome` | ✅ | `product/product-positioning` | Umbenannt, Affiliate-Links entfernt. |
@@ -30,7 +30,7 @@ Legende: ✅ integriert (eigener Skill) · 🔀 in einen bestehenden Skill gemer
 | 19 | `startup-competitors` (Teile) | 🔀 | `product/competitor-analysis` | Evidenz-Labels, Honesty-Regeln und Verification-Pass. |
 | 20 | `long-horizon-prompting` | ✅ | `engineering/long-horizon-prompting` | `claim-*`-IDs entfernt. `cdc-prompt-annotated.md` nicht übernommen (wörtliche Kopie des OpenAI-Prompts), nur verlinkt. |
 | 21 | `citation-management` | ⏸ | – | Das Plugin `research-tools` (MIT) wurde in Welle 2 nicht angelegt. |
-| 22 | `customer-research` | ❌ | – | Überschneidet sich mit `interview-script` und `user-personas`. |
+| 22 | `customer-research` | ❌ | – | Überschneidet sich mit `interview-script` und `user-personas`. In Welle 3 erneut gelesen, aber nicht übernommen; `user-personas` wurde mit eigenem Text vertieft. |
 | 23 | `impeccable` (craft-floor + critique) | 🔀 | `design/redesign-existing-projects` | Zwei Referenzdateien, Apache-2.0, mit Änderungsvermerk. |
 | 24 | `frontend-slides` | ✅ | `design/frontend-slides` | Ohne `deploy.sh` und `bold-template-pack`. |
 | 25 | `writing-skills` / `skill-creator` | ❌ | – | skill-creator ist in Claude Code bereits eingebaut. Ein `meta`-Plugin lohnt sich nicht. |
@@ -44,6 +44,7 @@ Legende: ✅ integriert (eigener Skill) · 🔀 in einen bestehenden Skill gemer
 - `design/icon-set-generator` (jezweb).
 - Plugin `security`, alle Skills mit Autorisierungs- und Scope-Gates: `threat-model`, `static-vuln-scan` und `vuln-triage` (anthropics/defending-code-reference-harness, Apache-2.0), `skill-scanner` (getsentry, Apache-2.0), `web-pentest` und `llm-app-security-audit` (briiirussell, MIT).
 - Plugin `security-cc-by-sa`: `supply-chain-risk-auditor` und `variant-analysis` (trailofbits, CC-BY-SA-4.0).
+- Welle 3: anthropics/knowledge-work-plugins `write-spec` in `product/create-prd` und `synthesize-research` in `product/user-personas` gemergt (Apache-2.0, umgeschrieben). `prioritization-frameworks` und `value-proposition` wurden mit eigenem Text vertieft.
 
 **Zusätzlich verworfen:**
 
@@ -81,7 +82,9 @@ Legende: ✅ integriert (eigener Skill) · 🔀 in einen bestehenden Skill gemer
 - `mcp-builder` (Default-Modell, MCP-Spec/SDK) etwa halbjährlich prüfen.
 - Modell-IDs in `image-generation` vor dem ersten Live-Call prüfen.
 - Die datierten Vendor- und arXiv-Claims in `long-horizon-prompting` bei jedem Update prüfen.
-- `frontend-slides` `export-pdf.sh` installiert Playwright ungepinnt.
+- `frontend-slides` `export-pdf.sh`: Playwright ist seit Welle 3 auf 1.63.0 gepinnt (vorher ungepinnt). Den Pin bei Pflege-Runden anheben.
+- `research`: Upstream hat seit `95929c0` neue Commits. Beim Sync die lokal aufgeteilten `SKILL.md`-Dateien über [`research/MERGE_MAPS.md`](../research/MERGE_MAPS.md) zuordnen.
+- `humanizer`: Upstream hat neue Muster ergänzt (u. a. #26). Nur Regeln und Taxonomie übernehmen, keine Beispiele.
 
 ## 1. Kurzfazit und Methode
 
