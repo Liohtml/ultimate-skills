@@ -1,6 +1,6 @@
 # Craft floor
 
-> Adapted from [pbakaus/impeccable](https://github.com/pbakaus/impeccable) `skill/reference/craft-floor.md` at commit `e0881d2` (Apache-2.0, Copyright 2025 Paul Bakaus; see [impeccable.LICENSE.txt](impeccable.LICENSE.txt)). **Modified by ultimate-skills:** removed the design-hook sentence and rule-ID comments, and merged the model-specific (`<codex>`, `<gemini>`) blocks into one list. Licensed under the Apache License 2.0; see `LICENSES/` at the repository root.
+> Adapted from [pbakaus/impeccable](https://github.com/pbakaus/impeccable) `skill/reference/craft-floor.md` at commit `c63b8dd` (Apache-2.0, Copyright 2025 Paul Bakaus; see [impeccable.LICENSE.txt](impeccable.LICENSE.txt)). **Modified by ultimate-skills:** removed the design-hook sentence and rule-ID comments, and merged the model-specific `<codex>` block into the refuse list. Licensed under the Apache License 2.0; see `LICENSES/` at the repository root.
 
 Load this after the direction is settled, and build without announcing the checklist. A pinned brief or the committed visual world overrides anything here; your own habit does not.
 
@@ -50,6 +50,5 @@ Additional tells worth refusing:
 - Real illustration or none. Sketch-style SVG scenes, `loose-sketch` / `doodle` class names, and `feTurbulence` grain read as amateur. This bans SVG imitating pictures, never SVG doing geometry: crisp vector shapes, diagrams, animated linework, and shader-driven effects remain first-class media. A shaded, perspectived, or figure-bearing illustration is a picture even in line-art style; geometry means shapes a session can specify exactly.
 - Backgrounds are surfaces, textured only from the subject's world. `repeating-linear-gradient` stripes and two-axis grid overlays need an actual canvas, map, blueprint, or measuring tool under them.
 - Claims and configuration come from supplied truth; label illustrative values honestly. Naming a concept and then ironizing it is not a claim.
-- Never animate an image on hover, directly or through its parent. It is not an action target. Give the container the feedback.
 
 The floor holds the mechanics; it never picks the direction. With every check green, spend the page on the committed world, and when torn between refined and committed, commit.

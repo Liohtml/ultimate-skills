@@ -4,8 +4,11 @@ Read this when you need to see the expected depth and tone. The product, the
 people and every number below are **fictional and illustrative**; never copy
 them into a real PRD.
 
-The example is a full 8-section PRD kept short. A real one would link designs,
-dashboards and research notes instead of describing them.
+The example is the full version of an 8-section PRD, kept short. A lean first
+draft of the same PRD would keep every section but cut each to its first line or
+table (about 800 words), with Contacts reduced to the decision owner. A real
+one would link designs, dashboards and research notes instead of describing
+them.
 
 ---
 
@@ -93,10 +96,20 @@ through the app per month".
 
 ## 6. Value proposition(s)
 
-Owners want to get paid on time without feeling like debt collectors. Today the
-alternative is manual emails or doing nothing. Reminders go out on time, in the
-owner's own voice and from their own address, and stop automatically on
-payment, so there is no embarrassing reminder for an invoice already paid.
+One segment, so one value proposition.
+
+| Part | Primary segment: owners who do their own admin |
+|---|---|
+| Who | Owners who invoice 3-30 clients a month and do their own admin |
+| Why | Get paid on time without chasing clients by hand, which 6 of 14 interviewees called "the worst part of invoicing" (E3) |
+| What before | They re-open each overdue invoice, copy the details into an email and write the reminder by hand, usually several times per invoice; many reminders go out late or never (E2, E3) |
+| How | Reminders go out automatically for overdue invoices, in the owner's own wording and from their own address, and stop on payment (R1-R3) |
+| What after | Invoices get paid sooner (leading metric: days late), with no embarrassing reminder for an invoice already paid, and owners keep invoicing with us (primary metric: second-invoice rate; A2) |
+| Alternatives | Manual emails, the existing "Send reminder" button (used on 4% of overdue invoices), competing tools' scheduled reminders, or doing nothing. Few competitors let owners set the tone per client, and interviewees said sending from their own address matters for tone |
+
+**Statement:** For owners who do their own invoicing, automatic reminders in
+their own voice get overdue invoices paid without awkward chasing, and stop the
+moment a client pays.
 
 ## 7. Solution
 

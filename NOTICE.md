@@ -10,7 +10,7 @@ upstream commit and the upstream paths used.
 
 ## Source repositories
 
-34 source repositories. "Skills" counts the skills that were built on the
+35 source repositories. "Skills" counts the skills that were built on the
 repo (`base`); "merged into" lists skills that took material from it.
 
 | Source repo | Copyright holder / author | License | Plugin(s) | Skills (base) / merged into | License file |
@@ -47,6 +47,7 @@ repo (`base`); "merged into" lists skills that took material from it.
 | [blader/humanizer](https://github.com/blader/humanizer) | Siqi Chen | MIT | `writing` | 1 (`humanizer`) | `humanizer.LICENSE` |
 | [anthropics/defending-code-reference-harness](https://github.com/anthropics/defending-code-reference-harness) | Anthropic PBC | Apache-2.0 | `security` | 3 (`threat-model`, `static-vuln-scan` ← vuln-scan, `vuln-triage` ← triage) | `defending-code-reference-harness.LICENSE` |
 | [briiirussell/cybersecurity-skills](https://github.com/briiirussell/cybersecurity-skills) | Bri Russell | MIT | `security` | 2 (`web-pentest` incl. recon, `llm-app-security-audit` ← prompt-injection) | `cybersecurity-skills.LICENSE` |
+| [cloudflare/security-audit-skill](https://github.com/cloudflare/security-audit-skill) | Cloudflare, Inc. | MIT | `security` | 1 (`security-audit`; description rewritten and an attribution/Claude Code note added, all other files unchanged) | `cloudflare-security-audit-skill.LICENSE` |
 | [trailofbits/skills](https://github.com/trailofbits/skills) | Trail of Bits | **CC-BY-SA-4.0** | `security-cc-by-sa` | 2 (`supply-chain-risk-auditor`, `variant-analysis`) | `trailofbits-skills.LICENSE` |
 | [Imbad0202/academic-research-skills](https://github.com/Imbad0202/academic-research-skills) | Cheng-I Wu | **CC-BY-NC-4.0** | `research` | 4 (+ vendored `research/shared/`) | `academic-research-skills.LICENSE` |
 
@@ -124,7 +125,7 @@ phrases, not share-alike text, so no CC BY-SA material remains in the MIT
 
 - **`engineering/`, `product/`, `design/`, `writing/`, `security/` are permissive.** Each skill is MIT or Apache-2.0 (plugin license `MIT AND Apache-2.0`), and commercial use is allowed. Keep the license files and the modification notices when you redistribute.
 - **`security-cc-by-sa/` is CC-BY-SA-4.0** (Trail of Bits). Attribution is required, and commercial use is allowed. **Share-alike:** adapted versions you distribute must be CC-BY-SA-4.0. Never copy these skills into an MIT or Apache-2.0 plugin.
-- **`research/` is CC-BY-NC-4.0** (© 2026 Cheng-I Wu). Attribution is required, **non-commercial use only**, and it may not be relicensed. Each research `SKILL.md` names the source, the license and the fact that it was modified (CC BY-NC 4.0 §3(a)); `research/shared/README.md` does the same for the vendored files. The `references/` files split out of `deep-research`, `academic-paper` and `academic-pipeline` in wave 3 are upstream text moved verbatim and say so in their first line; [`research/MERGE_MAPS.md`](./research/MERGE_MAPS.md) maps them back to upstream.
+- **`research/` is CC-BY-NC-4.0** (© 2026 Cheng-I Wu). Attribution is required, **non-commercial use only**, and it may not be relicensed. Each research `SKILL.md` names the source, the license and the fact that it was modified (CC BY-NC 4.0 §3(a)); `research/shared/README.md` does the same for the vendored files. The `references/` files split out of the four research skills (wave 3 and upstream sync 2) are upstream text moved verbatim and say so in their first line; [`research/MERGE_MAPS.md`](./research/MERGE_MAPS.md) maps them back to upstream.
 - `scripts/validate.py` enforces this split: a `PROVENANCE.csv` row whose license is not part of its plugin's `plugin.json` license fails validation.
 - **For a fully permissive marketplace**, delete `research/` and `security-cc-by-sa/` and remove their entries from `.claude-plugin/marketplace.json`.
 
@@ -144,17 +145,18 @@ phrases, not share-alike text, so no CC BY-SA material remains in the MIT
   - Frontmatter `description:` fields were rewritten with specific "Use when …" triggers and "For X use Y" pointers between neighbouring skills.
   - Links to upstream skills that are not part of this curation were rewritten or marked.
   - Vendor, harness and runtime specifics were generalised: Codex tooling, `superpowers:*` sibling skills, Sentry-only bots and harness pipelines.
-  - Skills over 500 lines were split into `SKILL.md` plus `references/`: three design skills in wave 2, and in wave 3 `deep-research`, `academic-paper` and `academic-pipeline`, whose sections were moved verbatim (map: [`research/MERGE_MAPS.md`](./research/MERGE_MAPS.md)).
+  - Skills over 500 lines were split into `SKILL.md` plus `references/`: three design skills in wave 2; `deep-research`, `academic-paper` and `academic-pipeline` in wave 3; and `academic-paper-reviewer` in upstream sync 2, which also moved further sections out of the other three as upstream grew. Research sections are moved verbatim (map: [`research/MERGE_MAPS.md`](./research/MERGE_MAPS.md)).
   - Offensive-security skills gained written authorization and scope gates.
   - Wave 3 deepened `create-prd`, `user-personas`, `prioritization-frameworks` and `value-proposition` with mostly original text plus new `references/`; only `create-prd` and `user-personas` merge outside material (anthropics/knowledge-work-plugins, Apache-2.0, rewritten). The new text names the people behind the methods it uses (for example Olsen, Ulwick, Reinertsen, Kano, Osterwalder, Moesta, Cagan) and explains the methods in its own words.
-  - `humanizer`'s before/after examples, pattern descriptions and watch lists are original text (see above).
+  - `humanizer`'s before/after examples, pattern descriptions and watch lists are original text (see above). Upstream sync 2 adopted the upstream 3.1.0 rules and taxonomy (for example §26 and the new family F) in original wording with original examples; Wikipedia remains credited for the pattern categories only.
   - `security-and-hardening` was narrowed to code being built, with pointers to the `security` plugin for auditing and testing.
   - Bundled scripts were fixed where they were broken or stale:
     - `mcp-builder` `evaluation.py`: a retired model ID, and parallel `tool_use` handling.
     - `image-generation` `image_gen.py`: model and size guards.
-    - `find-polluter.sh`: the test command is now configurable.
+    - `find-polluter.sh`: the test command is now configurable, test paths with spaces are kept intact, and it exits 2 instead of reporting "clean" when no test file matches or the artifact already exists.
     - `frontend-slides` `export-pdf.sh`: Playwright pinned, the preview server bound to 127.0.0.1 with a path-traversal fix, relative output paths fixed.
-    - `skill-scanner` `scan_skill.py`: `--help`, and a JSON error when PyYAML is missing (scan logic unchanged).
+    - `skill-scanner` `scan_skill.py`: `--help`, a JSON error when PyYAML is missing, no following of symlinks out of the skill directory, masked secrets in evidence, no crash on YAML dates, a working HTTP-exfiltration pattern and reporting of `!`-fenced load-time blocks (output keys unchanged).
   - Every change to Apache-2.0 material is noted in the file it changed.
-  - `research/`: the upstream `shared/` files the skills reference were vendored into `research/shared/` (verbatim except rewritten relative links; see `research/shared/README.md`). Upstream helper scripts and design docs are not included.
+  - `research/`: the upstream `shared/` files the skills reference were vendored into `research/shared/` (verbatim except rewritten relative links and "not included here" markings for upstream-only material; see `research/shared/README.md`). Upstream helper scripts, design docs, slash commands and the fifth upstream skill `sr-screener` are not included.
+  - Upstream syncs re-merge upstream changes into the curated skills and keep these local modifications; the commit each source is synced to is in `PROVENANCE.csv`, and what each sync took is in [`CHANGELOG.md`](./CHANGELOG.md).
 - **Structure.** Skills are regrouped by discipline into seven plugins. The marketplace and plugin manifests and the READMEs were written fresh.

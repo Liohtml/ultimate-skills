@@ -1,6 +1,6 @@
 # Ultimate Skills
 
-**One opinionated, deduplicated marketplace of the best Claude Code skills.** **68 skills in 7 plugins** (**engineering · product · design · writing · security · security-cc-by-sa · research**), taken from **34 community skill repos**. They were chosen from about 90 scouted repos: the first wave kept 39 of 109 skills from five repos, the second wave added 29 skills and merged material from further sources into existing ones, and the third wave added no skills but deepened four product skills, split the three largest research skills and replaced `humanizer`'s Wikipedia-quoted examples with original ones.
+**One opinionated, deduplicated marketplace of the best Claude Code skills.** **69 skills in 7 plugins** (**engineering · product · design · writing · security · security-cc-by-sa · research**), taken from **35 community skill repos**. They were chosen from about 90 scouted repos: the first wave kept 39 of 109 skills from five repos, the second wave added 29 skills and merged material from further sources into existing ones, and the third wave added no skills but deepened four product skills, split the three largest research skills and replaced `humanizer`'s Wikipedia-quoted examples with original ones. Since then Cloudflare's `security-audit` joined the `security` plugin as its full codebase-audit workflow.
 
 This is a *curation*, not original work. Every skill keeps its original author and license: see [`NOTICE.md`](./NOTICE.md) and [`PROVENANCE.csv`](./PROVENANCE.csv), which has one row per upstream source of every skill. Selection criteria: a checkable mechanism rather than generic advice, a verified redistributable license, little overlap with the other skills, and low token and tooling cost. Rejected candidates and the reasons are in [`docs/value-bombs.md`](./docs/value-bombs.md).
 
@@ -12,7 +12,7 @@ This is a *curation*, not original work. Every skill keeps its original author a
 | [`product`](./product) | 17 | MIT + Apache-2.0 | Discovery, positioning, strategy, prioritization, PRDs, pricing, SaaS metrics, analysis QA |
 | [`design`](./design) | 13 | MIT + Apache-2.0 | Anti-slop frontend taste, product UI, image generation, motion, UI review, WCAG audits, icons, slides |
 | [`writing`](./writing) | 3 | MIT + Apache-2.0 | Minto-pyramid structure, copy editing, humanizer pass |
-| [`security`](./security) | 7 | MIT + Apache-2.0 | Authorized threat modeling, static scan, triage, GHA review, skill scanning, LLM-app audit, scoped web pentest |
+| [`security`](./security) | 8 | MIT + Apache-2.0 | Full source-code security audit (Cloudflare), authorized threat modeling, static scan, triage, GHA review, skill scanning, LLM-app audit, scoped web pentest |
 | [`security-cc-by-sa`](./security-cc-by-sa) | 2 | **CC-BY-SA-4.0** | Supply-chain dependency risk, variant analysis |
 | [`research`](./research) | 4 | **CC-BY-NC-4.0** | Deep research, academic writing, peer review |
 
@@ -87,7 +87,7 @@ MIT + Apache-2.0 · [plugin README](./product/README.md)
 | `interview-script` | Mom-Test / JTBD customer-discovery interview script. |
 | `user-personas` | Evidence-gated behavioural personas with JTBD and switching forces; proto-persona labelling, validation and refresh. |
 | `prioritization-frameworks` | Pick and apply the right method (RICE, ICE, cost of delay / WSJF, Kano, MoSCoW…) with calibrated scales, worked examples and a session playbook. |
-| `create-prd` | Evidence-first 8-section PRD with metrics and guardrails, MoSCoW acceptance criteria and a rollout plan; also reviews PRDs. |
+| `create-prd` | Evidence-first 8-section PRD, lean by default (1–2 pages, full on request), with 6-part JTBD value propositions per segment, metrics and guardrails, MoSCoW acceptance criteria and a rollout plan; also reviews PRDs. |
 | `intended-vs-implemented` | Audit the gap between intended behavior and shipped code. |
 | `north-star-metric` | Define the NSM and its input-metric constellation by business game. |
 | `saas-metrics-coach` | ARR, churn, CAC, LTV, NRR and payback from raw numbers with scripts; benchmarked health check. |
@@ -119,7 +119,7 @@ MIT + Apache-2.0 · [plugin README](./writing/README.md)
 | Skill | What it does |
 |---|---|
 | `minto-pyramid` | Conclusion-first structure (SCQA) for decision documents, plus a structure audit with a verdict. |
-| `copy-editing` | Seven Sweeps edit of marketing and conversion copy; missing proof is flagged, never invented. |
+| `copy-editing` | Seven Sweeps edit of marketing and conversion copy with an AI-tell check on every edit, plus SERP-gap content refreshes; missing proof is flagged, never invented. |
 | `humanizer` | Final pass that removes AI-sounding patterns without adding or losing facts. |
 
 ### security
@@ -127,6 +127,7 @@ MIT + Apache-2.0 · authorized use only · [plugin README](./security/README.md)
 
 | Skill | What it does |
 |---|---|
+| `security-audit` | Cloudflare's source-first audit: coverage ledger, isolated hunters, adversarial validation, schema-validated findings and a report; guidance mode for single questions. |
 | `threat-model` | Code-grounded, read-only threat model (interview or bootstrap from the repo). |
 | `static-vuln-scan` | Read-only static vulnerability scan scoped from the threat model. |
 | `vuln-triage` | Adversarial N-vote verification, dedupe and re-ranking of any scanner's findings (incl. SARIF). |
@@ -161,7 +162,7 @@ Curated from these repositories (details, licenses and what was taken: [`NOTICE.
 - **product:** [phuryn/pm-skills](https://github.com/phuryn/pm-skills) (Paweł Huryn), [wondelai/skills](https://github.com/wondelai/skills) (Wondel.ai), [anthropics/knowledge-work-plugins](https://github.com/anthropics/knowledge-work-plugins) (Anthropic), [alirezarezvani/claude-skills](https://github.com/alirezarezvani/claude-skills) (Alireza Rezvani; skill author Abbas Mir), [ferdinandobons/startup-skill](https://github.com/ferdinandobons/startup-skill) (Ferdinando Bons)
 - **design:** [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill) (Leonxlnx), [vercel-labs/web-interface-guidelines](https://github.com/vercel-labs/web-interface-guidelines) (Vercel Labs), [emilkowalski/skills](https://github.com/emilkowalski/skills) (Emil Kowalski), [Dammyjay93/interface-design](https://github.com/Dammyjay93/interface-design) (Damola Akinleye), [84emllc/claude-wcag-skill](https://github.com/84emllc/claude-wcag-skill) (84EM), [masuP9/a11y-specialist-skills](https://github.com/masuP9/a11y-specialist-skills) (masuP9), [openai/skills](https://github.com/openai/skills) (OpenAI), [jezweb/claude-skills](https://github.com/jezweb/claude-skills) (Jeremy Dawes), [wuyoscar/GPT-Image2-Skill](https://github.com/wuyoscar/GPT-Image2-Skill) (Wuyoscar), [replicate/skills](https://github.com/replicate/skills) (Replicate), [zarazhangrui/frontend-slides](https://github.com/zarazhangrui/frontend-slides) (Zara Zhang), [pbakaus/impeccable](https://github.com/pbakaus/impeccable) (Paul Bakaus)
 - **writing:** [millwright-labs/minto-pyramid-skill](https://github.com/millwright-labs/minto-pyramid-skill) (Millwright Labs), [tyroneross/pyramid-principle](https://github.com/tyroneross/pyramid-principle) (Tyrone Ross), [coreyhaines31/marketingskills](https://github.com/coreyhaines31/marketingskills) (Corey Haines), [blader/humanizer](https://github.com/blader/humanizer) (Siqi Chen)
-- **security:** [anthropics/defending-code-reference-harness](https://github.com/anthropics/defending-code-reference-harness) (Anthropic), [getsentry/skills](https://github.com/getsentry/skills) (Sentry), [briiirussell/cybersecurity-skills](https://github.com/briiirussell/cybersecurity-skills) (Bri Russell)
+- **security:** [anthropics/defending-code-reference-harness](https://github.com/anthropics/defending-code-reference-harness) (Anthropic), [getsentry/skills](https://github.com/getsentry/skills) (Sentry), [briiirussell/cybersecurity-skills](https://github.com/briiirussell/cybersecurity-skills) (Bri Russell), [cloudflare/security-audit-skill](https://github.com/cloudflare/security-audit-skill) (Cloudflare)
 - **security-cc-by-sa:** [trailofbits/skills](https://github.com/trailofbits/skills) (Trail of Bits)
 - **research:** [Imbad0202/academic-research-skills](https://github.com/Imbad0202/academic-research-skills) (Cheng-I Wu)
 
@@ -172,4 +173,4 @@ The curation, manifests and docs are MIT. Each skill stays under its upstream li
 ## Maintenance
 
 - `python3 scripts/validate.py` checks frontmatter (name = directory, description ≤ 1024 chars), manifests, relative links, `PROVENANCE.csv` (one base row per skill, and each license must fit its plugin's license) and SKILL.md length. CI also runs `claude plugin validate --strict` on the marketplace and every plugin.
-- `python3 scripts/check_upstream.py [--skill NAME] [--repo OWNER/REPO]` reports every provenance row whose upstream paths changed since the recorded commit. Skills that diverge from upstream on purpose get a `note:` line: `deep-research`, `academic-paper` and `academic-pipeline` were split locally, so map upstream changes with [`research/MERGE_MAPS.md`](./research/MERGE_MAPS.md); `humanizer` must not take upstream's Wikipedia-quoted examples back.
+- `python3 scripts/check_upstream.py [--skill NAME] [--repo OWNER/REPO]` reports every provenance row whose upstream paths changed since the recorded commit. Skills that diverge from upstream on purpose get a `note:` line: `deep-research`, `academic-paper` and `academic-pipeline` were split locally, so map upstream changes with [`research/MERGE_MAPS.md`](./research/MERGE_MAPS.md), which also maps `academic-paper-reviewer` (split in upstream sync 2); `humanizer` must not take upstream's Wikipedia-quoted examples back. After a sync, set the row's `source_commit` to the upstream commit merged.

@@ -16,7 +16,7 @@ description: >-
 
 # Skill Security Scanner
 
-> Includes material adapted from [getsentry/skills](https://github.com/getsentry/skills/tree/c2f99a5b04b4cd992ec3022d7c2c3e23e938d241/skills/skill-scanner) (Apache-2.0). Modified by ultimate-skills: see `LICENSE.txt` and the change note at the end.
+> Includes material adapted from [getsentry/skills](https://github.com/getsentry/skills/tree/d18b7aa8ba878354e5c348310230e652f7690f9c/skills/skill-scanner) (Apache-2.0). Modified by ultimate-skills: see `LICENSE.txt` and the change note at the end.
 
 Scan agent skills for security issues before adoption. Detects prompt injection, malicious code, excessive permissions, secret exposure, and supply chain risks.
 
@@ -225,4 +225,4 @@ Example assessments:
 
 ## Change note (Apache-2.0 §4b)
 
-Modified from upstream commit `c2f99a5`: description rewritten with cross-pointers; script invocation changed to `${CLAUDE_SKILL_DIR}` with a `python3` fallback to `uv run`; skill-discovery order puts plugin layouts first; untrusted-data and expected-false-positive notes added; `allowed-tools` frontmatter dropped. `scripts/scan_skill.py` gained argparse `--help` and a JSON error when PyYAML is missing, and was fixed so that frontmatter dates no longer crash the JSON output, file content is read only from regular files inside the skill directory (symlinks are reported, never followed), secret values are masked in `evidence`, the HTTP-request pattern matches `urllib.request`/`http.client`/`aiohttp` calls, and fenced load-time shell blocks (opened with three backticks and an exclamation mark) are reported (output keys unchanged); a coverage note was added to the SKILL.md; the reference files are unchanged.
+Modified from upstream commit `d18b7aa`: description rewritten with cross-pointers; script invocation changed to `${CLAUDE_SKILL_DIR}` with a `python3` fallback to `uv run`; skill-discovery order puts plugin layouts first; untrusted-data and expected-false-positive notes added; `allowed-tools` frontmatter dropped. `scripts/scan_skill.py` gained argparse `--help` and a JSON error when PyYAML is missing, and was fixed so that frontmatter dates no longer crash the JSON output, file content is read only from regular files inside the skill directory (symlinks are reported, never followed), secret values are masked in `evidence`, the HTTP-request pattern matches `urllib.request`/`http.client`/`aiohttp` calls, and fenced load-time shell blocks (opened with three backticks and an exclamation mark) are reported (output keys unchanged); a coverage note was added to the SKILL.md; the reference files are unchanged.

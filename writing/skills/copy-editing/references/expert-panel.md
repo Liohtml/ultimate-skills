@@ -1,6 +1,6 @@
 # Expert Panel Scoring
 
-> From [coreyhaines31/marketingskills `copy-editing`](https://github.com/coreyhaines31/marketingskills/tree/5b2c0007766c6a1cf1d53fd8fc73e979e0821022/skills/copy-editing) (MIT, Copyright (c) 2025 Corey Haines). Moved out of SKILL.md for progressive disclosure.
+> From [coreyhaines31/marketingskills `copy-editing`](https://github.com/coreyhaines31/marketingskills/tree/1efedbc5148b54b2f0f6c6c9fe0be62e151c7fff/skills/copy-editing) (MIT, Copyright (c) 2025 Corey Haines). Moved out of SKILL.md for progressive disclosure.
 
 
 Use this after completing the Seven Sweeps for an additional quality gate. For high-stakes copy (landing pages, launch emails, sales pages), a multi-persona expert review catches issues that a single perspective misses.

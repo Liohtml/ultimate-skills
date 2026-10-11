@@ -13,7 +13,7 @@ description: >-
   workflows", "check CI security" or review a PR touching .github/. For
   building or fixing pipelines use ci-cd-and-automation; for dependency and
   package risk use supply-chain-risk-auditor (security-cc-by-sa plugin); for
-  application source code use static-vuln-scan.
+  application source code use security-audit.
 ---
 
 <!--
@@ -23,7 +23,7 @@ by StepSecurity (2025): https://www.stepsecurity.io/blog/hackerbot-claw-github-a
 
 # GitHub Actions Security Review
 
-> Includes material adapted from [getsentry/skills](https://github.com/getsentry/skills/tree/c2f99a5b04b4cd992ec3022d7c2c3e23e938d241/skills/gha-security-review) (Apache-2.0). Modified by ultimate-skills: see `LICENSE.txt` and the change note at the end.
+> Includes material adapted from [getsentry/skills](https://github.com/getsentry/skills/tree/d18b7aa8ba878354e5c348310230e652f7690f9c/skills/gha-security-review) (Apache-2.0). Modified by ultimate-skills: see `LICENSE.txt` and the change note at the end.
 
 Find exploitable vulnerabilities in GitHub Actions workflows. Every finding MUST include a concrete exploitation scenario — if you can't build the attack, don't report it.
 
@@ -209,4 +209,4 @@ If no findings: "No exploitable vulnerabilities identified. All workflows review
 
 ## Change note (Apache-2.0 §4b)
 
-Modified from upstream commit `c2f99a5`: description rewritten with cross-pointers; explicit read-only/authorization paragraph added to Scope; `allowed-tools` frontmatter dropped. The reference files are unchanged.
+Modified from upstream commit `d18b7aa`: description rewritten with cross-pointers; explicit read-only/authorization paragraph added to Scope; `allowed-tools` frontmatter dropped. The reference files are unchanged.

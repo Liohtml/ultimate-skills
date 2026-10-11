@@ -1,6 +1,6 @@
 {
   "name": "design",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Design & frontend craft: brief-aware direction for marketing pages, product-UI/dashboard design, image generation (OpenAI / Gemini) with image-first concepts and image-to-code, redesign audits with heuristic critique, motion rules, UI-code review, WCAG 2.2 audits, SVG icon sets, HTML slide decks, and production UI engineering.",
   "author": { "name": "Ultimate Skills (curated)", "url": "https://github.com/Liohtml/ultimate-skills" },
   "homepage": "https://github.com/Liohtml/ultimate-skills",

@@ -13,7 +13,7 @@ description: >-
   or MCP server for injection and privilege bugs. For design-time threat
   modeling of a new AI feature use threat-model; for hardening AI code while
   building use security-and-hardening; for scanning a skill/plugin file use
-  skill-scanner; for general source-code vulns use static-vuln-scan.
+  skill-scanner; for a full source-code audit use security-audit.
 ---
 
 # LLM Application Security Audit (prompt injection & agent security)

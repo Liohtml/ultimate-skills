@@ -1,6 +1,6 @@
 # Final Whole-Branch Reviewer Prompt Template
 
-> Adapted from [obra/superpowers `requesting-code-review/code-reviewer.md`](https://github.com/obra/superpowers/tree/5bf4e78011075bcfc0dc295f0724994cd123ee71/skills/requesting-code-review) (MIT, Copyright (c) 2025 Jesse Vincent). Bundled here so subagent-driven-development is self-contained. For the full review methodology behind this checklist see the code-review-and-quality skill.
+> Adapted from [obra/superpowers `requesting-code-review/code-reviewer.md`](https://github.com/obra/superpowers/tree/bb92a77741419a4ab5f06e711a283343f1ada0c3/skills/requesting-code-review) (MIT, Copyright (c) 2025 Jesse Vincent). Bundled here so subagent-driven-development is self-contained. For the full review methodology behind this checklist see the code-review-and-quality skill.
 
 Use this template when dispatching a code reviewer subagent.
 

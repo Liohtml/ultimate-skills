@@ -5,9 +5,10 @@ description: >-
   THREAT_MODEL.md (or a quick recon into 3-10 focus areas), fans out one review
   subagent per focus area, runs a confidence-scoring pass, and writes
   VULN-FINDINGS.json + .md for vuln-triage to verify. Never builds, runs, or
-  probes the target and makes no network calls. Use when asked to "scan for
-  vulns", "review this code for security issues", "find security bugs in <dir>",
-  or as the step between threat-model and vuln-triage. For a single known bug
+  probes the target and makes no network calls. Use for a quick one-pass scan
+  ("scan for vulns", "quick security scan of <dir>") or as the step between
+  threat-model and vuln-triage. For a full, coverage-tracked audit with
+  independently validated findings and a report use security-audit. For a single known bug
   and its siblings use variant-analysis (security-cc-by-sa plugin); for GitHub
   Actions workflows use gha-security-review; for LLM features use
   llm-app-security-audit; for secure-coding guidance while building use

@@ -1,6 +1,6 @@
 {
   "name": "engineering",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Production-grade engineering skills for AI coding agents: spec, plan, build incrementally or via reviewed subagents, test-drive, debug from a red feedback loop, verify before claiming done, review, iterate PRs to green, harden, optimize, design Postgres schemas and migrations, and build MCP servers.",
   "author": {
     "name": "Ultimate Skills (curated)",

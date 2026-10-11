@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Adapted from obra/superpowers (MIT, Copyright (c) 2025 Jesse Vincent),
-# skills/subagent-driven-development/scripts @ 5bf4e78. Change: workspace moved
+# skills/subagent-driven-development/scripts @ bb92a77. Change: workspace moved
 # from .superpowers/sdd/ to .sdd/.
 # Generate a review package: commit list, stat summary, and the net
 # diff with extended context, written to a file the reviewer reads in one

@@ -1,7 +1,7 @@
 # Value Bombs: Kandidaten für die nächste Kurationsrunde
 
 > Stand: 2026-09-23 · Kuratiert aus den Ergebnissen von 4 Scout-Agenten (engineering, product, design, research-and-docs).
-> Ursprünglich eine **Empfehlung**. **Stand der Umsetzung (Welle 2, 2026-09-23):** Welle 1 und der Großteil von Welle 2 sind umgesetzt. Den Status jedes Kandidaten zeigt Abschnitt 0. **Welle 3 (2026-10-11)** brachte keine neuen Skills, sondern vertiefte bestehende (siehe Abschnitt 0 und [`CHANGELOG.md`](../CHANGELOG.md)). Die Abschnitte 1 bis 5 bleiben als ursprüngliche Analyse unverändert, deshalb stehen dort teils noch die Upstream-Namen.
+> Ursprünglich eine **Empfehlung**. **Stand der Umsetzung (Welle 2, 2026-09-23):** Welle 1 und der Großteil von Welle 2 sind umgesetzt. Den Status jedes Kandidaten zeigt Abschnitt 0. **Welle 3 (2026-10-11)** brachte keine neuen Skills, sondern vertiefte bestehende (siehe Abschnitt 0 und [`CHANGELOG.md`](../CHANGELOG.md)). **Upstream-Sync 2 (2026-10-11, Marketplace 1.3.0)** übernahm Upstream-Änderungen in 22 Skills aus 11 Quell-Repos (siehe `CHANGELOG.md`). Die Abschnitte 1 bis 5 bleiben als ursprüngliche Analyse unverändert, deshalb stehen dort teils noch die Upstream-Namen und die damals gescouteten Commits; die aktuellen Pins stehen in [`PROVENANCE.csv`](../PROVENANCE.csv).
 
 ## 0. Umsetzungsstatus
 
@@ -10,13 +10,13 @@ Legende: ✅ integriert (eigener Skill) · 🔀 in einen bestehenden Skill gemer
 | Rang | Kandidat | Status | Ergebnis im Katalog | Anmerkung / Grund |
 |---:|---|---|---|---|
 | 1 | `diagnosing-bugs` | 🔀 | `engineering/debugging-and-error-recovery` | Feedback-Loop-Phase, Hypothesen und getaggte Logs gemergt, dazu `hitl-loop.template.sh`. Aus obra `systematic-debugging` kam nur `find-polluter.sh` mit. |
-| 2 | `web-interface-guidelines` | ✅ | `design/web-interface-review` | Regeln eingebettet und auf `e3d624b` gepinnt, kein WebFetch zur Laufzeit. |
+| 2 | `web-interface-guidelines` | ✅ | `design/web-interface-review` | Regeln eingebettet und gepinnt (Welle 2: `e3d624b`, seit Upstream-Sync 2: `434b7f9`), kein WebFetch zur Laufzeit. |
 | 3 | `verification-before-completion` | ✅ | `engineering/verification-before-completion` | Ton entschärft, Inhalt behalten. |
 | 4 | `mcp-builder` | ✅ | `engineering/mcp-builder` | Apache-2.0. Veraltete Default-Modell-ID und Parallel-`tool_use`-Bug in `evaluation.py` behoben. |
 | 5 | `subagent-driven-development` | ✅ | `engineering/subagent-driven-development` | Von anderen superpowers-Skills entkoppelt, Workspace heißt jetzt `.sdd/`, Reviewer-Prompt gebündelt. |
 | 6 | `review-animations` (+ `animate`) | ✅ | `design/motion-craft` | Build- und Review-Modus, `disable-model-invocation` entfernt. |
 | 7 | `interface-design` | ✅ | `design/interface-design` | Die Slash-Commands sind jetzt `references/`. |
-| 8 | `humanizer` | ✅ | `writing/humanizer` | Neues Plugin `writing`. Welle 3: alle Vorher/Nachher-Beispiele durch eigene ersetzt, weil die Upstream-Beispiele aus Wikipedias CC-BY-SA-Seite „Signs of AI writing“ zitiert waren. |
+| 8 | `humanizer` | ✅ | `writing/humanizer` | Neues Plugin `writing`. Welle 3: alle Vorher/Nachher-Beispiele durch eigene ersetzt, weil die Upstream-Beispiele aus Wikipedias CC-BY-SA-Seite „Signs of AI writing“ zitiert waren. Upstream-Sync 2: Regeln und Taxonomie von 3.1.0 (u. a. §26) in eigenen Worten mit eigenen Beispielen übernommen. |
 | 9 | `minto-pyramid` | ✅ | `writing/minto-pyramid` | tyroneross `pyramid-audit` gekürzt als `references/audit-report.md` (Apache-2.0) übernommen. Die Buch-Zitatanker wurden nicht übernommen. |
 | 10 | `validate-data` | ✅ | `product/validate-data` | Apache-2.0. Connector- und Slash-Command-Reste entfernt. |
 | 11 | `obviously-awesome` | ✅ | `product/product-positioning` | Umbenannt, Affiliate-Links entfernt. |
@@ -44,6 +44,7 @@ Legende: ✅ integriert (eigener Skill) · 🔀 in einen bestehenden Skill gemer
 - `design/icon-set-generator` (jezweb).
 - Plugin `security`, alle Skills mit Autorisierungs- und Scope-Gates: `threat-model`, `static-vuln-scan` und `vuln-triage` (anthropics/defending-code-reference-harness, Apache-2.0), `skill-scanner` (getsentry, Apache-2.0), `web-pentest` und `llm-app-security-audit` (briiirussell, MIT).
 - Plugin `security-cc-by-sa`: `supply-chain-risk-auditor` und `variant-analysis` (trailofbits, CC-BY-SA-4.0).
+- `security/security-audit` (cloudflare/security-audit-skill, MIT, `c1c8a8c`), auf Hinweis des Nutzers nach Upstream-Sync 2: Cloudflares quellcodebasierter Audit-Workflow (Coverage-Ledger, isolierte Hunter, adversariale Validierung, schema-geprüfte Findings, Report). Unverändert übernommen bis auf eine neue Beschreibung und einen Attributions-/Claude-Code-Hinweis. Ist jetzt der Standard für vollständige Code-Audits; `static-vuln-scan` bleibt für den schnellen Einzel-Scan vor `vuln-triage`.
 - Welle 3: anthropics/knowledge-work-plugins `write-spec` in `product/create-prd` und `synthesize-research` in `product/user-personas` gemergt (Apache-2.0, umgeschrieben). `prioritization-frameworks` und `value-proposition` wurden mit eigenem Text vertieft.
 
 **Zusätzlich verworfen:**
@@ -83,8 +84,8 @@ Legende: ✅ integriert (eigener Skill) · 🔀 in einen bestehenden Skill gemer
 - Modell-IDs in `image-generation` vor dem ersten Live-Call prüfen.
 - Die datierten Vendor- und arXiv-Claims in `long-horizon-prompting` bei jedem Update prüfen.
 - `frontend-slides` `export-pdf.sh`: Playwright ist seit Welle 3 auf 1.63.0 gepinnt (vorher ungepinnt). Den Pin bei Pflege-Runden anheben.
-- `research`: Upstream hat seit `95929c0` neue Commits. Beim Sync die lokal aufgeteilten `SKILL.md`-Dateien über [`research/MERGE_MAPS.md`](../research/MERGE_MAPS.md) zuordnen.
-- `humanizer`: Upstream hat neue Muster ergänzt (u. a. #26). Nur Regeln und Taxonomie übernehmen, keine Beispiele.
+- `research`: in Upstream-Sync 2 auf `ebc21bf` (v3.23.0) synchronisiert. Upstreams fünfter Skill `sr-screener`, die `/ars-*`-Slash-Commands und `scripts/check_acronyms.py` sind nicht enthalten und als „not included here“ markiert. Offen: `check_acronyms.py` nach Review und Tests als gebündeltes Skript übernehmen? Ohne das Skript meldet der Akronym-Check ehrlich „did not run“. Beim nächsten Sync alle vier lokal aufgeteilten `SKILL.md`-Dateien über [`research/MERGE_MAPS.md`](../research/MERGE_MAPS.md) zuordnen.
+- `humanizer`: in Upstream-Sync 2 auf 3.1.0 gebracht (u. a. #26). Auch künftig nur Regeln und Taxonomie übernehmen, keine Beispiele. Die `SKILL.md` hat rund 5.800 Wörter; Upstreams eigener Validator begrenzt auf 5.500 (bei uns keine Regel).
 
 ## 1. Kurzfazit und Methode
 

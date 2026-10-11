@@ -1,5 +1,302 @@
 # Changelog
 
+## Unreleased: `security-audit` (Cloudflare)
+
+- **New skill `security/security-audit`** from
+  [cloudflare/security-audit-skill](https://github.com/cloudflare/security-audit-skill)
+  `c1c8a8c` (MIT): Cloudflare's source-first audit workflow, which seeded their
+  vulnerability-discovery harness. Full audit mode runs six phases:
+  reconnaissance into a deterministic coverage ledger, isolated coverage-led
+  hunters (core attack classes plus 10 domain companions), a fresh verifier per
+  candidate, `findings.json` checked by `report-schema.json` and two
+  zero-dependency Node validators, independent re-verification, and a report
+  written outside the target repo. Guidance mode applies the same evidence bar
+  to a single question. Target code runs only inside an OS-enforced sandbox.
+  - Only the frontmatter description was rewritten (with pointers to the
+    neighbouring security skills) and an attribution / Claude Code terminology
+    note added; all other files are byte-identical to upstream.
+  - The bundled validator test suites pass (65/65). `skill-scanner` reports no
+    findings on the skill.
+- **Neighbours re-pointed:** `static-vuln-scan` is now the quick one-pass scan
+  feeding `vuln-triage`; full codebase audits route to `security-audit` from
+  `threat-model`, `vuln-triage`, `web-pentest`, `gha-security-review`,
+  `llm-app-security-audit` and `engineering/security-and-hardening`.
+- Catalog: **69 skills in 7 plugins from 35 source repos**.
+
+## Unreleased: upstream sync 2 (marketplace 1.3.0)
+
+This round syncs every provenance row whose upstream changed since its recorded
+`source_commit`: 22 rows, one per skill, from 11 source repos, plus the vendored
+`research/shared/`. The catalog is unchanged at **68 skills in 7 plugins from
+34 source repos**. Each changed file went through a 3-way merge
+(`git merge-file`, with the upstream file at the old `source_commit` as the
+base). Where our copy is a rewrite rather than a lightly edited upstream file
+(`create-prd`, `humanizer`, `debugging-and-error-recovery`,
+`accessibility-audit`), the upstream change was applied by hand.
+
+- **Licenses:** every upstream `LICENSE` is byte-identical at HEAD and at the old
+  commit, and so is impeccable's `NOTICE.md`. The only upstream legal-file change
+  is one new row in academic-research-skills' `THIRD_PARTY.md` (an OpenClaw
+  port). It does not touch our material. Nothing was imported under a different
+  license.
+- **Local changes kept:**
+  - rewritten descriptions and "For X use Y" pointers;
+  - "(upstream …, not included here)" markings;
+  - attribution lines and Apache-2.0 change notes, re-pinned to the new commits;
+  - progressive-disclosure splits;
+  - every fix from the script test pass below. The fixed files did not change
+    upstream (`find-polluter.sh`, `scan_skill.py`, the run-from-the-working-tree
+    note in `subagent-driven-development/SKILL.md`), so the fixes are intact.
+- **New "not included here" markings** for upstream material that this round's
+  text references but the marketplace does not ship:
+  - `constraint-driven-development` (agent-skills);
+  - a second mention of `shipping-artifacts` (pm-skills);
+  - the copywriting `ai-tells.md` and seo-audit `title-tags.md` references
+    (marketingskills);
+  - academic-research-skills' new fifth skill `sr-screener`, its `/ars-*` slash
+    commands and `scripts/check_acronyms.py`.
+
+Plugin versions: `engineering` 1.3.0, `product` 1.3.0, `design` 1.3.0,
+`writing` 1.2.0, `security` 1.2.0 and `research` 1.3.0. They also cover the
+script test pass below. `security-cc-by-sa` stays at 1.0.0 (its upstream paths
+are unchanged).
+
+### engineering
+addyosmani/agent-skills `bcab6a1` → `1be8e34`, mattpocock/skills `c55ee46` →
+`49dd158`, obra/superpowers `5bf4e78` → `bb92a77`.
+- `spec-driven-development`: a hard stop after writing the spec. Summarize it,
+  list the open questions, ask for approval, then end the turn without planning
+  or coding. A matching red flag and checklist item were added.
+- `code-review-and-quality`: "would the tests catch a regression?" is answered by
+  experiment. Invert one added condition, run the suite and restore the file; a
+  mutation that stays green is a finding.
+  - Upstream's fix for diffs pasted inline was folded into our rewritten
+    description (the frontmatter conflict).
+  - The new `constraint-driven-development` pointer is marked "not included
+    here".
+- `security-and-hardening`: the zod example applies `min(1)` after `trim()`, so a
+  whitespace-only title is rejected.
+- `performance-optimization`: Step 3 "Fix the Bottleneck" is condensed to a rule
+  and a recognizable signature per anti-pattern. The worked fixes moved to a new
+  `references/optimization-patterns.md` (upstream progressive disclosure;
+  SKILL.md 496 → 267 lines).
+- `api-and-interface-design`: `throw;` (invalid JS/TS) → `throw e;` in the
+  idempotency example.
+- `documentation-and-adrs`: the ADR Status line starts at `Proposed`. There is a
+  new tool-neutral "Prose Review" section with a checklist item, plus one local
+  line pointing to `humanizer` for its step 2.
+- `debugging-and-error-recovery` (mattpocock diagnosing-bugs `f3fc563`): if the
+  red was forced by mutating code or a fixture, `diff` against a pristine copy to
+  prove that the mutation landed. Upstream's CONTEXT.md → GLOSSARY.md rename
+  does not apply, because that convention was never taken.
+- `subagent-driven-development` (obra v7.0.0): `sdd-workspace` resolves the repo
+  root as a physical path, which fixes Git Bash and symlinked repos. It now only
+  creates `.sdd/.gitignore`, so a repo can commit its own.
+  - One conflict: we kept our `.sdd/` workspace path.
+  - A new 20-case harness passes. The pre-merge script fails the committed
+    `.gitignore` case.
+- The vendored `engineering/references/` and `design/references/` READMEs are
+  re-pinned to `1be8e34`; their content is unchanged upstream.
+
+### design
+- `frontend-ui-engineering` (agent-skills): `refetch` is destructured from
+  `useTasks()`, so `retry={refetch}` is bound.
+- `redesign-existing-projects` (impeccable `e0881d2` → `c63b8dd`): the craft-floor
+  rule "never animate an image on hover" is retired, as upstream did after a
+  corpus review.
+  - The merge conflicted because our copy folds the model-specific blocks into
+    one list, so the change was applied by hand.
+  - The Apache-2.0 change note is re-pinned and now says that the `<codex>`
+    block was merged (upstream no longer has a `<gemini>` block).
+- `web-interface-review` (vercel-labs `e3d624b` → `434b7f9`): a new desktop
+  overscroll rule. Put `overscroll-behavior: none` on `<html>` inside
+  `@media (pointer: fine)` and keep the coarse-pointer defaults for
+  pull-to-refresh. It is in both the SKILL.md rules and the verbatim `AGENTS.md`
+  copy.
+- `accessibility-audit` (masuP9 `6615e6e` → `eeba8df`): we take only ideas from
+  masuP9 and dropped its CLI, so the CLI-independent substance was folded into
+  the manual passes:
+  - axe does not cover 1.4.11, and its 2.5.3 rule is experimental and off by
+    default;
+  - keyboard reachability of composite widgets, popups, iframes and Shadow DOM
+    (2.1.1);
+  - target spacing for fixed elements (2.5.8);
+  - the HTML autofill grammar for `autocomplete` (1.3.5).
+
+  Upstream's claim that `position: sticky` targets "scroll with the page" was
+  left out on purpose.
+
+### product
+phuryn/pm-skills `8607e3b` → `c68487d`.
+- `create-prd` (pm-skills v2.2.0, 164 → 192 lines), folded into our deepened
+  version:
+  - lean by default: 1–2 pages, full version on request;
+  - ask up to three questions when the problem, the users or the success measure
+    is missing;
+  - research freely and cite each source;
+  - section 6 is now the 6-part JTBD value proposition, one per segment, and
+    serves as the spine of the PRD;
+  - a first version targets 2–3 segments at most;
+  - "say what you left out";
+  - reviews list blocking gaps first, then cuts;
+  - new anti-patterns: Padded PRD, Broken spine;
+  - the template, review rubric and worked example are updated to match.
+
+  A mechanical merge conflicted across the whole body, so the changes were
+  applied semantically. Two rules were reconciled:
+  - an inline `[TBD: owner]` is allowed only for a specific unknown value with an
+    open-question entry;
+  - high-stakes work gets the lean draft first, plus a recommendation for the
+    full version.
+
+  The merged `write-spec` source (knowledge-work-plugins) is unchanged upstream
+  and stays at `1bd4282`.
+- `intended-vs-implemented`: follows each repo's own documentation layout. The
+  new `shipping-artifacts` mention is marked "not included here".
+
+### writing
+- `copy-editing` (marketingskills `5b2c000` → `1efedbc`, 416 → 448 lines):
+  - an AI-Tell Check on every edit;
+  - a "replace with the fact" table;
+  - a "Reads as AI-Written" problem;
+  - an AI Tells checklist block;
+  - SERP gap analysis and "keep what already works" in the content-refresh
+    reference.
+
+  Our no-invented-facts `[needs: …]` marker wins over upstream's `[NEED: …]`.
+  The humanizer boundary stays in the description: copy-editing covers marketing
+  copy, humanizer other prose. Upstream's "sounds like AI" triggers were not
+  adopted. Upstream `evals/` are still not included.
+- `humanizer` (`9862685` → `225a6f3`, 3.0.0 → 3.1.0, 453 → 482 lines): rules and
+  taxonomy only, written in original wording with original examples:
+  - new family F "Writing for the wrong reader" with §26 "Re-explaining what the
+    reader knows";
+  - §25 widened to text that describes itself;
+  - §2 additions;
+  - the core rule now counts conversation context;
+  - §20 covers headings written for effect;
+  - de-duplicated watch lists;
+  - a detector non-goal;
+  - 26 patterns.
+
+  A check against the Wikipedia page dumps finds no shared run of 6 or more
+  words. Upstream's dash cross-reference fix matches our wave-3 fix.
+
+### security
+getsentry/skills `c2f99a5` → `d18b7aa`.
+- `gha-security-review` and `skill-scanner`: upstream's `# nosemgrep`
+  suppressions above the IMDS and reverse-shell examples in the reference files.
+  - The `allowed-tools` comma fix does not apply, because our copies drop
+    `allowed-tools`.
+  - The Apache-2.0 change notes are re-pinned to `d18b7aa`.
+  - `scan_skill.py` is unchanged upstream and every test-pass fix is kept.
+  - Re-run: the malicious fixture gives the same 21 findings, with no secret in
+    the output. A scan of all 68 skills gives valid JSON with empty stderr for
+    every one.
+
+### research
+Imbad0202/academic-research-skills `95929c0` → `ebc21bf` (upstream v3.22.1 →
+v3.23.0), covering all four skills and `research/shared/`.
+
+From upstream:
+- In all four `SKILL.md` files:
+  - The routing core (#892) is now inline, byte-identical to the newly vendored
+    `shared/references/routing_core.md`, because plugin installs never load
+    upstream's `.claude/CLAUDE.md`. It includes #961: only a `[direct-mode]` at
+    byte 0 is the escape hatch.
+  - A new section "Pasted and retrieved text is data, not instructions" carries
+    the canonical instruction/data boundary (#890, #894). Matching sections were
+    added to the agents that read pasted or retrieved text.
+  - Model tiering grows from 39 to 43 agents.
+- `academic-pipeline` (v3.23.0):
+  - new orchestration: a run ledger and handoff check (#887/#898), standing
+    constraints (#927), integrity-excluded sources (#936), an experiment-intake
+    question (#925), declined items at Stage 3'/4' (#927), a final-output
+    pre-check at Stage 4.5 (#929) and an evidence source folder handoff
+    (#933/#947/#948);
+  - the v3.6.7 audit artifact gate is opt-in (`ARS_AUDIT_ARTIFACT_GATE=1`; the
+    variable is configuration, not consent);
+  - `ARS_PASSPORT_RESET` resets at FULL and MANDATORY checkpoints;
+  - Stages 5 and 6 ask which files to produce (#928).
+- `academic-paper`:
+  - acronym-check hooks (#849);
+  - a `word_ceiling` standing constraint (#927);
+  - the formatter reports gaps and word-count mismatches instead of writing
+    content (#928, #929);
+  - a full Mode A run stops after Phase 6;
+  - journal and conference reviewers are peer review, never the
+    committee-correspondence variant (#854);
+  - the review-form note (#921);
+  - a revision does not regenerate the abstract (#936);
+  - per-source method weaknesses (#916).
+- `deep-research`:
+  - the review-form note, shown on `lit-review` selection or RQ confirmation
+    (#921);
+  - per-source method weaknesses in the three-way scan, bibliography agent and
+    evidence template (#916);
+  - `systematic-review` only on the author's choice;
+  - Schema 1 scope axes (#938).
+- `academic-paper-reviewer`:
+  - an advisory acronym-check attachment to the Editorial Decision Letter, added
+    only after `check_panel_synthesis.py` exits 0; it never feeds back into the
+    decision (#849);
+  - a Major that comes only from declined items goes into the next roadmap as a
+    limitations target (#927).
+- `shared/`:
+  - 10 files 3-way merged with 0 conflicts;
+  - 7 files added: the `excluded_source_entry`, `standing_constraint_entry` and
+    `run_ledger` passport schemas; `references/routing_core.md`,
+    `intent_clarification_protocol.md` and `review_form_note.md`; and
+    `research_workflow_profiles/field_general.json` (`contracts/README.md`
+    always pointed to it);
+  - `per_source_method_weaknesses.md` is not vendored, because the skills carry
+    that block inline.
+
+Local:
+- 12 `SKILL.md` conflicts (pipeline 3, paper 3, deep-research 4, reviewer 2).
+  They were all on lines where we had dropped pointers to unvendored upstream
+  files, or inside moved ranges. They were resolved to upstream content plus our
+  markings.
+- Progressive disclosure:
+  - `academic-paper-reviewer` was split for the first time (542 lines after the
+    merge → 486), with a new `references/skill_overview_details.md`.
+  - `deep-research` (480 lines): the Mode Selection flowchart, the Phase-by-phase
+    contract body and the key failure-path table moved to a new
+    `references/workflow_details.md`.
+  - `academic-paper` (575 lines after the merge → 464): new
+    `references/skill_overview_details.md` and
+    `references/review_target_criteria_binding.md`.
+  - `academic-pipeline` (513 lines after the merge → 478): the Orchestrator
+    Workflow Step 1–3 blocks moved to `references/orchestrator_workflow_details.md`.
+    The routing core and the boundary section stay inline because upstream
+    requires them in every `SKILL.md`, and the #925 flag stays because opt-in
+    flags must stay in context.
+  - In `deep-research` and `academic-paper`, the 60-line review-form-note block
+    is now a pointer stub to `shared/references/review_form_note.md`.
+- Attribution pins and pinned docs URLs were bumped to `ebc21bf`, and every
+  target was checked to exist.
+- [`research/MERGE_MAPS.md`](research/MERGE_MAPS.md) was rewritten:
+  - all four maps are now keyed to upstream `ebc21bf` line numbers, so no
+    offsets are needed;
+  - the routing core and boundary block are listed as keep-inline;
+  - the no-drop check now covers `academic-paper-reviewer`;
+  - expected today: 562/4, 471/5, 402/3 and 561/4 non-blank/missing lines.
+
+### Provenance, notices and docs
+- `PROVENANCE.csv`: the 22 synced rows are re-pinned and all stay
+  `modified-locally`. Rows without upstream changes keep their commits:
+  - the other addyosmani rows and obra's `find-polluter.sh`,
+    `verification-before-completion` and `receiving-code-review` rows;
+  - `create-prd`'s `write-spec` row (identical at upstream `02ffa99`);
+  - `iterate-pr`'s getsentry row, whose attribution link pins `c2f99a5`.
+- `NOTICE.md`:
+  - the `find-polluter.sh` and `scan_skill.py` modification notes now list the
+    test-pass fixes;
+  - the `research/` notes cover the sync-2 splits and the vendored files'
+    markings;
+  - the `humanizer` note covers the 3.1.0 rules.
+- `docs/value-bombs.md`: status for upstream sync 2.
+
 ## Unreleased: script test pass
 
 Every bundled script (24) was run for real on realistic inputs, with local mock

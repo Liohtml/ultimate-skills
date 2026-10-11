@@ -9,7 +9,7 @@ description: >-
   to an owner via CODEOWNERS/git history, and writes TRIAGE.json + TRIAGE.md.
   Resumable via checkpoints. Use when asked to "triage findings", "validate
   scanner output", "weed out false positives", "prioritize vulns" or "review the
-  security backlog". For producing findings use static-vuln-scan; for GitHub
+  security backlog". To produce findings use security-audit or static-vuln-scan; for GitHub
   Actions findings use gha-security-review; for everyday PR review use
   code-review-and-quality.
 ---

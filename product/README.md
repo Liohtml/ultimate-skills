@@ -26,7 +26,7 @@ Skills trigger automatically on matching tasks, or invoke one by name (e.g. "use
 
 `saas-metrics-coach` ships three small Python 3 scripts (standard library only, no network, no environment variables).
 
-`create-prd`, `user-personas`, `prioritization-frameworks` and `value-proposition` keep the core workflow in `SKILL.md` and load templates, calibration scales, worked examples and review rubrics from `references/` only when needed. Their examples and numbers are fictional and labelled as such.
+`create-prd`, `user-personas`, `prioritization-frameworks` and `value-proposition` keep the core workflow in `SKILL.md` and load templates, calibration scales, worked examples and review rubrics from `references/` only when needed. Their examples and numbers are fictional and labelled as such. `create-prd` is lean by default (a first PRD of about 1–2 pages, length a guide rather than a limit) and grows only where a decision needs it.
 
 ## License
 MIT, except `validate-data`, which is Apache-2.0, and the Apache-2.0 material merged into `create-prd` and `user-personas` (license text in each of these skill folders, modifications marked). Copies of every upstream license used by this plugin are in [`LICENSES/`](./LICENSES/); see [`../NOTICE.md`](../NOTICE.md) for attribution and [`../PROVENANCE.csv`](../PROVENANCE.csv) for per-skill sources.
