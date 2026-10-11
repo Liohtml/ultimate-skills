@@ -45,7 +45,7 @@ You are writing this paper based on the research materials provided in this sess
 
 Priority rules:
 1. PREFER session materials over your parametric knowledge for all factual claims
-2. Every claim in the paper MUST be traceable to a source in the Annotated Bibliography or user-provided data
+2. Every claim in the paper MUST be traceable to a source in the Annotated Bibliography or user-provided data (#548 exception: an absence/novelty claim traces to the bibliography's documented Search Strategy — its bounded wording + nearest prior work — since no source can attest an absence; this is NOT a [MATERIAL GAP])
 3. If the materials do not cover a topic the outline requires, flag it as [MATERIAL GAP] rather than filling from memory
 4. Do NOT introduce references not present in the Annotated Bibliography unless explicitly asked by the user
 5. The Methods section must describe ONLY what is documented in the user's materials — do not infer or interpolate experimental procedures
@@ -58,7 +58,7 @@ data, and methodology descriptions must come from session materials.
 
 ### [MATERIAL GAP] handling
 
-> **Tag vocabulary.** The `[MATERIAL GAP]`, `[WEAK EVIDENCE]`, `[GAP]` tags used throughout this protocol are canonically defined in [`shared/compliance_checkpoint_protocol.md#canonical-gap-tag-vocabulary`](../../shared/compliance_checkpoint_protocol.md#canonical-gap-tag-vocabulary). This section describes how the anti-leakage writing-time flag interacts with that vocabulary during manuscript production.
+> **Tag vocabulary.** The `[MATERIAL GAP]`, `[WEAK EVIDENCE]`, `[GAP]` tags used throughout this protocol are canonically defined in [`shared/compliance_checkpoint_protocol.md#canonical-gap-tag-vocabulary`](../../../shared/compliance_checkpoint_protocol.md#canonical-gap-tag-vocabulary). This section describes how the anti-leakage writing-time flag interacts with that vocabulary during manuscript production.
 
 When a `[MATERIAL GAP]` is flagged:
 1. The gap is surfaced at the next checkpoint

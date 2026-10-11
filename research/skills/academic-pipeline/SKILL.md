@@ -1,12 +1,12 @@
 ---
 name: academic-pipeline
-description: "Orchestrator for the full academic research pipeline: research -> write -> integrity check -> review -> revise -> re-review -> re-revise -> final integrity check -> finalize. Coordinates deep-research, academic-paper, and academic-paper-reviewer into a seamless 10-stage workflow with mandatory integrity verification, two-stage peer review, and reproducible quality gates. Triggers on: academic pipeline, research to paper, full paper workflow, paper pipeline, end-to-end paper, research-to-publication, complete paper workflow."
+description: "Orchestrator for the full academic research-to-publication pipeline: research, write, integrity check, peer review, revise, re-review, re-revise, final integrity check, finalize. Coordinates deep-research, academic-paper and academic-paper-reviewer through a 10-stage workflow with mandatory, coverage-bounded integrity checks, two-stage peer review and auditable QA artifacts. Use only when the user wants the whole journey from research topic to finished paper in one run. For a single stage use the individual skill: deep-research (research), academic-paper (writing, revision), academic-paper-reviewer (review). Triggers: academic pipeline, research to paper, full paper workflow, end-to-end paper, research-to-publication, 연구부터 논문까지, 논문 전체 워크플로, investigación a artículo, flujo completo de artículo."
 metadata:
-  version: "3.12.0"
-  last_updated: "2026-06-08"
+  version: "3.22.1"
+  last_updated: "2026-09-23"
   depends_on: "deep-research, academic-paper, academic-paper-reviewer"
   status: active
-  data_access_level: verified_only
+  data_access_level: raw
   task_type: open-ended
   related_skills:
     - deep-research
@@ -14,7 +14,9 @@ metadata:
     - academic-paper-reviewer
 ---
 
-# Academic Pipeline v3.12.0 — Full Academic Research Workflow Orchestrator
+# Academic Pipeline v3.22.1 — Full Academic Research Workflow Orchestrator
+
+> Adapted from [Imbad0202/academic-research-skills `academic-pipeline`](https://github.com/Imbad0202/academic-research-skills/tree/95929c00fc066730b40cf268fd1250b04f00356a/academic-pipeline) (© 2026 Cheng-I Wu), licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/) — see `../../LICENSE`. **Modified by ultimate-skills:** description rewritten, `shared/` paths pointed at the vendored `../../shared/`, upstream-only scripts and docs marked as optional links (details in the [marketplace CHANGELOG](https://github.com/Liohtml/ultimate-skills/blob/main/CHANGELOG.md)). Non-commercial use only.
 
 A lightweight orchestrator that manages the complete academic pipeline from research exploration to final manuscript. It does not perform substantive work — it only detects stages, recommends modes, dispatches skills, manages transitions, and tracks state.
 
@@ -26,42 +28,16 @@ A lightweight orchestrator that manages the complete academic pipeline from rese
 
 **v2.0 Core Improvements**:
 1. **Mandatory user confirmation checkpoints** — Each stage completion requires user confirmation before proceeding to the next step
-2. **Academic integrity verification** — After paper completion and before review submission, 100% reference and data verification must pass
+2. **Academic integrity checks** — After paper completion and before review submission, run the declared reference, registered-claim, and reported-data checks; expose denominators, sampling, unknown states, and blocking verdicts
 3. **Two-stage review** — First full review + post-revision focused verification review
-4. **Final integrity check** — After revision completion, re-verify all citations and data are 100% correct
-5. **Reproducible** — Standardized workflow producing consistent quality assurance each time
-6. **Process documentation** — After pipeline completion, automatically generates a "Paper Creation Process Record" PDF documenting the human-AI collaboration history
+4. **Final integrity check** — After revision completion, rerun the final-check contract from fresh inputs; `100%` applies only where the named registered population is explicitly complete
+5. **Auditable** — Version, hash, and retain workflow artifacts; deterministic checks are replayable, while generative outputs are not promised byte-identical
+6. **Process documentation** — Stage 6 generates a "Paper Creation Process Record" PDF documenting the human-AI collaboration history (delivered before the terminal acknowledgement that completes the pipeline)
 
 ## Quick Start
 
-**Full workflow (from scratch):**
-```
-I want to write a research paper on the impact of AI on higher education quality assurance
-```
---> academic-pipeline launches, starting from Stage 1 (RESEARCH)
-
-**Mid-entry (existing paper):**
-```
-I already have a paper, help me review it
-```
---> academic-pipeline detects mid-entry, starting from Stage 2.5 (INTEGRITY)
-
-**Revision mode (received reviewer feedback):**
-```
-I received reviewer comments, help me revise
-```
---> academic-pipeline detects, starting from Stage 4 (REVISE)
-
-**Resume from passport (cross-session context reset, opt-in):**
-```
-resume_from_passport=<hash> [stage=<n>] [mode=<m>]
-```
---> Loads the Material Passport (Schema 9), locates the `kind: boundary` entry matching `<hash>`, and confirms it has no later `kind: resume` entry consuming it. If `pending_decision` is set, the decision prompt fires first to capture the user's branch choice for the audit ledger; the prompt is never skipped, even when the user supplies `stage=`. After the prompt (or immediately if no `pending_decision`), the next stage is determined by: (a) `stage=<n>` CLI override if provided, else (b) the matched option's `next_stage`, else (c) the `next` field recorded in the boundary entry. CLI `stage=`/`mode=` overrides win over option routing.
-- **Gate (emit)**: `ARS_PASSPORT_RESET=1` must be set in the emitting session. Without the flag, no `kind: boundary` entries are written and there is nothing to resume from.
-- **Gate (resume)**: No flag required. Any session can invoke `resume_from_passport=<hash>` against a passport that carries a valid boundary entry matching the hash.
-- **Intent**: Invoke in a *fresh* Claude Code session. Resuming within the same session that emitted the boundary provides no token savings and may drop still-live in-session context.
-- **Stage**: Any. Resumes at whatever stage the routing rules above determine.
-- **Reference**: [`references/passport_as_reset_boundary.md`](references/passport_as_reset_boundary.md) — see §"`resume_from_passport` mode contract".
+Entry by material: a new research topic starts at Stage 1 (RESEARCH), an existing paper at Stage 2.5 (INTEGRITY), received reviewer comments at Stage 4 (REVISE). `resume_from_passport=<hash> [stage=<n>] [mode=<m>]` continues from a passport `kind: boundary` entry that no later `kind: resume` entry has consumed (emitting requires `ARS_PASSPORT_RESET=1`; resuming needs no flag and should run in a fresh session); a recorded `pending_decision` prompt always fires first and is never skipped, even with `stage=`; the next stage is the `stage=` override, else the chosen option's `next_stage`, else the boundary's `next`, and CLI `stage=`/`mode=` overrides win over option routing.
+Read [`references/entry_and_routing.md`](references/entry_and_routing.md) when the user asks to resume from a passport (full routing contract) or you need the example entry prompts.
 
 **Execution flow:**
 1. Detect the user's current stage and available materials
@@ -74,25 +50,8 @@ resume_from_passport=<hash> [stage=<n>] [mode=<m>]
 
 ## Trigger Conditions
 
-### Trigger Keywords
-
-**English**: academic pipeline, research to paper, full paper workflow, paper pipeline, end-to-end paper, research-to-publication, complete paper workflow
-
-### Non-Trigger Scenarios
-
-| Scenario | Skill to Use |
-|----------|-------------|
-| Only need to search materials or do a literature review | `deep-research` |
-| Only need to write a paper (no research phase needed) | `academic-paper` |
-| Only need to review a paper | `academic-paper-reviewer` |
-| Only need to check citation format | `academic-paper` (citation-check mode) |
-| Only need to convert paper format | `academic-paper` (format-convert mode) |
-
-### Trigger Exclusions
-
-- If the user only needs a single function (just search materials, just check citations), no pipeline is needed — directly trigger the corresponding skill
-- If the user is already using a specific mode of a skill, respect that entry point; the pipeline is opt-in
-- The pipeline is optional, not mandatory
+Use only for the whole research-to-publication journey; the pipeline is opt-in, never mandatory. For a single function dispatch the skill directly — `deep-research` (search, literature review), `academic-paper` (writing only; citation-check and format-convert modes), `academic-paper-reviewer` (review only) — and respect an entry point the user already chose in a specific skill mode.
+Read [`references/entry_and_routing.md`](references/entry_and_routing.md) when deciding whether a request should trigger the pipeline (English/Spanish/Korean keywords, non-trigger table, exclusions).
 
 ---
 
@@ -107,16 +66,12 @@ resume_from_passport=<hash> [stage=<n>] [mode=<m>]
 | 4 | REVISE | `academic-paper` | revision | Revised Draft, Response to Reviewers |
 | **3'** | **RE-REVIEW** | **`academic-paper-reviewer`** | **re-review** | **Verification review report: revision response checklist + residual issues** |
 | **4'** | **RE-REVISE** | **`academic-paper`** | **revision** | **Second revised draft (if needed)** |
-| **4.5** | **FINAL INTEGRITY** | **`integrity_verification_agent`** | **final-check** | **Final verification report (must achieve 100% pass to proceed)** |
+| **4.5** | **FINAL INTEGRITY** | **`integrity_verification_agent`** | **final-check** | **Final verification report (declared checks must PASS; registered denominators and unknown/out-of-scope states remain visible)** |
 | 5 | FINALIZE | `academic-paper` | format-convert | Final Paper (default MD; DOCX via Pandoc when available, otherwise conversion instructions; ask about LaTeX; confirm correctness; PDF) |
 | **6** | **PROCESS SUMMARY** | **orchestrator** | **auto** | **Paper creation process record MD + LaTeX to PDF (bilingual)** |
 
-**Parallelization opportunity (v3.3)**: Within Stage 2, the `academic-paper` skill's Phase 1 (literature_strategist_agent) and the `visualization_agent` can operate in parallel after Phase 2 (structure_architect_agent) completes the outline. Specifically:
-- Once the outline includes a visualization plan, `visualization_agent` can begin figure generation
-- Simultaneously, `argument_builder_agent` can build CER chains
-- `draft_writer_agent` waits for both to complete before beginning Phase 4
-
-This mirrors PaperOrchestra's parallel execution of Plot Generation (Step 2) and Literature Review (Step 3) after Outline (Step 1), which reduces overall pipeline latency. The parallelization is optional — sequential execution remains the default for simplicity.
+Optional (v3.3): within Stage 2, `visualization_agent` and `argument_builder_agent` may run in parallel once the outline exists, with `draft_writer_agent` waiting for both; sequential execution remains the default.
+Read [`references/orchestrator_workflow_details.md`](references/orchestrator_workflow_details.md) when enabling this parallel path.
 
 ---
 
@@ -124,14 +79,14 @@ This mirrors PaperOrchestra's parallel execution of Plot Generation (Step 2) and
 
 1. **Stage 1 RESEARCH** -> user confirmation -> Stage 2
 2. **Stage 2 WRITE** -> user confirmation -> Stage 2.5
-3. **Stage 2.5 INTEGRITY** -> PASS -> Stage 3 (FAIL -> fix and re-verify, max 3 rounds)
+3. **Stage 2.5 INTEGRITY** -> PASS -> Stage 3 (FAIL -> fix and re-verify, max 3 rounds; then Integrity Check FAIL Loop -> recorded user decision)
 4. **Stage 3 REVIEW** -> Accept -> Stage 4.5 / Minor|Major -> Stage 4 / Reject -> Stage 2 or end
 5. **Stage 4 REVISE** -> user confirmation -> Stage 3'
 6. **Stage 3' RE-REVIEW** -> Accept|Minor -> Stage 4.5 / Major -> Stage 4'
 7. **Stage 4' RE-REVISE** -> user confirmation -> Stage 4.5 (no return to review)
-8. **Stage 4.5 FINAL INTEGRITY** -> PASS (zero issues) -> Stage 5 (FAIL -> fix and re-verify)
-9. **Stage 5 FINALIZE** -> MD -> DOCX via Pandoc when available (otherwise instructions) -> ask about LaTeX -> confirm -> PDF -> Stage 6
-10. **Stage 6 PROCESS SUMMARY** -> ask language version -> generate process record MD -> LaTeX -> PDF -> end
+8. **Stage 4.5 FINAL INTEGRITY** -> PASS (zero issues) -> Stage 5 (FAIL -> fix and re-verify; after 3 unresolved rounds -> Integrity Check FAIL Loop -> recorded user decision)
+9. **Stage 5 FINALIZE** -> MD -> DOCX via Pandoc when available (otherwise instructions) -> ask about LaTeX -> confirm -> PDF -> completion checkpoint (FULL) -> Stage 6 (user may decline Stage 6: marked `skipped`, pipeline goes directly to `completed`)
+10. **Stage 6 PROCESS SUMMARY** -> ask language version -> generate process record MD -> LaTeX -> PDF -> terminal acknowledgement (`finish` / `end` / `done` / `confirm`, or an unambiguous natural-language equivalent) -> pipeline global state `completed`
 
 See `references/pipeline_state_machine.md` for complete state transition definitions.
 
@@ -145,33 +100,14 @@ See `references/pipeline_state_machine.md` for complete state transition definit
 
 | Type | When Used | Content |
 |------|-----------|---------|
-| FULL | First checkpoint; after integrity boundaries; before finalization | Full deliverables list + decision dashboard + all options |
+| FULL | First checkpoint; after integrity boundaries; Stage 5 completion (final-deliverable acceptance) | Full deliverables list + decision dashboard + all options |
 | SLIM | After 2+ consecutive "continue" responses on non-critical stages | One-line status + explicit continue/pause prompt |
-| MANDATORY | Integrity FAIL; Review decision; Stage 5 | Cannot be skipped; requires explicit user input |
+| MANDATORY | Integrity FAIL; Review decision; Stage 5 entry gate (before finalization) | Cannot be skipped; requires explicit user input |
 
 ### Decision Dashboard (shown at FULL checkpoints)
 
-```
-━━━ Stage [X] [Name] Complete ━━━
-
-Metrics:
-- Word count: [N] (target: [T] +/-10%)    [OK/OVER/UNDER]
-- References: [N] (min: [M])              [OK/LOW]
-- Coverage: [N]/[T] sections drafted       [COMPLETE/PARTIAL]
-- Quality indicators: [score if available]
-
-Deliverables:
-- [Material 1]
-- [Material 2]
-
-Flagged: [any issues detected, or "None"]
-
-Ready to proceed to Stage [Y]? You can also:
-1. View progress (say "status")
-2. Adjust settings
-3. Pause pipeline
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-```
+FULL checkpoints open with `━━━ Stage [X] [Name] Complete ━━━` and show Metrics (word count vs target ±10%, references vs minimum, sections drafted, criterion status or `NOT_COMPARABLE`), Deliverables, `Flagged:` (issues or "None"), then "Ready to proceed to Stage [Y]?" offering view progress (`status`), adjust settings, or pause.
+Read [`references/orchestrator_workflow_details.md`](references/orchestrator_workflow_details.md) when rendering a FULL checkpoint (exact dashboard template).
 
 ### Adaptive Rules
 
@@ -179,7 +115,7 @@ Ready to proceed to Stage [Y]? You can also:
 2. **After 2+ consecutive "continue" without review**: prompt user awareness ("You've continued [N] times in a row. Want to review progress?")
 3. **Integrity boundaries (Stage 2.5, 4.5)**: always MANDATORY
 4. **Review decisions (Stage 3, 3')**: always MANDATORY
-5. **Before finalization (Stage 5)**: always MANDATORY
+5. **Before finalization (Stage 5 entry gate)**: always MANDATORY — this is the checkpoint between Stage 4.5 PASS and the Stage 5 dispatch, where the user explicitly confirms proceeding and makes the finalization-format decision (citation style); the in-stage LaTeX question and content confirmation stay inside Stage 5 execution. The Stage 5 completion checkpoint (Final Paper delivered, before Stage 6) is FULL — never SLIM. See `references/pipeline_state_machine.md` § Stage 5 boundary semantics
 6. **All other stages**: start FULL, downgrade to SLIM if user says "just continue"
 
 ### Checkpoint Rules
@@ -196,7 +132,7 @@ Before presenting the checkpoint to the user, the orchestrator asks itself:
 
 1. **Citation integrity**: Are there any unverified citations in the latest output?
 2. **Sycophantic concession**: Did the latest stage uncritically accept all feedback without pushback?
-3. **Quality trajectory**: Is the latest output ≥ the quality of the previous stage? If declining, PAUSE and flag.
+3. **Criterion trajectory**: For each applicable named criterion, did the evidence-anchored status improve, remain unchanged, regress, or become non-comparable? Never reduce this to a hidden scalar or `latest >= previous`. Pause and flag any unresolved decision-bearing regression; use `NOT_COMPARABLE` when the criterion or evidence base changed.
 4. **Scope discipline**: Did the latest stage add content not requested by the user or the revision roadmap?
 5. **Completeness**: Are all required deliverables for this stage present?
 
@@ -210,8 +146,8 @@ If ANY answer raises concern, include it in the checkpoint presentation to the u
 |---|-------|------|------|
 | 1 | `pipeline_orchestrator_agent` | Main orchestrator: detects stage, recommends mode, triggers skill, manages transitions | `agents/pipeline_orchestrator_agent.md` |
 | 2 | `state_tracker_agent` | State tracker: records completed stages, produced materials, revision loop count | `agents/state_tracker_agent.md` |
-| 3 | `integrity_verification_agent` | Integrity verifier: 100% reference/citation/data verification (blocking) | `agents/integrity_verification_agent.md` |
-| 4 | `collaboration_depth_agent` | **Observer (advisory only — never blocks).** Reads dialogue log and scores user-AI collaboration pattern against `shared/collaboration_depth_rubric.md`. Invoked at FULL/SLIM checkpoints and at pipeline completion. Based on Wang & Zhang (2026). | `agents/collaboration_depth_agent.md` |
+| 3 | `integrity_verification_agent` | Integrity checker: coverage-bounded reference, citation, registered-claim, and reported-data checks (blocking verdicts are explicit) | `agents/integrity_verification_agent.md` |
+| 4 | `collaboration_depth_agent` | **Observer (advisory only — never blocks).** Reads dialogue log and scores user-AI collaboration pattern against `shared/collaboration_depth_rubric.md`. Invoked at FULL/SLIM checkpoints and during Stage 6 record compilation (whole-pipeline pass, before the Process Record is delivered). Based on Wang & Zhang (2026). | `agents/collaboration_depth_agent.md` |
 | 5 | `claim_ref_alignment_audit_agent` | **Opt-in claim faithfulness auditor (v3.8 #103).** Audits sampled citations for claim ↔ reference alignment + negative-constraint compliance; emits per-claim `claim_audit_results[]`, `claim_drift[]`, `uncited_assertions[]`, `constraint_violations[]`. Dispatched via orchestrator §3.6 when claim_audit mode is requested. | `agents/claim_ref_alignment_audit_agent.md` |
 
 ---
@@ -275,58 +211,40 @@ After user confirmation:
 
 1. Pass the previous stage's deliverables as input to the next stage
 2. Trigger handoff protocol (defined in each skill's SKILL.md):
-   - Stage 1  --> 2: deep-research handoff (RQ Brief + Bibliography + Synthesis)
+   - Stage 1  --> 2: deep-research handoff (RQ Brief + Methodology Blueprint + Bibliography + Synthesis)
+   - #672 cargo on every transition: exact builder-produced `preregistration-artifact/1.0` receipt and its named companion when provided; validate and carry byte-for-byte
    - Stage 2  --> 2.5: Pass complete paper to integrity_verification_agent
-   - Stage 2.5 --> 3: Pass verified paper to reviewer
+   - Stage 2.5 --> 3: Pass the Stage 2.5 paper to reviewer (verified, or carrying the recorded FAIL-loop partially-unverified warning)
    - Stage 3  --> 4: Pass Revision Roadmap to academic-paper revision mode
-   - Stage 4  --> 3': Pass revised draft and Response to Reviewers to reviewer
-   - Stage 3' --> 4': Pass new Revision Roadmap + R&R Traceability Matrix (Schema 11) to academic-paper revision mode
-   - Stage 4/4' --> 4.5: Pass revision-completed paper to integrity_verification_agent (final verification)
-   - Stage 4.5 --> 5: Pass verified final draft to format-convert mode
+   - Stage 4  --> 3': Pass revised draft, the hard-required original pre-revision draft (#576 current 1.1 §3.1 Phase 2A comparison base), exact author-adjudication sidecar, fully replayed Revision-Evidence Bundle, Response to Reviewers, Editorial Decision Letter, Round-1 findings, the immutable Roadmap, the exact ordered patch/report pairs projected by the bundle, and Round-1 Reviewer Configuration Cards. Missing original/roadmap/author/bundle is `manifest_incomplete`; this is the default contract re-review transfer. A user-requested fresh full review at 3' remains a separate full-mode branch.
+   - Stage 3' --> 4': Pass new Revision Roadmap + R&R Traceability Matrix (Schema 11) to academic-paper revision mode; the traceability sidecar (frozen `previously_missed`/`indeterminate` records, #576 §8) rides through 4' toward Stage 4.5
+   - Stage 3' --> 4.5 (Accept/Minor direct path): Pass verified revised draft + the traceability sidecar's frozen records to integrity_verification_agent as gate input
+   - Stage 4/4' --> 4.5: Pass revision-completed paper to integrity_verification_agent (final verification); on the Major-via-4' path the Stage 3' traceability sidecar travels along as gate input
+   - Stage 4.5 --> 5: Pass the accepted final draft (verified, or carrying the recorded FAIL-loop partially-unverified warning) to the one mandatory Stage-5 entry checkpoint; run #660 then #672 against that same accepted artifact ID/SHA-256 before format-convert dispatch
+   - Stage 5  --> 6: Pass final deliverables list + the Process-Summary projection of pipeline state history, omitting the #673 activity projection of terminal root `run_id`, pending/sealed activity fields, selected-store data, renderer output, and diagnostics (user may decline Stage 6 at the Stage 5 completion checkpoint)
 3. Begin next stage
 ```
 
 ### Mid-Conversation Reinforcement Protocol
 
-At every stage transition, the orchestrator MUST inject a brief core principles reminder. This prevents context rot in long conversations.
-
-**Template** (adapt to the upcoming stage):
-
-````
---- STAGE TRANSITION: [Current] → [Next] ---
-
-🔄 Core Principles Reinforcement:
-1. [Most relevant IRON RULE for the next stage]
-2. [Most relevant Anti-Pattern to avoid in the next stage]
-3. Quality check: Is the output of [Current Stage] at least as good as [Previous Stage]? If not, PAUSE.
-
-Checkpoint: [MANDATORY/ADVISORY] — [What user needs to confirm]
----
-````
-
-**Stage-specific reinforcement content**: See `references/reinforcement_content.md` for the full transition → reinforcement focus table.
+At every stage transition the orchestrator MUST inject a brief core-principles reminder (prevents context rot): the most relevant IRON RULE and Anti-Pattern for the next stage, a quality check — is [Current] output at least as good as [Previous]? If not, PAUSE — and the checkpoint type (MANDATORY/ADVISORY) with what the user must confirm.
+Read [`references/orchestrator_workflow_details.md`](references/orchestrator_workflow_details.md) at each stage transition for the exact template, and [`references/reinforcement_content.md`](references/reinforcement_content.md) for the per-transition focus table.
 
 ---
 
 ## Phase-by-phase Invocation Contract (v3.9.2)
 
-academic-pipeline is the orchestrator skill that coordinates the full ARS pipeline across 10 stages (delegating to deep-research, academic-paper, academic-paper-reviewer). Two invocation modes:
+Mode A (default, orchestrator-driven): `pipeline_orchestrator_agent` runs all stages end-to-end with Material Passport state tracking and dispatches the other four agents, which are cross-phase/meta (Bucket C/D, no phase fence). Mode B (phase-by-phase across sessions, typically `ARS_PASSPORT_RESET=1` + `resume_from_passport=<hash>`) requires an explicit user signal (`/ars-<mode>` or `[direct-mode]` prefix); downstream single-phase (Bucket A) agents write only within their phase, and ambiguous cross-phase input goes to clarification BEFORE the orchestrator runs.
+Read [`references/entry_and_routing.md`](references/entry_and_routing.md) when running phase-by-phase (Mode B) or checking agent phase buckets and enforcement.
 
-**Mode A — orchestrator-driven (default):** `pipeline_orchestrator_agent` runs all stages end-to-end with state tracking via Material Passport. `state_tracker_agent`, `integrity_verification_agent`, `collaboration_depth_agent`, and `claim_ref_alignment_audit_agent` are dispatched by the orchestrator at the appropriate checkpoints.
+> **Path note (Ultimate Skills):** `shared/...` paths refer to this plugin's vendored [`../../shared/`](../../shared/) directory. `scripts/*.py` validators and `docs/design/...` specs live only in the upstream repo ([Imbad0202/academic-research-skills@95929c0](https://github.com/Imbad0202/academic-research-skills/tree/95929c00fc066730b40cf268fd1250b04f00356a)); they are optional/advisory and not required to run this skill.
 
-**Mode B — phase-by-phase (cross-session resume):** User invokes one phase agent at a time across sessions, typically via `ARS_PASSPORT_RESET=1` + `resume_from_passport=<hash>` (see `references/passport_as_reset_boundary.md`).
+---
 
-In Mode B, **single-phase agents (Bucket A per `docs/design/2026-05-18-ars-v3.9.2-agent-phase-classification.md`) in the downstream skills (deep-research, academic-paper, academic-paper-reviewer) stay strictly within their assigned phase for writes**. The 5 agents in academic-pipeline itself are all cross-phase / meta by design (Bucket C/D) — they have no fence by design:
+## Opt-in Inquiry Branch Ledger (#743 alpha)
 
-- `pipeline_orchestrator_agent` (D — orchestrator, full pipeline visibility)
-- `state_tracker_agent` (D — meta state, all phases)
-- `integrity_verification_agent` (C — Stage 2.5 / 4.5 cross-skill gate)
-- `collaboration_depth_agent` (C — FULL/SLIM checkpoints + pipeline completion, advisory-only)
-- `claim_ref_alignment_audit_agent` (C — opt-in claim audit, phase-orthogonal)
-
-Routing into Mode B requires explicit user signal — `/ars-<mode>` slash command or `[direct-mode]` prefix. Ambiguous cross-phase input defaults to clarification before processing. **Critically:** if `pipeline_orchestrator_agent` is dispatched on ambiguous cross-phase materials, the orchestrator itself currently cannot reconcile (this is the v3.10 conductor #134 work) — v3.9.2 routes such cases to clarification BEFORE the orchestrator runs.
-
-**Enforcement (v3.9.2):** prompt-level via Phase Boundary blocks on downstream Bucket A agents + advisory verifier (`scripts/check_pipeline_integrity.py`). Deterministic PreToolUse hook + multi-phase envelope + orchestrator structured intake deferred to v3.10 active conductor (#134).
+Opt-in only: `ARS_INQUIRY_LEDGER=1` enables the `inquiry-branch-ledger/1.0` memory surface; unset or `0` emits no ledger artifact, pointer, prompt or summary, and a single linear branch never materializes a ledger. The summary is advisory state memory and never changes an integrity verdict or checkpoint requirement.
+Read [`references/advisory_side_channels.md`](references/advisory_side_channels.md) when `ARS_INQUIRY_LEDGER=1` is set (runtime ownership, adoption/reopen rules, where the summary may render, skip/off/reset options).
 
 ---
 
@@ -334,20 +252,33 @@ Routing into Mode B requires explicit user signal — `/ars-<mode>` slash comman
 
 Stage 2.5 (pre-review) and Stage 4.5 (post-revision) verification. 5-phase protocol: references → citation context → statistical data → originality → claims.
 
-⚠️ **IRON RULE**: Stage 4.5 must PASS with zero issues to proceed to Stage 5. Stage 4.5 verifies from scratch independently.
+⚠️ **IRON RULE**: Stage 4.5 must reach a recorded terminal resolution before Stage 5: PASS, or — after the 3-round integrity FAIL loop is exhausted — an explicit, recorded user decision on the listed unresolved items (rationale requirements escalate on repeated overrides; see `shared/compliance_checkpoint_protocol.md`). Unresolved items are never silently dropped. Stage 4.5 performs a fresh from-scratch pass without relying on Stage 2.5 conclusions; this is not a claim of independent error processes.
 
-⚠️ **IRON RULE (v3.2)**: Both Stage 2.5 and Stage 4.5 must also run the **AI Research Failure Mode Checklist** — a 7-mode taxonomy extending the citation hallucination checks into implementation bugs, hallucinated results, shortcut reliance, bug-as-insight, methodology fabrication, and pipeline-level frame-lock. If any of the 7 modes is `SUSPECTED`, or if Modes 1/3/5/6 are `INSUFFICIENT EVIDENCE`, the pipeline **blocks** and the user must acknowledge (confirm / override with reasoning / revise) before the pipeline proceeds. There is no `--no-block` escape hatch. Stage 6 PROCESS SUMMARY then reports the full failure-mode audit log as part of the AI Self-Reflection Report.
+⚠️ **IRON RULE (v3.2)**: Both Stage 2.5 and Stage 4.5 must also run the **AI Research Failure Mode Checklist** — a 7-mode taxonomy extending the citation hallucination checks into implementation bugs, hallucinated results, shortcut reliance, bug-as-insight, methodology fabrication, and pipeline-level frame-lock. If any of the 7 modes is `SUSPECTED`, or if Modes 1/3/5/6 are `INSUFFICIENT EVIDENCE`, the pipeline **blocks** and the user must acknowledge (confirm / override with reasoning / revise) before the pipeline proceeds. No configuration flag silences this block; the only path past it is the recorded user acknowledgment above — a trust-based control with an audit trail. Stage 6 PROCESS SUMMARY then reports the full failure-mode audit log as part of the AI Self-Reflection Report.
 
 > See `references/integrity_review_protocol.md` for the 5-phase citation/claim verification procedures.
 > See `references/ai_research_failure_modes.md` for the 7-mode AI research failure checklist and block/override logic.
 
 - [v3.4.0] `compliance_agent` runs mode-aware PRISMA-trAIce + RAISE compliance check; tier-based block semantics. See `shared/compliance_checkpoint_protocol.md`.
 
+### Tortured-phrase advisory (#660)
+
+After the exact Stage 4.5 pass and immediately before Stage 5 formatting, run the deterministic #660 checker on the exact accepted draft (no supplied snapshot → explicit `not_checked` artifact); the result is `HEURISTIC-ADVISORY` / `UNMEASURED`, never changes the Stage 4.5 PASS or Stage 5 gate, never rewrites prose, and reruns only after a revision re-entered the integrity sequence.
+Read [`references/advisory_side_channels.md`](references/advisory_side_channels.md) when running #660 (snapshot/manifest binding, literature-corpus advisory rows).
+
+### Cross-document consistency advisory (#672)
+
+Stage 1: only the shell-capable dispatcher builds the `preregistration-artifact/1.0` receipt; it and its named companion are replay-validated and carried byte-for-byte through every handoff (omission, substitution, template replacement or digest repair is invalid). At the single mandatory Stage-5 entry checkpoint run #660 first and #672 second against the identical accepted draft ID/SHA-256.
+#672 is always `LLM-ADVISORY` / `UNMEASURED` (no score, pass/fail, gate or rewrite) and cannot change Stage 4.5, block or delay the checkpoint, or alter Stage-5 routing; a manuscript revision stales both advisories, which rerun (#660, then #672) only after re-entering integrity.
+Read [`references/advisory_side_channels.md`](references/advisory_side_channels.md) when building the Stage 1 receipt or running #672 (binding equality, failure semantics).
+
 ---
 
 ## Two-Stage Review Protocol
 
 Stage 3 (full review, 5 reviewers) → Revision Coaching → Stage 4 → Stage 3' (re-review) → optional Residual Coaching → Stage 4'.
+
+Stage 3' runs under the #576 three-gate evidence-before-persuasion contract by default: the orchestrator emits a hash-bound input manifest, dispatches Phase 1 (criteria commitment, revision-blind) → Phase 2A (evidence verdict, persuasion-blind) → Phase 2B (claim matching, letter revealed), and invokes `scripts/check_re_review_synthesis.py` as a MANDATORY step before any decision surfaces — outcomes are Accept / Minor / Major, a `user_review_required` deferral, or a fail-closed abort (never Reject). The sidecar's frozen `previously_missed`/`indeterminate` new-issue records forward to Stage 4.5 on both routes. Legacy single-pass re-review requires the explicit `ARS_RE_REVIEW_LEGACY=1` flag and is marked `[LEGACY-NO-CONTRACT]`. Authority: `pipeline_orchestrator_agent.md` § Stage 3' Re-Review Contract Dispatch + `academic-paper-reviewer/references/re_review_mode_protocol.md`.
 
 > See `references/two_stage_review_protocol.md` for detailed stage flows and coaching dialogue limits.
 
@@ -392,9 +323,9 @@ ASCII dashboard shown at FULL checkpoints to display pipeline progress.
 - Mark unresolved issues as Acknowledged Limitations
 - Provide cumulative revision history (each round's decision, items addressed, unresolved items)
 
-### Early-Stopping Criterion (v3.2)
+### Early-Stopping Criterion
 
-At the end of each revision round, if **delta < 3 points** on the 0-100 rubric AND **no P0 issues remain**, suggest stopping the revision loop ("converged"). User can override. Hard cap: 2 full revision loops (Stage 4 + Stage 4').
+At the end of each revision round, suggest stopping only when **no P0 issue remains**, **no unresolved decision-bearing regression remains**, **no applicable criterion has a substantive status change requiring another revision**, and **the author has no outstanding required action**. Explain the criterion-bound basis; do not compute a score delta or treat small label-count changes as convergence. The user can override. Hard cap: 2 full revision loops (Stage 4 + Stage 4').
 
 ### Budget Transparency (v3.2; interaction-count extension #89/#388)
 
@@ -404,11 +335,18 @@ Alongside the token estimate, present the **interaction-count budget**: long-hor
 
 ---
 
-## Reproducibility
+## Cross-run Adjudication Activity (#673; opt-in advisory side channel)
 
-Every pipeline artifact is versioned, hashed, and auditable.
+Opt-in, advisory only; `state_tracker_agent` ("Adjudication-activity metadata") is the single producer. Handlers apply their routing/state effect first and only then best-effort record activity; terminal behaviour runs first and no activity failure can affect the durable terminal outcome. Activity data never enters a Material Passport, handoff, Process Record, reviewer/model/observer/compliance input, gate, verdict, checkpoint input or stage transition.
+Read [`references/advisory_side_channels.md`](references/advisory_side_channels.md) when recording activity bindings or the user selected a local activity store (terminal sealing sequence).
 
-> See `references/reproducibility_audit.md` for standardized workflow guarantees, audit trail format, and artifact tracking.
+---
+
+## Auditability and replay boundaries
+
+Pipeline artifacts are versioned, hashed, and auditable. Deterministic validators can be replayed against the same bytes and configuration. LLM-generated prose and semantic judgements are stochastic and are not byte-reproducibility guarantees; record model/configuration and evidence so differences can be inspected.
+
+> See `references/reproducibility_audit.md` for the standardized workflow contract, deterministic replay boundary, audit trail format, and artifact tracking.
 
 ---
 
@@ -416,35 +354,16 @@ Every pipeline artifact is versioned, hashed, and auditable.
 
 Produces the final process record: paper creation journey, collaboration quality evaluation (6 dimensions, 1-100), and AI self-reflection report.
 
+**Terminal semantics (#528)**: Stage 6 is non-mandatory — the user may decline it at the Stage 5 completion checkpoint (Stage 6 marked `skipped`; the pipeline still terminates `completed`). When it runs, after the process record is delivered the orchestrator prompts for a terminal acknowledgement — `finish` / `end` / `done` / `confirm`, or an unambiguous natural-language equivalent that accepts the deliverables. On acknowledgement, Stage 6 is marked `completed` and the pipeline global state is set to `completed`; change requests (the other language version, content corrections) keep Stage 6 `in_progress` and are not acknowledgements. See `references/pipeline_state_machine.md` § Stage 6 terminal semantics.
+
 > See `references/process_summary_protocol.md` for full workflow, required content structure, scoring dimensions, and output specifications.
 
 ---
 
 ## Collaboration Depth Observer (v3.5.0, advisory only — never blocks)
 
-The `collaboration_depth_agent` observes the user's collaboration pattern with the pipeline. It is **advisory only** and **never blocks** progression at any checkpoint. It is `non-blocking` by design and carries `blocking: false` in its frontmatter as a structural guarantee.
-
-**When invoked**: every FULL checkpoint, every SLIM checkpoint, and after Stage 6 (pipeline completion). MANDATORY checkpoints (Stages 2.5 / 4.5 integrity gates) **do not** invoke the observer — those are integrity concerns and must not be diluted.
-
-**What it does**: reads the dialogue range for the just-completed stage (at checkpoints) or the whole pipeline (at completion), scores the pattern against the canonical rubric at `shared/collaboration_depth_rubric.md`, and emits an advisory block/chapter. Dimensions: Delegation Intensity, Cognitive Vigilance, Cognitive Reallocation, Zone Classification (Zone 1 / Zone 2 / Zone 3). Rubric is based on Wang & Zhang (2026) IJETHE 23:11 (DOI 10.1186/s41239-026-00585-x).
-
-**Distinction from existing mechanisms**:
-
-| Mechanism | What it evaluates | Blocking? |
-|---|---|---|
-| `integrity_verification_agent` (Stages 2.5 / 4.5) | Paper content — references, citations, data | Yes (blocking gate) |
-| Stage 6 Collaboration Quality Evaluation (6 dims, 1–100) | AI's self-reflection on its own behaviour | No, but produced once only |
-| `collaboration_depth_agent` (this observer) | The **user's** collaboration pattern (delegation intensity, vigilance, reallocation) | **No — never blocks. Advisory only.** |
-
-**Non-blocking guarantees**:
-- Observer output never appears on the "Flagged" line of any checkpoint.
-- The `Ready to proceed?` prompt is unchanged by observer output.
-- `blocked_by: collaboration_depth_agent` is never a legal state in `state_tracker`.
-- If observer frontmatter ever asserts `blocking: true`, the orchestrator must refuse to dispatch it.
-
-**Cross-model**: when `ARS_CROSS_MODEL` is set, the observer runs on both models and flags any dimension divergence > 2 points. Scores are never silently averaged across models.
-
-> See `agents/collaboration_depth_agent.md` for full scoring procedure and anti-sycophancy discipline; `shared/collaboration_depth_rubric.md` for the canonical 4-dimension rubric.
+`collaboration_depth_agent` scores the **user's** collaboration pattern (rubric `shared/collaboration_depth_rubric.md`) at every FULL and SLIM checkpoint and during Stage 6 record compilation, never at MANDATORY integrity checkpoints. It is advisory only and never blocks: its output never appears on the `Flagged` line or changes the proceed prompt, `blocked_by: collaboration_depth_agent` is never a legal state, refuse to dispatch it if its frontmatter asserts `blocking: true`, and never silently average cross-model scores.
+Read [`references/advisory_side_channels.md`](references/advisory_side_channels.md) when invoking the observer (dimensions, comparison with other mechanisms, cross-model rule).
 
 ---
 
@@ -459,82 +378,37 @@ Explicit prohibitions to prevent common failure modes:
 | 3 | **Auto-advancing past MANDATORY checkpoints** | Moving to next stage without user confirmation at FULL checkpoints | MANDATORY checkpoints require explicit user input before proceeding |
 | 4 | **Quality degradation across stages** | Stage 4 revision is worse than Stage 2 draft because context window is exhausted | If Stage N output quality < Stage N-1, PAUSE and reload core principles before continuing |
 | 5 | **Silently dropping reviewer concerns** | Revision addresses 8 of 10 concerns and hopes nobody notices | The R&R tracking table must account for every concern with explicit status |
-| 6 | **Re-verifying only known issues at Stage 4.5** | Final integrity check only re-checks Stage 2.5 findings | Stage 4.5 must verify from scratch independently; revision may introduce new issues |
+| 6 | **Re-verifying only known issues at Stage 4.5** | Final integrity check only re-checks Stage 2.5 findings | Stage 4.5 must run a fresh from-scratch pass; revision may introduce new issues |
 | 7 | **Inflating Collaboration Quality scores** | Giving 90/100 to avoid awkward self-criticism | Honesty first: no inflation, no pleasantries; cite specific evidence for every score |
-| 8 | **Bypassing the Failure Mode Checklist block** (v3.2) | "The 7-mode checklist is new, let's skip it this run" | Stage 2.5/4.5 Failure Mode Checklist is MANDATORY and BLOCKING; no `--no-block` flag exists; overrides require user reasoning recorded for Stage 6 |
+| 8 | **Bypassing the Failure Mode Checklist block** (v3.2) | "The 7-mode checklist is new, let's skip it this run" | Stage 2.5/4.5 Failure Mode Checklist is MANDATORY and BLOCKING; there is no unrecorded bypass — every override requires user reasoning recorded for Stage 6 |
 
 ---
 
 ## Quality Standards
 
-| Dimension | Requirement |
-|-----------|------------|
-| Stage detection | Correctly identify user's current stage and available materials |
-| Mode recommendation | Recommend appropriate mode based on user preferences and material status |
-| Material handoff | Stage-to-stage handoff materials are complete and correctly formatted |
-| State tracking | Pipeline state updated in real time; Progress Dashboard accurate |
-| **Mandatory checkpoint** | **User confirmation required after each stage completion** |
-| **Mandatory integrity check** | **Stage 2.5 and 4.5 cannot be skipped, must PASS** |
-| **Mandatory failure mode checklist** (v3.2) | **Stage 2.5 and 4.5 must run the 7-mode AI research failure checklist; suspected failures block; overrides require user reasoning** |
-| No overstepping | ⚠️ IRON RULE: Orchestrator does not perform substantive research/writing/reviewing, only dispatching |
-| No forcing | ⚠️ IRON RULE: User can pause or exit pipeline at any time (but cannot skip integrity checks) |
-| Reproducible | Same input follows the same workflow across different sessions |
-| **Convergence-aware stopping** (v3.2) | **If delta < 3 points AND no P0 issues, suggest stopping revision loop; user can override** |
-| **Budget transparency** (v3.2; #388) | **Token cost estimate + interaction-count budget (round-trip caps + accumulated count at checkpoints, advisory) + user confirmation at pipeline start** |
+⚠️ IRON RULES: the orchestrator never performs substantive research/writing/reviewing (dispatch only); the user can pause or exit at any time but cannot skip integrity checks. Also required: correct stage detection and mode recommendation, complete and correctly formatted handoffs, real-time state, user confirmation after every stage, Stage 2.5 and 4.5 always run (continuing past a non-PASS result needs an explicit, recorded user decision) with the 7-mode failure checklist (suspected failures block; overrides need user reasoning), replayable deterministic audit (stochastic outputs visible, not promised identical), convergence-aware stopping (user can override) and budget transparency confirmed at pipeline start.
+Read [`references/skill_overview_details.md`](references/skill_overview_details.md) when self-auditing a run against the full quality table.
 
 ---
 
 ## Error Recovery
 
-| Stage | Error | Handling |
-|-------|-------|---------|
-| Intake | Cannot determine entry point | Ask user what materials they have and their goal |
-| Stage 1 | deep-research not converging | Suggest mode switch (socratic -> full) or narrow scope |
-| Stage 2 | Missing research foundation | Suggest returning to Stage 1 to supplement research |
-| Stage 2.5 | Still FAIL after 3 correction rounds | List unverifiable items; user decides whether to continue |
-| Stage 3 | Review result is Reject | Provide options: major restructuring (Stage 2) or abandon |
-| Stage 4 | Revision incomplete on all items | List unaddressed items; ask whether to continue |
-| Stage 3' | Verification still has major issues | Enter Stage 4' for final revision |
-| Stage 4' | Issues remain after revision | Mark as Acknowledged Limitations; proceed to Stage 4.5 |
-| Stage 4.5 | Final verification FAIL | Fix and re-verify (max 3 rounds) |
-| Any | User leaves midway | Save pipeline state; can resume from breakpoint next time |
-| Any | Skill execution failure | Report error; suggest retry, pause, or mode switch. Do not skip mandatory integrity or failure-mode gates |
+Any skill failure: report it and suggest retry, pause or mode switch — never skip mandatory integrity or failure-mode gates; if the user leaves midway, save state for resume. Unclear entry point → ask what materials and goal the user has; Stage 1 not converging → suggest socratic → full or a narrower scope; Stage 2 lacking a research foundation → suggest returning to Stage 1. Integrity FAIL (2.5 or 4.5) → fix and re-verify (max 3 rounds), then list unverifiable items for a user decision; Stage 3 Reject → offer restructuring (Stage 2) or abandon; Stage 4 items left unaddressed → list them and ask whether to continue; Stage 3' still major → Stage 4'; issues left after Stage 4' → Acknowledged Limitations, proceed to Stage 4.5.
+Read [`references/skill_overview_details.md`](references/skill_overview_details.md) when a stage fails (full per-stage handling table).
 
 ---
 
 ## Agent File References
 
-| Agent | Definition File |
-|-------|----------------|
-| pipeline_orchestrator_agent | `agents/pipeline_orchestrator_agent.md` |
-| state_tracker_agent | `agents/state_tracker_agent.md` |
-| integrity_verification_agent | `agents/integrity_verification_agent.md` |
-| collaboration_depth_agent | `agents/collaboration_depth_agent.md` |
-| claim_ref_alignment_audit_agent | `agents/claim_ref_alignment_audit_agent.md` |
+Each agent is defined in `agents/<agent_name>.md` (same files as the Agent Team table).
+Read [`references/skill_overview_details.md`](references/skill_overview_details.md) when you need the standalone agent-file index.
 
 ---
 
 ## Reference Files
 
-| Reference | Purpose |
-|-----------|---------|
-| `references/pipeline_state_machine.md` | Complete state machine definition: all legal transitions, preconditions, actions |
-| `references/plagiarism_detection_protocol.md` | Phase D originality verification protocol + self-plagiarism + AI text characteristics |
-| `references/mode_advisor.md` | Unified cross-skill decision tree: maps user intent to optimal skill + mode |
-| `references/claim_verification_protocol.md` | Phase E claim verification protocol: claim extraction, source tracing, cross-referencing, verdict taxonomy |
-| `references/claim_audit_calibration_protocol.md` | v3.8 #103 claim_ref_alignment audit calibration: gold-set shape (T-C3), threshold gates FNR<0.15 / FPR<0.10 (T-C1), per-class FNR/FPR reporting (T-C2). Re-run via `PYTHONPATH=. python3 -m unittest scripts.test_claim_audit_calibration -v`. |
-| `references/ai_research_failure_modes.md` | 7-mode AI research failure checklist (Lu 2026), run at Stage 2.5 + 4.5 with blocking behaviour, reported at Stage 6 |
-| `references/team_collaboration_protocol.md` | Multi-person team coordination: role definitions, handoff protocol, version control, conflict resolution |
-| `references/integrity_review_protocol.md` | Stage 2.5 + 4.5 integrity verification: 5-phase protocol details |
-| `references/two_stage_review_protocol.md` | Two-stage review: Stage 3 full review + Stage 3' verification review |
-| `references/external_review_protocol.md` | External (human) reviewer feedback: 4-step intake/coaching/revision/verification |
-| `references/process_summary_protocol.md` | Stage 6: collaboration quality evaluation + AI self-reflection report |
-| `references/reproducibility_audit.md` | Standardized workflow guarantees + audit trail format |
-| `references/progress_dashboard_template.md` | ASCII progress dashboard template |
-| `references/reinforcement_content.md` | Stage-specific reinforcement focus table for transitions |
-| `references/changelog.md` | Full version history |
-| `shared/handoff_schemas.md` | Cross-skill data contracts: 9 schemas for all inter-stage handoff artifacts |
-| `shared/collaboration_depth_rubric.md` | Collaboration Depth Observer rubric (v1.0): 4 dimensions based on Wang & Zhang (2026) IJETHE 23:11 |
+Most references are linked from their sections above. Also available: `references/mode_advisor.md` (intent → skill + mode tree), `references/team_collaboration_protocol.md` (multi-person teams), `references/plagiarism_detection_protocol.md` (Phase D originality), `references/claim_verification_protocol.md` (Phase E claims), `references/claim_audit_calibration_protocol.md` (v3.8 audit calibration), `references/changelog.md`, `shared/handoff_schemas.md` (inter-stage data contracts), `references/literature_corpus_consumers.md` (how agents read a passport's `literature_corpus[]`), `references/adapters/overview.md` (adapters that produce `literature_corpus[]` entries) and `references/score_trajectory_protocol.md` (criterion trajectory across revisions; design contract, no machine producer yet).
+Read [`references/skill_overview_details.md`](references/skill_overview_details.md) when looking for which reference covers a topic (full index with purposes).
 
 ---
 
@@ -563,36 +437,9 @@ Follows user language. Academic terminology retained in English.
 
 ## Integration with Other Skills
 
-```
-academic-pipeline dispatches the following skills (does not do work itself):
-
-Stage 1: deep-research
-  - socratic mode: Guided research exploration
-  - full mode: Complete research report
-  - quick mode: Quick research summary
-
-Stage 2: academic-paper
-  - plan mode: Socratic chapter-by-chapter guidance
-  - full mode: Complete paper writing
-
-Stage 2.5: integrity_verification_agent (Mode 1: pre-review)
-Stage 4.5: integrity_verification_agent (Mode 2: final-check)
-
-Stage 3: academic-paper-reviewer
-  - full mode: Complete 5-person review (EIC + R1/R2/R3 + Devil's Advocate)
-
-Stage 3': academic-paper-reviewer
-  - re-review mode: Verification review (focused on revision responses)
-
-Stage 4/4': academic-paper (revision mode)
-Stage 5: academic-paper (format-convert mode)
-  - Step 1: Ask user which academic formatting style (APA 7.0 / Chicago / IEEE, etc.)
-  - Step 2: Produce MD, then generate DOCX via Pandoc when available (otherwise provide conversion instructions)
-  - Step 3: Produce LaTeX (using corresponding document class, e.g., apa7 class for APA 7.0)
-  - Step 4: After user confirms content is correct, tectonic compiles PDF (final version)
-  - Fonts: Times New Roman (English) + Source Han Serif TC VF (Chinese) + Courier New (monospace)
-  - ⚠️ IRON RULE: PDF must be compiled from LaTeX (HTML-to-PDF is prohibited)
-```
+Dispatch only, matching the Pipeline Stages table: Stage 1 `deep-research` (socratic/full/quick); Stage 2 `academic-paper` (plan/full); Stages 2.5/4.5 `integrity_verification_agent` (pre-review/final-check); Stage 3 `academic-paper-reviewer` full 5-person review, Stage 3' re-review; Stages 4/4' `academic-paper` revision; Stage 5 `academic-paper` format-convert (citation style from the Stage 5 entry gate, asked only if none was recorded → MD → DOCX via Pandoc when available → LaTeX → user confirms → tectonic PDF).
+⚠️ IRON RULE: PDF must be compiled from LaTeX (HTML-to-PDF is prohibited).
+Read [`references/orchestrator_workflow_details.md`](references/orchestrator_workflow_details.md) when dispatching a stage (mode notes, Stage 5 steps, fonts).
 
 ---
 
@@ -606,15 +453,17 @@ Stage 5: academic-paper (format-convert mode)
 
 ---
 
+## Model Tiering (#517, optional)
+
+Optional: when `ARS_MODEL_TIERING` is set (`economy` / `quality-boost`), route this skill's agents per `shared/model_tiering.md`; unset (default) means every agent inherits the session model, and unknown values warn once and behave as unset.
+Read [`references/orchestrator_workflow_details.md`](references/orchestrator_workflow_details.md) when `ARS_MODEL_TIERING` is set.
+
+---
+
 ## Version Info
 
-| Item | Content |
-|------|---------|
-| Skill Version | 3.12.0 |
-| Last Updated | 2026-06-08 |
-| Maintainer | Cheng-I Wu |
-| Dependent Skills | deep-research v2.0+, academic-paper v2.0+, academic-paper-reviewer v1.1+ |
-| Role | Full academic research workflow orchestrator |
+Maintained by Cheng-I Wu; skill version and date are in the frontmatter `metadata`.
+Read [`references/skill_overview_details.md`](references/skill_overview_details.md) when checking the minimum versions of the dependent skills.
 
 ---
 

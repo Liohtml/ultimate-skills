@@ -2,16 +2,26 @@ MIT License
 
 Copyright (c) 2026 Ultimate Skills (curated compilation)
 
-This MIT license applies to the CURATION, structure, manifests, and documentation
-of this repository, and to the bundled `engineering/`, `product/`, and `design/`
-plugins, whose upstream sources are all MIT-licensed (see NOTICE.md).
+This MIT license applies to the CURATION, structure, manifests, scripts, and
+documentation of this repository. Each bundled skill remains under the license
+of its upstream source (see NOTICE.md and PROVENANCE.csv):
 
->>> IMPORTANT LICENSING EXCEPTION <<<
-The `research/` plugin is derived from Imbad0202/academic-research-skills, which is
-licensed CC-BY-NC-4.0 (Creative Commons Attribution-NonCommercial 4.0). It is NOT
-MIT-licensed and may NOT be used commercially. See research/LICENSE and NOTICE.md.
-If you need a fully permissive, commercially-usable set, remove the `research/`
-plugin and its entry in .claude-plugin/marketplace.json.
+- `engineering/`, `product/`, `design/`, `writing/`, `security/`: MIT or
+  Apache-2.0 per skill (permissive; license copies in each plugin's LICENSES/
+  directory and, for Apache-2.0 material, next to the files).
+
+>>> IMPORTANT LICENSING EXCEPTIONS <<<
+- The `security-cc-by-sa/` plugin is derived from trailofbits/skills and is
+  licensed CC-BY-SA-4.0 (Creative Commons Attribution-ShareAlike 4.0). It is
+  NOT MIT-licensed; adapted versions you distribute must remain CC-BY-SA-4.0.
+  See security-cc-by-sa/LICENSE.
+- The `research/` plugin is derived from Imbad0202/academic-research-skills,
+  which is licensed CC-BY-NC-4.0 (Creative Commons Attribution-NonCommercial
+  4.0). It is NOT MIT-licensed and may NOT be used commercially. See
+  research/LICENSE.
+If you need a fully permissive, commercially-usable set, remove the
+`research/` and `security-cc-by-sa/` plugins and their entries in
+.claude-plugin/marketplace.json.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

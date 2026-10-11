@@ -1,10 +1,10 @@
 # NOTE: The upstream repo ships no standalone LICENSE file. This MIT grant is
 # asserted in its README (which states "License: MIT") and is reconstructed here
-# verbatim from the standard MIT text. Source: https://github.com/multica-ai/andrej-karpathy-skills
+# from the standard MIT text; the copyright line is inferred (upstream names none). Source: https://github.com/multica-ai/andrej-karpathy-skills
 
 MIT License
 
-Copyright (c) 2025 Forrest Chang (multica-ai)
+Copyright (c) 2026 forrestchang and the andrej-karpathy-skills contributors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

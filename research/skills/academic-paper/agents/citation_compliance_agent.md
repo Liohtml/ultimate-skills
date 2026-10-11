@@ -23,7 +23,7 @@ You MAY READ files in `phase0_*/` through `phase4_*/` (config, literature, struc
 
 If downstream work is needed, return control to the caller.
 
-**Enforcement (v3.9.2):** prompt-level only. Advisory verifier (`scripts/check_pipeline_integrity.py`) can detect violations post-hoc. Deterministic PreToolUse hook deferred to v3.10 active conductor (#134).
+**Enforcement (v3.9.2):** prompt-level fence + advisory verifier (`scripts/check_pipeline_integrity.py`). Since the #134 rescope (PR #294), a deterministic PreToolUse write-scope guard enforces the WRITE clause where a hook runs; where none runs, this fence is the enforcement layer.
 
 ## Core Principles
 
@@ -66,7 +66,7 @@ For each reference list entry:
 **In-text citations**:
 - [ ] One author: (Smith, 2024)
 - [ ] Two authors: (Smith & Jones, 2024) — "&" in parenthetical, "and" in narrative
-- [ ] Three+ authors: (Smith et al., 2024)
+- [ ] Three+ authors: (Smith et al., 2024), from the first citation; expand names only as needed to disambiguate same-year works. For Chinese names, apply the Chinese Citation Special Checks below.
 - [ ] Multiple works: (Chen, 2023; Smith, 2024) — alphabetical, semicolon
 - [ ] Same author same year: (Smith, 2024a, 2024b)
 - [ ] Organization first time: (World Health Organization [WHO], 2024)
@@ -76,7 +76,7 @@ For each reference list entry:
 
 **Reference list**:
 - [ ] Hanging indent (0.5 inch)
-- [ ] Alphabetical by first author surname
+- [ ] Latin-script references: alphabetical by first author surname. Chinese references: apply the venue/locale ordering rule under Chinese Citation Special Checks; do not silently romanize names.
 - [ ] Double-spaced
 - [ ] DOI as hyperlink: https://doi.org/xxxxx
 - [ ] No period after DOI/URL
@@ -93,6 +93,15 @@ For each reference:
 - [ ] URL for web sources is complete
 - [ ] No trailing period after DOI/URL
 - [ ] Retrieval date included only for content that may change
+
+**Evidence boundary:** distinguish visible DOI syntax from resolution and source identity.
+A malformed identifier can be reported from its text, but an unfamiliar or
+test-looking prefix alone does not establish that a particular DOI is broken,
+fabricated, or mismatched. Without an actual resolver/source result, describe
+resolution as unchecked; do not turn a prefix heuristic into a required
+reference correction or a confirmed source error. A conditional verification
+suggestion must remain separate from the corrections/error count. Do not claim
+an online lookup was performed when working only from a supplied source pack.
 
 ### 4. Additional Checks
 
@@ -242,25 +251,17 @@ Step 6: Output
 
 ### Citation Format Auto-Detection
 
-```
-When receiving a paper without an explicitly specified citation format:
+When no citation format is specified, identify it from the in-text form, confirming against the reference-list layout:
 
-Step 1: Sample Check (extract first 5 in-text citations)
-  ├── See (Author, Year) -> possibly APA or Chicago Author-Date
-  ├── See [N] numbered -> possibly IEEE or Vancouver
-  ├── See (Author Page) without year -> possibly MLA
-  ├── See footnote/endnote -> possibly Chicago Notes-Bibliography
-  └── See superscript number -> possibly Vancouver
+| In-text signature | Reference-list confirmation | Format |
+|---|---|---|
+| `(Author, Year)` | hanging indent, DOI as URL, sentence-case titles | APA |
+| `(Author, Year)` or footnotes | Author-Date + Reference List, or footnotes + Bibliography | Chicago |
+| `(Author Page)`, no year | Works Cited, containers model | MLA |
+| numbered `[N]` | numbered list, conference proceedings common | IEEE |
+| superscript number | numbered, superscript, medical journals common | Vancouver |
 
-Step 2: Confirm (check Reference List format)
-  ├── APA: hanging indent, DOI as URL, sentence case titles
-  ├── Chicago: footnotes + Bibliography, or Author-Date + Reference List
-  ├── MLA: Works Cited, containers model, no DOI in old MLA
-  ├── IEEE: numbered [1], conference proceedings common
-  └── Vancouver: numbered, superscript, medical journals common
-
-Step 3: If unable to determine -> ask user; if user does not respond -> default to APA 7th
-```
+If the format cannot be determined, ask the user; if the user does not respond, default to **APA 7th**.
 
 ### Core Verification Rules by Format
 
@@ -268,7 +269,7 @@ Step 3: If unable to determine -> ask user; if user does not respond -> default 
 |--------|---------|-------------|---------|------|-----------|
 | In-text format | (Author, Year) | Footnote or (Author Year) | (Author Page) | [N] | N (superscript) |
 | Multiple author threshold | 3+ -> et al. | 4+ -> et al. | 3+ -> et al. | 3+ -> et al. | 7+ -> et al. |
-| Ref list ordering | Alphabetical | Alphabetical | Alphabetical | Order of appearance | Order of appearance |
+| Ref list ordering | Alphabetical for Latin-script names; Chinese venue/locale rule below | Alphabetical | Alphabetical | Order of appearance | Order of appearance |
 | DOI format | https://doi.org/ | URL or DOI | Optional | Required | Required |
 | Title case | Sentence case (articles) | Title Case (book titles) | Title Case | Sentence case | Sentence case |
 
@@ -289,18 +290,23 @@ Step 3: If unable to determine -> ask user; if user does not respond -> default 
 
 ### Chinese Citation Special Checks
 
-Reference: `references/apa7_chinese_citation_guide.md`:
+For APA 7 with Chinese citations, read `references/apa7_chinese_citation_guide.md` before checking format. Apply any supplied journal/author style requirement first; use its Taiwan defaults only where no override is supplied:
 
 | # | Check Item | Rule |
 |---|--------|------|
-| 1 | Author name | Chinese authors use full name (no first/last split): Wang Daming (2024) |
+| 1 | Author name | Preserve Chinese full names and script; do not split or romanize them to apply an English-name rule. |
 | 2 | Book title format | Chinese book titles use angle brackets or italics (per journal requirements) |
 | 3 | Journal name format | Chinese journal names use full names (no abbreviations) |
 | 4 | Translated works | Format: Original Author (Trans. Translator, Publication Year). *Book Title*. Publisher. (Original work published YYYY) |
-| 5 | Chinese-English mixed | Chinese references first, English references second (per Taiwan academic convention) |
+| 5 | Reference ordering | Under the Taiwan default, check Chinese surname stroke count within the Chinese entries and alphabetical order within Latin-script entries. Chinese/English group placement is venue-dependent; without a supplied rule, do not mark either group-first arrangement wrong. Do not replace stroke order with pinyin/alphabetical order unless the venue explicitly requires romanization. |
 | 6 | Page number notation | Chinese uses "page" instead of "p.": (Wang Daming, 2024, page 45) |
 | 7 | Multiple author connector | Chinese uses enumeration comma instead of regular comma: (Wang Daming, Li Xiaohua, 2024) |
-| 8 | et al. equivalent | Chinese uses "deng" (meaning "et al."): (Wang Daming et al., 2024) |
+| 8 | Three or more authors | Count authors in the matched reference: from the first in-text citation use the first Chinese author’s full name plus 「等」 or the venue’s 「等人」 (e.g., 許雅雯等（2024） / （許雅雯等，2024）). Explicitly report a fully listed 3+ author citation as a format error unless expansion is needed for disambiguation. This is an in-text rule, not permission to shorten the reference-list author field. |
+
+**Before reporting Chinese format findings:**
+- Check every matched in-text citation for author-count abbreviation, including citations that contain no 「等」 / `et al.` yet. Keep both names for two-author works. If same-year works would collapse to the same shortened form, retain enough names to distinguish them; when only the final author differs, list all names.
+- For each ordering error, identify the applicable rule and an actual adjacent inversion in that script's reference sequence. Under stroke ordering, give verified stroke counts or a cited authoritative collation source; never label a list wrong because it merely looks unfamiliar. If counts or tie-breaking cannot be verified, disclose that limited check without proposing a reorder. A supplied romanization rule takes precedence; no universal surname-to-pinyin conversion is assumed.
+- Report the exact in-text correction separately from reference-list findings. Do not treat correct reference metadata or a supported source claim as erroneous just because its in-text author list needs abbreviation.
 
 ### Citation Consistency Check (Cross-Reference)
 
@@ -319,7 +325,9 @@ Step 2: Cross-Check Consistency
   FOR each matched pair:
     COMPARE author spelling (InText vs Ref) -> flag mismatch
     COMPARE year (InText vs Ref) -> flag mismatch
-    IF InText uses "et al." -> verify Ref has 3+ authors
+    IF APA 7 and Ref has 3+ authors -> verify InText abbreviates from first use
+      ("et al." / Chinese 「等」 or 「等人」), unless names are needed to disambiguate
+    IF InText uses an abbreviation -> verify author count and unambiguous source identity
 
 Step 3: Additional Consistency Checks
   - Same author same year multiple works -> confirm a/b labels are consistent (InText corresponds to Ref)
@@ -417,7 +425,7 @@ Quality gate not passed ->
 ### Handoff Format Requirements
 
 - **Receiving draft_writer_agent's Draft**: Reference List must exist as an independent section (`## References`)
-- **Output to formatter_agent**: Corrected Reference List must already be sorted by target format (APA/MLA = alphabetical, IEEE/Vancouver = order of appearance)
+- **Output to formatter_agent**: Corrected Reference List must already be sorted by target format (APA = the venue/locale ordering rule above; MLA = alphabetical; IEEE/Vancouver = order of appearance)
 - **Cross-verification with literature_strategist_agent**: Each source in the Annotated Bibliography is the ground truth. If citation information in the Draft differs from the Bibliography -> correct using Bibliography as authoritative source
 
 ## Quality Criteria

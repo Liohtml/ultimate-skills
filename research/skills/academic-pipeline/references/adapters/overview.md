@@ -3,8 +3,8 @@
 **Status**: Stable as of ARS v3.6.4
 **Applies to**: any adapter that produces a Material Passport `literature_corpus[]` field
 **Authoritative schemas**:
-- [`shared/contracts/passport/literature_corpus_entry.schema.json`](../../../shared/contracts/passport/literature_corpus_entry.schema.json)
-- [`shared/contracts/passport/rejection_log.schema.json`](../../../shared/contracts/passport/rejection_log.schema.json)
+- [`shared/contracts/passport/literature_corpus_entry.schema.json`](../../../../shared/contracts/passport/literature_corpus_entry.schema.json)
+- [`shared/contracts/passport/rejection_log.schema.json`](../../../../shared/contracts/passport/rejection_log.schema.json)
 
 ## 1. What an adapter is
 
@@ -25,7 +25,7 @@ ARS deliberately does NOT run adapter code itself. The adapter runs in the user'
 
 ## 3. Entry field reference
 
-Refer to the [`literature_corpus_entry` schema](../../../shared/contracts/passport/literature_corpus_entry.schema.json) for the authoritative contract. The field tables below are generated from that schema and must not drift.
+Refer to the [`literature_corpus_entry` schema](../../../../shared/contracts/passport/literature_corpus_entry.schema.json) for the authoritative contract. The field tables below are generated from that schema and must not drift.
 
 <!-- GENERATED:LITERATURE_CORPUS_REQUIRED:START -->
 | Field | Type | Description (first sentence) |
@@ -44,6 +44,8 @@ Refer to the [`literature_corpus_entry` schema](../../../shared/contracts/passpo
 | `adapter_name` | string | Optional. |
 | `adapter_version` | string | — |
 | `arxiv_id` | string | Optional arXiv identifier for arXiv-hosted works. |
+| `bibliographic_integrity_signals` | array | #678 additive v1 carrier. |
+| `contamination_signal_omissions` | object | #511 Part A reason-provenance for degraded-lookup omissions. |
 | `contamination_signals` | object | v3.7.3 + v3.9.0 + v3.11 contaminated-source advisory field (spec v3.7.3 §3.2 + v3.9.0 §3.4–§3.5 + v3.11 #182 Delta 1). |
 | `contamination_signals_backfilled_at` | string | v3.7.3 backfill provenance (issue #105). |
 | `description_last_audit` | null \| string | v3.7.1 trust-chain field. |
@@ -146,6 +148,6 @@ Give your own adapter pytest coverage so you can catch determinism and rejection
 
 ## 10. Relationship to other ARS artifacts
 
-- [`shared/handoff_schemas.md`](../../../shared/handoff_schemas.md) Schema 9: the `literature_corpus[]` field lives inside the Material Passport.
+- [`shared/handoff_schemas.md`](../../../../shared/handoff_schemas.md) Schema 9: the `literature_corpus[]` field lives inside the Material Passport.
 - [`academic-pipeline/references/passport_as_reset_boundary.md`](../passport_as_reset_boundary.md): `literature_corpus[]` is consumed across reset boundaries like any other passport field.
 - ARS agents that consume `literature_corpus[]` are **deferred** to v3.6.5+. As of v3.6.4, the field is a defined input port with no runtime consumer; adapters produce it, future ARS versions read it.

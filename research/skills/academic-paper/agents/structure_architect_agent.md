@@ -23,7 +23,7 @@ You MAY READ files in `phase0_*/` (Paper Configuration Record) and `phase1_*/` (
 
 If downstream work is needed, return control to the caller with a recommendation. Do not execute.
 
-**Enforcement (v3.9.2):** prompt-level only. Advisory verifier (`scripts/check_pipeline_integrity.py`) can detect violations post-hoc. Deterministic PreToolUse hook deferred to v3.10 active conductor (#134).
+**Enforcement (v3.9.2):** prompt-level fence + advisory verifier (`scripts/check_pipeline_integrity.py`). Since the #134 rescope (PR #294), a deterministic PreToolUse write-scope guard enforces the WRITE clause where a hook runs; where none runs, this fence is the enforcement layer.
 
 ## Core Principles
 
@@ -32,6 +32,9 @@ If downstream work is needed, return control to the caller with a recommendation
 3. **Proportional emphasis** — word count allocation reflects the importance of each section
 4. **Evidence-driven** — every section must have assigned evidence from the literature report
 5. **Flexibility** — adapt standard patterns to the paper's specific needs
+6. **Pointer-bound target awareness** — when supplied, use the exact #684
+   criterion ids and digest by pointer; never copy registry prose, infer a
+   target, or turn venue fit into scientific validity
 
 ## Structure Selection
 
@@ -79,7 +82,7 @@ For each section, provide:
 #### IMRaD Default Allocation (for 6,000-word paper)
 | Section | % | Words |
 |---------|---|-------|
-| Abstract | — | 250 |
+| Abstract | — | regime table |
 | Introduction | 15% | 900 |
 | Literature Review | 25% | 1,500 |
 | Methodology | 15% | 900 |
@@ -91,7 +94,7 @@ For each section, provide:
 #### Literature Review Default Allocation (for 8,000-word paper)
 | Section | % | Words |
 |---------|---|-------|
-| Abstract | — | 250 |
+| Abstract | — | regime table |
 | Introduction | 10% | 800 |
 | Thematic Section 1 | 20% | 1,600 |
 | Thematic Section 2 | 20% | 1,600 |
@@ -112,11 +115,33 @@ Create an evidence assignment table:
 | Discussion | Author1, Author7 | Comparison with prior work |
 ```
 
+Each section row also names the RQ Brief sub-question it serves. When the RQ Brief carries `sub_question_bindings` (#547), the section inherits that sub-question's scope bindings; a section whose planned content needs a broader scope than it inherits is a user decision to approve, never a silent widening (Ren et al. 2026, arXiv:2607.13104 §5.1).
+
 ### Step 6: Define Transition Logic
 For each section boundary, specify:
 - How the current section leads into the next
 - What the reader should understand before moving on
 - Connecting themes or arguments
+
+### Step 7: Map Review Criteria Without Inventing Content (#684)
+
+When the caller supplies a `ReviewCriteriaBindingManifest` and Target Criteria
+Brief:
+
+- preserve its `target_review_id`, context hash, `resolved_digest`, ordered
+  criterion ids, and every `parallel_conflicts[]` group unchanged;
+- map criterion ids to planned sections, evidence needs, or an explicit
+  unresolved applicability check;
+- keep scientific validity, venue fit, and submission readiness separate; and
+- never invent data, results, methods, citations, or a contribution the author
+  did not choose.
+
+Append one exact
+`criteria_parallel_conflicts: <canonical compact JSON array>` line followed by
+the exact role `FORMATIVE` binding marker to the completed outline. The
+orchestrator records that artifact as the single formative receipt. If no
+binding exists, disclose `criteria_binding_unavailable` and make no
+venue-alignment claim.
 
 ## Output Format
 
@@ -128,10 +153,18 @@ For each section boundary, specify:
 ### Overview
 [1-paragraph summary of the paper's flow]
 
+### Review Criteria Coverage Plan
+| Criterion ID | Planned section(s) | Evidence need / unresolved check | Dimension |
+|--------------|--------------------|----------------------------------|-----------|
+| [pointer only] | [...] | [...] | scientific_validity / venue_fit / submission_readiness |
+
+[Preserve every interdisciplinary parallel-conflict group without averaging or selecting a preferred criterion.]
+
 ### Detailed Outline
 
 #### 1. [Section Title] (~[N] words)
 **Purpose**: [what this section does]
+**Serves sub-question**: [#N — inherited scope bindings / "framing (no sub-question binding)"]
 **Content**:
 - 1.1 [Sub-section]
   - [Key point A]
@@ -140,6 +173,9 @@ For each section boundary, specify:
   - [Key point C]
 **Sources**: [Author1, Author2]
 **Transition to next**: [how this connects to section 2]
+
+[Exact `criteria_parallel_conflicts:` line plus `FORMATIVE` review-target
+binding marker, or `criteria_binding_unavailable`]
 
 #### 2. [Section Title] (~[N] words)
 ...
@@ -192,7 +228,7 @@ Step 1: Get base proportions
 
 Step 2: Scale by total word count
   -> section_words = round(total_word_count x section_percentage)
-  -> Abstract fixed at 250 words (EN) or 400 characters (zh-TW), not counted in total
+  -> Abstract length follows the regime table (academic-paper/references/abstract_writing_guide.md) for the run's paper type and output language pair, not counted in total
 
 Step 3: Adjust by literature matrix (Literature Review type only)
   -> IF paper_type = "Literature Review":
@@ -212,7 +248,7 @@ Step 5: Output
 
 | Section | IMRaD | Lit Review | Theoretical | Case Study | Policy Brief | Conference |
 |------|-------|-----------|-------------|-----------|-------------|-----------|
-| Abstract | 250 fixed | 250 fixed | 250 fixed | 250 fixed | — | 150 fixed |
+| Abstract | regime table | regime table | regime table | regime table | — | regime table |
 | Introduction | 15% | 10% | 12% | 12% | 10% | 15% |
 | Literature / Background | 25% | Distributed to themes | 20% | 15% | 15% | 20% |
 | Framework / Method | 15% | — | 30% | 10% | — | 15% |
@@ -223,6 +259,8 @@ Step 5: Output
 | Recommendations | — | — | — | — | 30% | — |
 | Conclusion | 5% | 10% | 8% | 8% | 10% | 5% |
 | Future Directions | — | 5% | 5% | 5% | 5% | — |
+
+> **`regime table` cells (#862 Phase 1).** The Abstract rows restate no abstract length. Abstract length and keyword counts come from the regime table in [`references/abstract_writing_guide.md`](../references/abstract_writing_guide.md), keyed by paper type and by the run's declared output language pair (default `zh-tw-en`, read from the PCR `Output Language Pair` row) — the single source for both figures. That guide's *Paper-type lookup* note maps `structure_type` to a table row and records that `policy_brief` has no abstract row (it takes an Executive Summary). The abstract is not counted in `total_word_count`. A venue-declared limit (#394 venue profile) takes precedence over the table.
 
 ### Outline Depth Rules
 
