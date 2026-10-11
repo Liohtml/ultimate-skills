@@ -10,7 +10,7 @@ upstream commit and the upstream paths used.
 
 ## Source repositories
 
-34 source repositories. "Skills" counts the skills that were built on the
+35 source repositories. "Skills" counts the skills that were built on the
 repo (`base`); "merged into" lists skills that took material from it.
 
 | Source repo | Copyright holder / author | License | Plugin(s) | Skills (base) / merged into | License file |
@@ -47,6 +47,7 @@ repo (`base`); "merged into" lists skills that took material from it.
 | [blader/humanizer](https://github.com/blader/humanizer) | Siqi Chen | MIT | `writing` | 1 (`humanizer`) | `humanizer.LICENSE` |
 | [anthropics/defending-code-reference-harness](https://github.com/anthropics/defending-code-reference-harness) | Anthropic PBC | Apache-2.0 | `security` | 3 (`threat-model`, `static-vuln-scan` ← vuln-scan, `vuln-triage` ← triage) | `defending-code-reference-harness.LICENSE` |
 | [briiirussell/cybersecurity-skills](https://github.com/briiirussell/cybersecurity-skills) | Bri Russell | MIT | `security` | 2 (`web-pentest` incl. recon, `llm-app-security-audit` ← prompt-injection) | `cybersecurity-skills.LICENSE` |
+| [cloudflare/security-audit-skill](https://github.com/cloudflare/security-audit-skill) | Cloudflare, Inc. | MIT | `security` | 1 (`security-audit`; description rewritten and an attribution/Claude Code note added, all other files unchanged) | `cloudflare-security-audit-skill.LICENSE` |
 | [trailofbits/skills](https://github.com/trailofbits/skills) | Trail of Bits | **CC-BY-SA-4.0** | `security-cc-by-sa` | 2 (`supply-chain-risk-auditor`, `variant-analysis`) | `trailofbits-skills.LICENSE` |
 | [Imbad0202/academic-research-skills](https://github.com/Imbad0202/academic-research-skills) | Cheng-I Wu | **CC-BY-NC-4.0** | `research` | 4 (+ vendored `research/shared/`) | `academic-research-skills.LICENSE` |
 

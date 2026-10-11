@@ -44,6 +44,7 @@ Legende: ✅ integriert (eigener Skill) · 🔀 in einen bestehenden Skill gemer
 - `design/icon-set-generator` (jezweb).
 - Plugin `security`, alle Skills mit Autorisierungs- und Scope-Gates: `threat-model`, `static-vuln-scan` und `vuln-triage` (anthropics/defending-code-reference-harness, Apache-2.0), `skill-scanner` (getsentry, Apache-2.0), `web-pentest` und `llm-app-security-audit` (briiirussell, MIT).
 - Plugin `security-cc-by-sa`: `supply-chain-risk-auditor` und `variant-analysis` (trailofbits, CC-BY-SA-4.0).
+- `security/security-audit` (cloudflare/security-audit-skill, MIT, `c1c8a8c`), auf Hinweis des Nutzers nach Upstream-Sync 2: Cloudflares quellcodebasierter Audit-Workflow (Coverage-Ledger, isolierte Hunter, adversariale Validierung, schema-geprüfte Findings, Report). Unverändert übernommen bis auf eine neue Beschreibung und einen Attributions-/Claude-Code-Hinweis. Ist jetzt der Standard für vollständige Code-Audits; `static-vuln-scan` bleibt für den schnellen Einzel-Scan vor `vuln-triage`.
 - Welle 3: anthropics/knowledge-work-plugins `write-spec` in `product/create-prd` und `synthesize-research` in `product/user-personas` gemergt (Apache-2.0, umgeschrieben). `prioritization-frameworks` und `value-proposition` wurden mit eigenem Text vertieft.
 
 **Zusätzlich verworfen:**

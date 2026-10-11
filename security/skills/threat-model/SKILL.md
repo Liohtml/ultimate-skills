@@ -10,7 +10,8 @@ description: >-
   model" a system, "map the attack surface", do a security design review, or
   answer "what should we be worried about in this codebase", and before
   static-vuln-scan so the scan is scoped. For hardening code you are writing use
-  security-and-hardening; for finding concrete bugs use static-vuln-scan; for
+  security-and-hardening; for finding concrete bugs use security-audit (full
+  audit) or static-vuln-scan (quick scan); for
   LLM/agent features use llm-app-security-audit.
 ---
 

@@ -1,5 +1,28 @@
 # Changelog
 
+## Unreleased: `security-audit` (Cloudflare)
+
+- **New skill `security/security-audit`** from
+  [cloudflare/security-audit-skill](https://github.com/cloudflare/security-audit-skill)
+  `c1c8a8c` (MIT): Cloudflare's source-first audit workflow, which seeded their
+  vulnerability-discovery harness. Full audit mode runs six phases:
+  reconnaissance into a deterministic coverage ledger, isolated coverage-led
+  hunters (core attack classes plus 10 domain companions), a fresh verifier per
+  candidate, `findings.json` checked by `report-schema.json` and two
+  zero-dependency Node validators, independent re-verification, and a report
+  written outside the target repo. Guidance mode applies the same evidence bar
+  to a single question. Target code runs only inside an OS-enforced sandbox.
+  - Only the frontmatter description was rewritten (with pointers to the
+    neighbouring security skills) and an attribution / Claude Code terminology
+    note added; all other files are byte-identical to upstream.
+  - The bundled validator test suites pass (65/65). `skill-scanner` reports no
+    findings on the skill.
+- **Neighbours re-pointed:** `static-vuln-scan` is now the quick one-pass scan
+  feeding `vuln-triage`; full codebase audits route to `security-audit` from
+  `threat-model`, `vuln-triage`, `web-pentest`, `gha-security-review`,
+  `llm-app-security-audit` and `engineering/security-and-hardening`.
+- Catalog: **69 skills in 7 plugins from 35 source repos**.
+
 ## Unreleased: upstream sync 2 (marketplace 1.3.0)
 
 This round syncs every provenance row whose upstream changed since its recorded

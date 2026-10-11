@@ -78,5 +78,6 @@ security,gha-security-review,getsentry/skills,Apache-2.0,skills/skills/gha-secur
 security,skill-scanner,getsentry/skills,Apache-2.0,skills/skills/skill-scanner,d18b7aa8ba878354e5c348310230e652f7690f9c,modified-locally,base
 security,llm-app-security-audit,briiirussell/cybersecurity-skills,MIT,cybersecurity-skills/skills/prompt-injection,c9ade0349f8ecd5c9c68a82a05d2b6012c5fa1d7,modified-locally,base
 security,web-pentest,briiirussell/cybersecurity-skills,MIT,cybersecurity-skills/skills/web-pentest;cybersecurity-skills/skills/recon,c9ade0349f8ecd5c9c68a82a05d2b6012c5fa1d7,modified-locally,base
+security,security-audit,cloudflare/security-audit-skill,MIT,security-audit-skill/skills/security-audit,c1c8a8c1471069fb0e188eeaff69b8e8db6564a8,modified-locally,base
 security-cc-by-sa,supply-chain-risk-auditor,trailofbits/skills,CC-BY-SA-4.0,skills/plugins/supply-chain-risk-auditor/skills/supply-chain-risk-auditor,32e34f8173796e3566a51aee877dc96bc5191f64,modified-locally,base
 security-cc-by-sa,variant-analysis,trailofbits/skills,CC-BY-SA-4.0,skills/plugins/variant-analysis/skills/variant-analysis,32e34f8173796e3566a51aee877dc96bc5191f64,modified-locally,base

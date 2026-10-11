@@ -13,7 +13,7 @@ description: >-
   workflows", "check CI security" or review a PR touching .github/. For
   building or fixing pipelines use ci-cd-and-automation; for dependency and
   package risk use supply-chain-risk-auditor (security-cc-by-sa plugin); for
-  application source code use static-vuln-scan.
+  application source code use security-audit.
 ---
 
 <!--

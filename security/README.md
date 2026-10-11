@@ -1,7 +1,7 @@
 # security
 
 ## Overview
-An authorized security auditing and pentesting toolkit for AI coding agents. Seven permissively-licensed (MIT / Apache-2.0) skills that cover the defensive security loop: model the threats, find the bugs, triage them honestly, and test the running system — all on assets you own or are explicitly authorized to assess.
+An authorized security auditing and pentesting toolkit for AI coding agents. Eight permissively-licensed (MIT / Apache-2.0) skills that cover the defensive security loop: model the threats, find the bugs, triage them honestly, and test the running system — all on assets you own or are explicitly authorized to assess.
 
 Every offensive-testing skill opens with an authorization / scope / rules-of-engagement step and refuses to widen scope, weaponize findings, or touch systems the user does not control. None of these skills is for malware, evasion, credential theft, or untargeted attacks.
 
@@ -15,10 +15,11 @@ Every offensive-testing skill opens with an authorization / scope / rules-of-eng
 `security-and-hardening` (in the `engineering` plugin) is the **builder** side: secure-coding controls and hardening checklists for code you are writing. This plugin is the **auditor / tester** side: assessing and testing code and systems that already exist. The skills cross-point to each other.
 
 ## Skills
-7 skills (see also the table in the [root README](../README.md#security)):
+8 skills (see also the table in the [root README](../README.md#security)):
 
 | Skill | What it does | License |
 |---|---|---|
+| `security-audit` | Cloudflare's source-first codebase audit. Full audit mode: reconnaissance into a coverage ledger, isolated coverage-led hunters (core attack classes plus 10 domain companions), a fresh verifier per candidate, `findings.json` validated against a schema by two bundled Node validators, independent re-verification and `REPORT.md` written outside the repo; repeat runs add coverage. Guidance mode answers one question with the same evidence bar. Target code runs only in an OS sandbox. | MIT |
 | `threat-model` | Code-grounded threat model in three modes (interview / bootstrap / bootstrap-then-interview). Static, read-only; writes `THREAT_MODEL.md`. | Apache-2.0 |
 | `static-vuln-scan` | Read-only static vulnerability scan, scoped from the threat model, fanning subagents per focus area; writes `VULN-FINDINGS.json`. | Apache-2.0 |
 | `vuln-triage` | Adversarial triage of any scanner's output (its own JSON, SARIF, markdown): N-vote verification, dedupe, exploitability re-ranking, owner routing. | Apache-2.0 |
@@ -28,7 +29,7 @@ Every offensive-testing skill opens with an authorization / scope / rules-of-eng
 | `web-pentest` | Scope-gated black-box / grey-box web application pentest following OWASP WSTG. A written `SCOPE.md` / rules-of-engagement is reconfirmed before every active request. | MIT |
 
 ## Typical flow
-`threat-model` → `static-vuln-scan` → `vuln-triage` for a source-code assessment; `gha-security-review` for CI; `skill-scanner` before importing third-party skills; `llm-app-security-audit` for AI features; `web-pentest` for authorized testing of a running app.
+`security-audit` for a full source-code audit with validated findings and a report (optionally after `threat-model`); `threat-model` → `static-vuln-scan` → `vuln-triage` for a lighter scan-and-triage pass or to triage other scanners' output; `gha-security-review` for CI; `skill-scanner` before importing third-party skills; `llm-app-security-audit` for AI features; `web-pentest` for authorized testing of a running app.
 
 ## License
 MIT and Apache-2.0 per skill. Each skill directory carries its upstream `LICENSE.txt`, a `> Includes material adapted from …` attribution line, and (for Apache-2.0 skills) an Apache §4(b) change note at the end of `SKILL.md`. Copies of the upstream licenses are in [`LICENSES/`](./LICENSES/); full provenance is in [`../PROVENANCE.csv`](../PROVENANCE.csv) and [`../NOTICE.md`](../NOTICE.md). Share-alike (CC-BY-SA-4.0) security-testing skills are kept out of this plugin — see the separate [`security-cc-by-sa`](../security-cc-by-sa/README.md) plugin.
