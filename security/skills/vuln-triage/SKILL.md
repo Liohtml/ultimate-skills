@@ -497,4 +497,4 @@ formats, checkpointing, interview questions, design notes); `_lib/checkpoint.py`
 bundled as `scripts/checkpoint.py` with paths rewritten to `${CLAUDE_SKILL_DIR}`;
 harness-specific inputs (`INCIDENTS.json`, pipeline `reports/`, `found_bugs.jsonl`)
 replaced by a generic SARIF mapping; the upstream "Testing this skill" section
-removed; authorization line added; `allowed-tools` frontmatter dropped.
+removed; authorization line added; `allowed-tools` frontmatter dropped; `scripts/checkpoint.py` changed so that `--help` exits 0 and a non-integer `<N>`, non-UTF-8 payload or missing `--from` file exits with a one-line error instead of a traceback.

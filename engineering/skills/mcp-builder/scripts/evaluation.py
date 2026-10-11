@@ -4,7 +4,12 @@ This script evaluates MCP servers by running test questions against them using C
 
 Modified by ultimate-skills (from anthropics/skills@34040c9, Apache-2.0):
 default model now comes from $MCP_EVAL_MODEL (fallback claude-opus-5), all
-parallel tool_use blocks in a turn are answered, max_tokens raised to 16000.
+parallel tool_use blocks in a turn are answered, max_tokens raised to 16000;
+MCP content blocks are serialised to JSON (previously every tool result was
+sent as a "not JSON serializable" error), a response without text no longer
+crashes the run, an empty or malformed eval file exits 1 before connecting,
+repeated -a/-e/-H flags accumulate, and an eval file given after -a/-e/-H is
+no longer swallowed by them.
 Requires ANTHROPIC_API_KEY (or another credential the anthropic SDK resolves).
 """
 
@@ -84,11 +89,20 @@ def parse_evaluation_file(file_path: Path) -> list[dict[str, Any]]:
         return []
 
 
-def extract_xml_content(text: str, tag: str) -> str | None:
+def extract_xml_content(text: str | None, tag: str) -> str | None:
     """Extract content from XML tags."""
+    if not text:  # ultimate-skills: e.g. refusal / no text block in the reply
+        return None
     pattern = rf"<{tag}>(.*?)</{tag}>"
     matches = re.findall(pattern, text, re.DOTALL)
     return matches[-1].strip() if matches else None
+
+
+def _jsonable(obj: Any) -> Any:
+    """ultimate-skills: MCP content blocks are pydantic models; dump them."""
+    if hasattr(obj, "model_dump"):
+        return obj.model_dump(mode="json", by_alias=True, exclude_none=True)
+    return str(obj)
 
 
 async def agent_loop(
@@ -126,7 +140,7 @@ async def agent_loop(
             is_error = False
             try:
                 tool_result = await connection.call_tool(tool_name, tool_input)
-                tool_response = json.dumps(tool_result) if isinstance(tool_result, (dict, list)) else str(tool_result)
+                tool_response = json.dumps(tool_result, default=_jsonable) if isinstance(tool_result, (dict, list)) else str(tool_result)
             except Exception as e:
                 is_error = True
                 tool_response = f"Error executing tool {tool_name}: {str(e)}\n"
@@ -332,25 +346,46 @@ Examples:
         """,
     )
 
-    parser.add_argument("eval_file", type=Path, help="Path to evaluation XML file")
+    parser.add_argument("eval_file", type=Path, nargs="?", help="Path to evaluation XML file")
     parser.add_argument("-t", "--transport", choices=["stdio", "sse", "http"], default="stdio", help="Transport type (default: stdio)")
     parser.add_argument("-m", "--model", default=DEFAULT_MODEL, help=f"Claude model to use (default: $MCP_EVAL_MODEL or {DEFAULT_MODEL})")
 
     stdio_group = parser.add_argument_group("stdio options")
     stdio_group.add_argument("-c", "--command", help="Command to run MCP server (stdio only)")
-    stdio_group.add_argument("-a", "--args", nargs="+", help="Arguments for the command (stdio only)")
-    stdio_group.add_argument("-e", "--env", nargs="+", help="Environment variables in KEY=VALUE format (stdio only)")
+    stdio_group.add_argument("-a", "--args", nargs="+", action="extend", help="Arguments for the command (stdio only)")
+    stdio_group.add_argument("-e", "--env", nargs="+", action="extend", help="Environment variables in KEY=VALUE format (stdio only)")
 
     remote_group = parser.add_argument_group("sse/http options")
     remote_group.add_argument("-u", "--url", help="MCP server URL (sse/http only)")
-    remote_group.add_argument("-H", "--header", nargs="+", dest="headers", help="HTTP headers in 'Key: Value' format (sse/http only)")
+    remote_group.add_argument("-H", "--header", nargs="+", action="extend", dest="headers", help="HTTP headers in 'Key: Value' format (sse/http only)")
 
     parser.add_argument("-o", "--output", type=Path, help="Output file for evaluation report (default: stdout)")
 
     args = parser.parse_args()
 
+    # ultimate-skills: -a/-e/-H take one or more values, so in the documented
+    # form "... -a server.py eval.xml" argparse hands the eval file to that
+    # option; take back the last value of the last such run in argv (only
+    # when that run has 2+ values, so "-a server.py" alone still errors).
+    if args.eval_file is None:
+        greedy = {"-a": "args", "--args": "args", "-e": "env", "--env": "env", "-H": "headers", "--header": "headers"}
+        argv, last = sys.argv[1:], None
+        for i, tok in enumerate(argv):
+            j = i + 1
+            while tok in greedy and j < len(argv) and not argv[j].startswith("-"):
+                j += 1
+            if j > i + 1:
+                last = (greedy[tok], argv[j - 1]) if j > i + 2 else None
+        values = getattr(args, last[0]) if last else None
+        if not values or values[-1] != last[1]:
+            parser.error("the following arguments are required: eval_file")
+        args.eval_file = Path(values.pop())
+
     if not args.eval_file.exists():
         print(f"Error: Evaluation file not found: {args.eval_file}")
+        sys.exit(1)
+    if not parse_evaluation_file(args.eval_file):  # ultimate-skills: fail fast
+        print(f"Error: no <qa_pair> with <question> and <answer> found in {args.eval_file}")
         sys.exit(1)
 
     headers = parse_headers(args.headers) if args.headers else None

@@ -5,7 +5,7 @@ description: Build distinctive, animation-rich HTML slide decks as a single self
 
 # Frontend Slides
 
-> Adapted from [zarazhangrui/frontend-slides](https://github.com/zarazhangrui/frontend-slides) (MIT, (c) 2025 Zara Zhang) at commit `9906a34`. Changes: the bold-template pack and the Vercel hosting script/phase are not included (previews now mix presets with a custom design); supporting files moved into `references/`, `assets/` and `scripts/`; description rewritten; `scripts/export-pdf.sh` pins Playwright, reuses an installed Playwright/Chromium, serves the deck on 127.0.0.1 only and resolves relative output paths correctly.
+> Adapted from [zarazhangrui/frontend-slides](https://github.com/zarazhangrui/frontend-slides) (MIT, (c) 2025 Zara Zhang) at commit `9906a34`. Changes: the bold-template pack and the Vercel hosting script/phase are not included (previews now mix presets with a custom design); supporting files moved into `references/`, `assets/` and `scripts/`; description rewritten; `scripts/export-pdf.sh` pins Playwright, reuses an installed Playwright/Chromium, serves the deck on 127.0.0.1 only, resolves relative output paths correctly and captures every slide in its final revealed state (sets `.visible`, freezes transitions); `scripts/extract-pptx.py` also extracts tables, grouped shapes and pictures in placeholders, and reports bad input or a missing `python-pptx` with a clear message.
 
 Create zero-dependency, animation-rich HTML presentations that run entirely in the browser.
 

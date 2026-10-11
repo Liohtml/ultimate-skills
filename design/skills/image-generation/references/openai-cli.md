@@ -42,7 +42,7 @@ Override the default with `--model` or the `IMAGEGEN_OPENAI_MODEL` environment v
 | `--background` | `transparent`, `opaque`, `auto` | Output transparency, not the scene backdrop. Transparent needs `png`/`webp` and a model that supports it. |
 | `--output-format` | `png` (default), `jpeg`, `webp` | |
 | `--output-compression` | 0–100 | jpeg/webp only. |
-| `--moderation` | `auto` (default), `low` | |
+| `--moderation` | `auto` (default), `low` | `generate` and batch only; `edit` ignores it with a warning (the Images edit API has no moderation parameter). |
 | `--image` (edit) | repeatable, up to 16 | Order matters - describe each by index and role in the prompt. Under 50 MB each. |
 | `--mask` (edit) | one PNG with alpha | Masking is prompt-guided; exact shapes are not guaranteed. |
 | `--input-fidelity` (edit) | `low`, `high` | Not for `gpt-image-2`. `gpt-image-1.5` preserves the first 5 inputs at higher fidelity; `high` raises input-token cost. |

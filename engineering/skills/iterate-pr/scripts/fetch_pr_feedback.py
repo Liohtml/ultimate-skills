@@ -28,7 +28,10 @@ Bot classification:
 
 Modified by ultimate-skills (from getsentry/skills@c2f99a5, Apache-2.0):
 extra review-bot / info-bot login patterns can be supplied via the
-comma-separated regex lists in $PR_REVIEW_BOTS and $PR_INFO_BOTS.
+comma-separated regex lists in $PR_REVIEW_BOTS and $PR_INFO_BOTS; a null
+author/user (comments from deleted accounts) no longer crashes the script;
+paginated output printed as back-to-back JSON arrays is merged, and failures
+to fetch review threads or parse gh output are reported on stderr.
 """
 from __future__ import annotations
 
@@ -75,6 +78,23 @@ REVIEW_BOT_PATTERNS += [p.strip() for p in os.environ.get("PR_REVIEW_BOTS", "").
 INFO_BOT_PATTERNS += [p.strip() for p in os.environ.get("PR_INFO_BOTS", "").split(",") if p.strip()]
 
 
+def _load_json_pages(text: str) -> Any:
+    """Parse gh output; `gh api --paginate` may print one JSON array per page
+    back to back (ultimate-skills: merged instead of silently dropped)."""
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        decoder, pos, pages = json.JSONDecoder(), 0, []
+        while pos < len(text):
+            page, pos = decoder.raw_decode(text, pos)
+            pages.append(page)
+            while pos < len(text) and text[pos].isspace():
+                pos += 1
+        if pages and all(isinstance(page, list) for page in pages):
+            return [item for page in pages for item in page]
+        raise
+
+
 def run_gh(args: list[str]) -> dict[str, Any] | list[Any] | None:
     """Run a gh CLI command and return parsed JSON output."""
     try:
@@ -84,11 +104,12 @@ def run_gh(args: list[str]) -> dict[str, Any] | list[Any] | None:
             text=True,
             check=True,
         )
-        return json.loads(result.stdout) if result.stdout.strip() else None
+        return _load_json_pages(result.stdout.strip()) if result.stdout.strip() else None
     except subprocess.CalledProcessError as e:
         print(f"Error running gh {' '.join(args)}: {e.stderr}", file=sys.stderr)
         return None
     except json.JSONDecodeError:
+        print(f"Unparseable JSON from gh {' '.join(args)}", file=sys.stderr)
         return None
 
 
@@ -96,7 +117,7 @@ def get_repo_info() -> tuple[str, str] | None:
     """Get owner and repo name from current directory."""
     result = run_gh(["repo", "view", "--json", "owner,name"])
     if result:
-        return result.get("owner", {}).get("login"), result.get("name")
+        return (result.get("owner") or {}).get("login"), result.get("name")
     return None
 
 
@@ -188,7 +209,9 @@ def get_review_threads(owner: str, repo: str, pr_number: int) -> list[dict[str, 
         data = json.loads(result.stdout)
         threads = data.get("data", {}).get("repository", {}).get("pullRequest", {}).get("reviewThreads", {}).get("nodes", [])
         return threads
-    except (subprocess.CalledProcessError, json.JSONDecodeError):
+    except (subprocess.CalledProcessError, json.JSONDecodeError) as e:
+        # ultimate-skills: say so instead of silently reporting no threads
+        print(f"Error fetching review threads: {getattr(e, 'stderr', e)}", file=sys.stderr)
         return []
 
 
@@ -224,7 +247,7 @@ def categorize_comment(comment: dict[str, Any], body: str) -> str:
 
     Uses LOGAF scale: high (must fix), medium (should fix), low (optional).
     """
-    author = comment.get("author", {}).get("login", "") or comment.get("user", {}).get("login", "")
+    author = (comment.get("author") or {}).get("login", "") or (comment.get("user") or {}).get("login", "")
 
     # Info bots are skipped silently; review bots fall through to content
     # categorization so their actionable feedback is not lost.
@@ -335,7 +358,7 @@ def main():
         sys.exit(1)
 
     pr_number = pr_info["number"]
-    pr_author = pr_info.get("author", {}).get("login", "")
+    pr_author = (pr_info.get("author") or {}).get("login", "")
 
     # Get review decision
     review_decision = pr_info.get("reviewDecision", "")
@@ -353,7 +376,7 @@ def main():
     reviews = pr_info.get("reviews", [])
     for review in reviews:
         if review.get("state") == "CHANGES_REQUESTED":
-            author = review.get("author", {}).get("login", "")
+            author = (review.get("author") or {}).get("login", "")
             body = review.get("body", "")
             if body and author != pr_author:
                 item = extract_feedback_item(body, author)
@@ -369,7 +392,7 @@ def main():
             continue
 
         first_comment = thread["comments"]["nodes"][0]
-        author = first_comment.get("author", {}).get("login", "")
+        author = (first_comment.get("author") or {}).get("login", "")
         body = first_comment.get("body", "")
 
         # Skip if author is PR author (self-comments)
@@ -413,7 +436,7 @@ def main():
     issue_comments = get_issue_comments(owner, repo, pr_number)
 
     for comment in issue_comments:
-        author = comment.get("user", {}).get("login", "")
+        author = (comment.get("user") or {}).get("login", "")
         body = comment.get("body", "")
 
         # Skip if author is PR author

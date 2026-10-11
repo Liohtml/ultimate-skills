@@ -33,6 +33,9 @@ def simulate(
         sm_spend_pct: Sales & marketing as % of revenue (0-1)
         months: Number of months to project
     
+    Month m reports the MRR after m months of net growth, so the last month of a
+    12-month run is mrr * (1 + growth - churn) ** 12.
+
     Returns:
         dict with monthly projections and summary
     """
@@ -58,9 +61,9 @@ def simulate(
         growth_rate = monthly_growth_pct / 100
         churn_rate = monthly_churn_pct / 100
         
-        # Net growth = growth - churn
+        # Net growth = growth - churn, applied before the month is reported
         net_growth_rate = growth_rate - churn_rate
-        new_mrr = current_mrr * (1 + net_growth_rate)
+        current_mrr = current_mrr * (1 + net_growth_rate)
         
         # Revenue and costs
         monthly_revenue = current_mrr
@@ -85,8 +88,6 @@ def simulate(
             "net_profit": round(net_profit, 2),
             "growth_rate_pct": round(net_growth_rate * 100, 2),
         })
-        
-        current_mrr = new_mrr
     
     # Summary
     final_mrr = results["projections"][-1]["mrr"]
@@ -104,6 +105,10 @@ def simulate(
         "total_sm_spend_12m": round(cumulative_sm_spend, 2),
         "total_net_profit_12m": round(total_net_profit, 2),
         "avg_monthly_growth_pct": round((monthly_growth_pct - monthly_churn_pct), 2),
+        "months": months,
+        # The growth rate drives MRR; CAC converts the projected S&M spend into the
+        # number of customers that spend would buy, as a sanity check on the rate.
+        "implied_customers_acquired": round(cumulative_sm_spend / cac, 1) if cac > 0 else None,
     }
     
     return results
@@ -113,7 +118,7 @@ def format_report(results):
     """Format simulation results as human-readable report."""
     lines = []
     lines.append("\n" + "=" * 70)
-    lines.append("UNIT ECONOMICS SIMULATION - 12 MONTH PROJECTION")
+    lines.append(f"UNIT ECONOMICS SIMULATION - {results['summary']['months']} MONTH PROJECTION")
     lines.append("=" * 70)
     
     # Inputs
@@ -128,7 +133,7 @@ def format_report(results):
     
     # Summary
     summary = results["summary"]
-    lines.append("\n📈 12-MONTH SUMMARY")
+    lines.append(f"\n📈 {summary['months']}-MONTH SUMMARY")
     lines.append(f"  Starting MRR: ${summary['starting_mrr']:,.0f}")
     lines.append(f"  Ending MRR: ${summary['ending_mrr']:,.0f}")
     lines.append(f"  Ending ARR: ${summary['ending_arr']:,.0f}")
@@ -137,6 +142,10 @@ def format_report(results):
     lines.append(f"  Total Gross Profit: ${summary['total_gross_profit_12m']:,.0f}")
     lines.append(f"  Total S&M Spend: ${summary['total_sm_spend_12m']:,.0f}")
     lines.append(f"  Total Net Profit: ${summary['total_net_profit_12m']:,.0f}")
+    if summary["implied_customers_acquired"] is not None:
+        lines.append(
+            f"  Customers that S&M spend buys at this CAC: {summary['implied_customers_acquired']:,.1f}"
+        )
     
     # Monthly breakdown (first 3, last 3)
     lines.append("\n📅 MONTHLY PROJECTIONS")
@@ -144,16 +153,17 @@ def format_report(results):
     lines.append("-" * 70)
     
     projs = results["projections"]
-    for p in projs[:3]:
+    head, tail = (projs, []) if len(projs) <= 6 else (projs[:3], projs[-3:])
+    for p in head:
         lines.append(
             f"{p['month']:<8} ${p['mrr']:<11,.0f} ${p['arr']:<11,.0f} "
             f"${p['monthly_revenue']:<11,.0f} ${p['net_profit']:<11,.0f}"
         )
     
-    if len(projs) > 6:
+    if tail:
         lines.append("  ...")
     
-    for p in projs[-3:]:
+    for p in tail:
         lines.append(
             f"{p['month']:<8} ${p['mrr']:<11,.0f} ${p['arr']:<11,.0f} "
             f"${p['monthly_revenue']:<11,.0f} ${p['net_profit']:<11,.0f}"
@@ -166,7 +176,7 @@ def format_report(results):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Simulate SaaS unit economics over 12 months"
+        description="Simulate SaaS unit economics forward (default: 12 months)"
     )
     parser.add_argument("--mrr", type=float, required=True, help="Starting MRR")
     parser.add_argument(
@@ -188,7 +198,19 @@ if __name__ == "__main__":
     parser.add_argument("--json", action="store_true", help="Output JSON format")
     
     args = parser.parse_args()
-    
+    if args.mrr <= 0:
+        parser.error("--mrr must be greater than 0")
+    if args.cac <= 0:
+        parser.error("--cac must be greater than 0")
+    if args.churn < 0:
+        parser.error("--churn must be >= 0")
+    if args.months < 1:
+        parser.error("--months must be at least 1")
+    if not 0 < args.gross_margin <= 100:
+        parser.error("--gross-margin must be greater than 0 and at most 100")
+    if not 0 <= args.sm_spend <= 100:
+        parser.error("--sm-spend must be between 0 and 100 (percent of revenue)")
+
     results = simulate(
         mrr=args.mrr,
         monthly_growth_pct=args.growth,

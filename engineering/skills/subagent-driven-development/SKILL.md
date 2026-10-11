@@ -6,7 +6,7 @@ license: MIT
 
 # Subagent-Driven Development
 
-> Adapted from [obra/superpowers `subagent-driven-development`](https://github.com/obra/superpowers/tree/5bf4e78011075bcfc0dc295f0724994cd123ee71/skills/subagent-driven-development) (MIT, Copyright (c) 2025 Jesse Vincent). Changes: decoupled from other superpowers skills (worktree, finishing and code-review skills replaced by this marketplace's skills; the final reviewer prompt is bundled as `final-reviewer-prompt.md`), workspace moved to `.sdd/`, example workflow and rationalizations moved to `references/`.
+> Adapted from [obra/superpowers `subagent-driven-development`](https://github.com/obra/superpowers/tree/5bf4e78011075bcfc0dc295f0724994cd123ee71/skills/subagent-driven-development) (MIT, Copyright (c) 2025 Jesse Vincent). Changes: decoupled from other superpowers skills (worktree, finishing and code-review skills replaced by this marketplace's skills; the final reviewer prompt is bundled as `final-reviewer-prompt.md`), workspace moved to `.sdd/`, script invocation clarified (run from the project's working tree), example workflow and rationalizations moved to `references/`.
 
 Execute plan by dispatching a fresh implementer subagent per task, a task review (spec compliance + code quality) after each, and a broad whole-branch review at the end.
 
@@ -139,6 +139,9 @@ a ledger file, not only in todos.
   directory (under `<repo-root>/.sdd/`), home to
   every artifact for THIS plan: ledger, briefs, reports, review packages.
   Another plan's directory is never yours to read or write.
+  `scripts/` paths are relative to this skill's directory, but run every
+  script from the project's working tree (`bash <this-skill-dir>/scripts/...`):
+  they resolve the repository and PLAN_FILE from the current directory.
 - Check for this plan's ledger at `<workspace>/progress.md`. If its first
   line names your plan file, tasks with a `Task <N>: complete` line are DONE
   — do not re-dispatch them; resume at the first task without one. A task
@@ -287,7 +290,7 @@ Template: [implementer-prompt.md](implementer-prompt.md)
 
 Implementer subagents report one of four statuses. Handle each appropriately:
 
-**DONE:** Generate the review package (`bash scripts/review-package PLAN_FILE BASE HEAD`, from this skill's directory — it prints the unique file path it wrote; BASE is the commit you recorded before dispatching the implementer — never `HEAD~1`, which silently drops all but the last commit of a multi-commit task), then dispatch the task reviewer with the printed path.
+**DONE:** Generate the review package (`bash scripts/review-package PLAN_FILE BASE HEAD`, run from the project's working tree — it prints the unique file path it wrote; BASE is the commit you recorded before dispatching the implementer — never `HEAD~1`, which silently drops all but the last commit of a multi-commit task), then dispatch the task reviewer with the printed path.
 
 **DONE_WITH_CONCERNS:** The implementer completed the work but flagged doubts. Read the concerns before proceeding. If the concerns are about correctness or scope, address them before review. If they're observations (e.g., "this file is getting large"), note them and proceed to review.
 

@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 # Copyright 2026 Anthropic PBC
 # SPDX-License-Identifier: Apache-2.0
+# Modified by ultimate-skills (Apache-2.0 section 4(b)): --help prints this
+# docstring and exits 0; a non-integer <N>, a non-UTF-8 payload or a missing
+# --from file exits with a one-line "checkpoint:" error instead of a traceback.
 """Checkpoint helper for the runbook skills (vuln-scan, triage,
 threat-model, dnr-hunt, dnr-respond).
 
@@ -386,10 +389,20 @@ CMDS = {
 
 
 def main(argv: list[str]) -> int:
+    if argv and argv[0] in ("-h", "--help"):
+        print(f"usage: checkpoint.py {{{'|'.join(CMDS)}}} ...\n{__doc__}")
+        return 0
     if not argv or argv[0] not in CMDS:
         print(f"usage: checkpoint.py {{{'|'.join(CMDS)}}} ...", file=sys.stderr)
         return 2
-    return CMDS[argv[0]](argv[1:])
+    try:
+        return CMDS[argv[0]](argv[1:])
+    except ValueError as exc:  # non-integer <N>, or a payload that is not UTF-8
+        print(f"checkpoint: invalid argument or payload: {exc}", file=sys.stderr)
+        return 2
+    except OSError as exc:  # missing/unreadable --from file
+        print(f"checkpoint: {exc}", file=sys.stderr)
+        return 1
 
 
 if __name__ == "__main__":

@@ -59,6 +59,9 @@ The scripts enforce two rules worth knowing before you read their output:
    uv run ${CLAUDE_SKILL_DIR}/scripts/render.py <out-dir>/findings.json --out <out-dir>/report.md
    ```
 
+   Without `uv`, run the same two commands with `python3` (3.11+) in place of `uv run`;
+   the scripts are stdlib-only and produce the same artifact.
+
    Expect a few minutes for ~50 dependencies — several HTTP requests per dependency,
    more with many Go modules, and slower without authenticated `gh`. If `collect.py`
    exits non-zero, it is refusing to report — relay its message verbatim instead of
@@ -133,4 +136,4 @@ or framing.
 
 ## Change note
 
-Modified from upstream commit `32e34f8`: `{baseDir}` rewritten to `${CLAUDE_SKILL_DIR}`; the `report-writing:writing-style` cross-reference removed; an explicit authorization / read-only / no-execution note and the Python and `gh` prerequisites added; the bundled `test_*.py`, `uv.lock`, `agents/openai.yaml` and Trail of Bits brand asset removed from the skill directory; `allowed-tools` frontmatter dropped. The four collector/renderer scripts (`collect.py`, `sources.py`, `model.py`, `render.py`) and their measurement discipline are unchanged.
+Modified from upstream commit `32e34f8`: `{baseDir}` rewritten to `${CLAUDE_SKILL_DIR}`; the `report-writing:writing-style` cross-reference removed; an explicit authorization / read-only / no-execution note, the Python and `gh` prerequisites and a `python3` fallback for the two commands added; the bundled `test_*.py`, `uv.lock`, `agents/openai.yaml` and Trail of Bits brand asset removed from the skill directory; `allowed-tools` frontmatter dropped. The four collector/renderer scripts (`collect.py`, `sources.py`, `model.py`, `render.py`) and their measurement discipline are unchanged.

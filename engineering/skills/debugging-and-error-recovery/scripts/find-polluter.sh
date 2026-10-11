@@ -2,11 +2,15 @@
 # Find which test file creates unwanted files/state by running test files one
 # at a time until the artifact appears.
 # Adapted from obra/superpowers (MIT, Copyright (c) 2025 Jesse Vincent),
-# skills/systematic-debugging/find-polluter.sh @ 5bf4e78. Change: the test
-# runner is configurable via TEST_CMD (default: "npm test").
+# skills/systematic-debugging/find-polluter.sh @ 5bf4e78. Changes: the test
+# runner is configurable via TEST_CMD (default: "npm test"); test paths
+# containing spaces are kept intact; the script aborts (exit 2) instead of
+# reporting "all tests clean" when the artifact already exists before the
+# first test or when no test file matches the pattern.
 #
 # Usage: TEST_CMD="npx vitest run" ./find-polluter.sh <file_or_dir_to_check> <test_pattern>
 # Example: ./find-polluter.sh '.git' 'src/**/*.test.ts'
+# Exit: 0 no polluter found, 1 polluter found (or usage error), 2 cannot search
 
 set -e
 
@@ -31,18 +35,28 @@ TEST_PATTERN="${TEST_PATTERN#./}"
 # find -path can't match '**/' against zero directory levels, so a pattern
 # like src/**/*.test.ts would skip src/top.test.ts; also try the pattern
 # with '**/' collapsed to cover files directly under the base directory.
-TEST_FILES=$(find . \( -path "./$TEST_PATTERN" -o -path "./${TEST_PATTERN//\*\*\//}" \) | sort -u)
-if [ -z "$TEST_FILES" ]; then
-  TOTAL=0
-else
-  TOTAL=$(printf '%s\n' "$TEST_FILES" | wc -l | tr -d ' ')
-fi
+# Read into an array (bash 3.2 compatible) so paths with spaces stay intact.
+TEST_FILES=()
+while IFS= read -r f; do
+  TEST_FILES+=("$f")
+done < <(find . \( -path "./$TEST_PATTERN" -o -path "./${TEST_PATTERN//\*\*\//}" \) | sort -u)
+TOTAL=${#TEST_FILES[@]}
 
 echo "Found $TOTAL test files"
 echo ""
 
+if [ "$TOTAL" -eq 0 ]; then
+  echo "❌ No test files match '$TEST_PATTERN' (relative to $(pwd)); nothing to search." >&2
+  exit 2
+fi
+
+if [ -e "$POLLUTION_CHECK" ]; then
+  echo "❌ $POLLUTION_CHECK already exists before any test ran; remove it and re-run." >&2
+  exit 2
+fi
+
 COUNT=0
-for TEST_FILE in $TEST_FILES; do
+for TEST_FILE in "${TEST_FILES[@]}"; do
   COUNT=$((COUNT + 1))
 
   # Skip if pollution already exists
@@ -68,8 +82,8 @@ for TEST_FILE in $TEST_FILES; do
     ls -la "$POLLUTION_CHECK"
     echo ""
     echo "To investigate:"
-    echo "  $TEST_CMD $TEST_FILE    # Run just this test"
-    echo "  cat $TEST_FILE         # Review test code"
+    echo "  $TEST_CMD \"$TEST_FILE\"    # Run just this test"
+    echo "  cat \"$TEST_FILE\"         # Review test code"
     exit 1
   fi
 done

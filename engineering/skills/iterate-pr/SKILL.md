@@ -6,7 +6,7 @@ license: Apache-2.0 (see LICENSE.txt); references/receiving-code-review.md is MI
 
 # Iterate on a PR Until CI Passes
 
-> Adapted from [getsentry/skills `iterate-pr`](https://github.com/getsentry/skills/tree/c2f99a5b04b4cd992ec3022d7c2c3e23e938d241/skills/iterate-pr) (Apache-2.0, see `LICENSE.txt`). **Modified by ultimate-skills:** generalised beyond Sentry's bots (configurable bot lists), scripts runnable with plain `python3`, tool-specific monitor wording neutralised, and a "Receiving feedback" section adapted from [obra/superpowers `receiving-code-review`](https://github.com/obra/superpowers/tree/5bf4e78011075bcfc0dc295f0724994cd123ee71/skills/receiving-code-review) (MIT).
+> Adapted from [getsentry/skills `iterate-pr`](https://github.com/getsentry/skills/tree/c2f99a5b04b4cd992ec3022d7c2c3e23e938d241/skills/iterate-pr) (Apache-2.0, see `LICENSE.txt`). **Modified by ultimate-skills:** generalised beyond Sentry's bots (configurable bot lists), scripts runnable with plain `python3`, tool-specific monitor wording neutralised, `fetch_pr_feedback.py` hardened (comments from deleted accounts, back-to-back paginated JSON, review-thread fetch failures reported on stderr), `reply_to_thread.py` reports per-thread results when a batch partly fails, and a "Receiving feedback" section adapted from [obra/superpowers `receiving-code-review`](https://github.com/obra/superpowers/tree/5bf4e78011075bcfc0dc295f0724994cd123ee71/skills/receiving-code-review) (MIT).
 
 Goal: fix actionable CI failures and high/medium review feedback. Stop and report human approval, draft-readiness, and merge-readiness gates; do not wait on them.
 

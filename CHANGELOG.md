@@ -1,5 +1,34 @@
 # Changelog
 
+## Unreleased: script test pass
+
+Every bundled script (24) was run for real on realistic inputs, with local mock
+APIs where no key was available. Bugs found by those runs are fixed:
+
+- `image-generation`: the default Gemini model is now `gemini-nano-banana-2.1`.
+  `gemini-3.1-flash-image` is deprecated and shuts down on 2026-10-29 (per
+  google-gemini/gemini-skills `832c8f9`). `gemini_image.py` no longer saves interim
+  `thought` images. `image_gen.py` checks for an existing output before the paid
+  call, reports API errors without a traceback, ignores `--moderation` on edits
+  (the edit API has no such parameter) and has a corrected retry-after regex.
+- `frontend-slides`: `export-pdf.sh` captured every slide after the first blank or
+  mid-fade; reveal transitions are now disabled during export. `extract-pptx.py`
+  now extracts tables, grouped shapes and placeholder pictures, and fails cleanly
+  on bad input.
+- `saas-metrics-coach`: the projection compounded one month too few; the quick
+  ratio now includes reactivation; Rule of 40 annualises MoM growth by compounding;
+  zero/negative inputs and non-interactive runs no longer crash.
+- `skill-scanner`: no longer follows symlinks out of the skill directory, masks
+  secrets in its evidence, does not crash on YAML dates, and its HTTP-exfiltration
+  pattern now matches real calls.
+- `mcp-builder`: `mcp` pinned below 2.0; `evaluation.py` serialises MCP content
+  blocks and parses its arguments reliably.
+- `iterate-pr`, `find-polluter.sh`, `checkpoint.py` (threat-model, vuln-triage):
+  robustness fixes (missing fields, paths with spaces, clean errors, `--help`).
+- `subagent-driven-development`: the SKILL.md now says to run the scripts from the
+  project's working tree (running them from the skill directory created the
+  workspace inside the plugin checkout).
+
 ## Unreleased: wave 3 (marketplace 1.2.0)
 
 A depth and clean-up round with no new skills: still **68 skills in 7 plugins

@@ -6,7 +6,7 @@ license: Apache-2.0 (complete terms in LICENSE.txt)
 
 # MCP Server Development Guide
 
-> From [anthropics/skills `mcp-builder`](https://github.com/anthropics/skills/tree/34040c9c568585f6929bedeaad110ad08f079624/skills/mcp-builder), licensed under Apache-2.0 (see `LICENSE.txt`). **Modified by ultimate-skills:** description rewritten, tool-specific fetch wording neutralised, and `scripts/evaluation.py` updated (current default model, handling of parallel tool calls, larger `max_tokens`).
+> From [anthropics/skills `mcp-builder`](https://github.com/anthropics/skills/tree/34040c9c568585f6929bedeaad110ad08f079624/skills/mcp-builder), licensed under Apache-2.0 (see `LICENSE.txt`). **Modified by ultimate-skills:** description rewritten, tool-specific fetch wording neutralised, and `scripts/evaluation.py` updated (current default model, handling of parallel tool calls, larger `max_tokens`; tool results serialised to JSON instead of being sent as errors, replies without text and empty or malformed eval files handled, repeated or trailing `-a`/`-e`/`-H` arguments parsed correctly); `scripts/requirements.txt` pins `mcp<2`, whose client API `scripts/connections.py` targets.
 
 ## Overview
 

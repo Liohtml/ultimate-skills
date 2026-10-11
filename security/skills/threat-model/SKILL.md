@@ -182,4 +182,7 @@ wording neutralized; references to the upstream `vuln-pipeline`, harness
 `recon`/`judge` stages and `docs/*.md` removed and the authorization framing
 inlined in Step 0; `allowed-tools` frontmatter dropped; optional ATT&CK/ATLAS
 mapping note, cross-links to this marketplace's skills and
-`CLAUDE_SKILL_DIR` expansion notes (SKILL.md and each reference file) added.
+`CLAUDE_SKILL_DIR` expansion notes (SKILL.md and each reference file) added;
+`scripts/checkpoint.py` changed so that `--help` exits 0 and a non-integer
+`<N>`, non-UTF-8 payload or missing `--from` file exits with a one-line error
+instead of a traceback.

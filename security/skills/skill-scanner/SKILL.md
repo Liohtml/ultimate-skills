@@ -3,7 +3,7 @@ name: skill-scanner
 description: >-
   Security scan of an agent skill or plugin before installing or importing it:
   a bundled static scanner (prompt-injection phrases, obfuscation/base64,
-  dangerous code, secrets, URLs, symlinks, frontmatter hooks, !`cmd` load-time
+  dangerous code, secrets, URLs, symlinks, frontmatter hooks, inline bang-command load-time
   expansion, auto-run test files, npm lifecycle scripts, image metadata)
   followed by agent review of intent, config/memory poisoning, scope creep,
   script behavior, supply-chain URLs and least-privilege tool grants. Ends with
@@ -38,6 +38,8 @@ uv run ${CLAUDE_SKILL_DIR}/scripts/scan_skill.py <skill-directory> \
 ```
 
 Returns JSON with findings, URLs, structure info, and severity counts. The script catches patterns mechanically — your job is to evaluate intent and filter false positives.
+
+**Coverage**: text patterns are matched in `SKILL.md`, top-level `references/*.md` and top-level `scripts/*.{py,sh,js,ts}` only; structural checks (symlinks, test files, `package.json`, PNG metadata) cover the whole tree. Files elsewhere — nested `scripts/**`, `agents/`, `examples/`, `templates/`, other extensions — are not pattern-scanned, so list them with `find <skill-directory> -type f` and read them in Phases 5–6. Symlinks are reported, never followed.
 
 ## Workflow
 
@@ -223,4 +225,4 @@ Example assessments:
 
 ## Change note (Apache-2.0 §4b)
 
-Modified from upstream commit `c2f99a5`: description rewritten with cross-pointers; script invocation changed to `${CLAUDE_SKILL_DIR}` with a `python3` fallback to `uv run`; skill-discovery order puts plugin layouts first; untrusted-data and expected-false-positive notes added; `allowed-tools` frontmatter dropped. `scripts/scan_skill.py` gained argparse `--help` and a JSON error when PyYAML is missing (scan logic and output format unchanged); the reference files are unchanged.
+Modified from upstream commit `c2f99a5`: description rewritten with cross-pointers; script invocation changed to `${CLAUDE_SKILL_DIR}` with a `python3` fallback to `uv run`; skill-discovery order puts plugin layouts first; untrusted-data and expected-false-positive notes added; `allowed-tools` frontmatter dropped. `scripts/scan_skill.py` gained argparse `--help` and a JSON error when PyYAML is missing, and was fixed so that frontmatter dates no longer crash the JSON output, file content is read only from regular files inside the skill directory (symlinks are reported, never followed), secret values are masked in `evidence`, the HTTP-request pattern matches `urllib.request`/`http.client`/`aiohttp` calls, and fenced load-time shell blocks (opened with three backticks and an exclamation mark) are reported (output keys unchanged); a coverage note was added to the SKILL.md; the reference files are unchanged.

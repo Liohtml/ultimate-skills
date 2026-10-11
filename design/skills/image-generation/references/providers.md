@@ -1,6 +1,6 @@
 # Providers and model routing
 
-> Model-selection matrix, web-asset purpose table, Gemini REST pattern, multi-turn editing note and common-mistakes table adapted from [jezweb/claude-skills](https://github.com/jezweb/claude-skills) `plugins/design-assets/skills/ai-image-generator` at commit `e875a6b` (MIT, (c) 2025 Jeremy Dawes). **Changes:** advert for a managed service, author-specific save paths and regional advice removed; the outdated claim that Gemini cannot render text corrected; model IDs aligned with the official lists in [google-gemini/gemini-skills](https://github.com/google-gemini/gemini-skills) (`gemini-api-dev`, commit `eaa2325`) and GPT Image 2.5 notes from [wuyoscar/GPT-Image2-Skill](https://github.com/wuyoscar/GPT-Image2-Skill) (MIT, checked 2026-09-09); inline heredoc calls replaced by the bundled scripts; API key moved from URL query to header; hard-coded prices dropped (they drift - check the provider's pricing page).
+> Model-selection matrix, web-asset purpose table, Gemini REST pattern, multi-turn editing note and common-mistakes table adapted from [jezweb/claude-skills](https://github.com/jezweb/claude-skills) `plugins/design-assets/skills/ai-image-generator` at commit `e875a6b` (MIT, (c) 2025 Jeremy Dawes). **Changes:** advert for a managed service, author-specific save paths and regional advice removed; the outdated claim that Gemini cannot render text corrected; model IDs aligned with the official lists in [google-gemini/gemini-skills](https://github.com/google-gemini/gemini-skills) (`gemini-api-dev`, commit `832c8f9`) and GPT Image 2.5 notes from [wuyoscar/GPT-Image2-Skill](https://github.com/wuyoscar/GPT-Image2-Skill) (MIT, checked 2026-09-09); inline heredoc calls replaced by the bundled scripts; API key moved from URL query to header; hard-coded prices dropped (they drift - check the provider's pricing page).
 
 **Model IDs change often.** Before the first live call in a session, verify: `python3 scripts/gemini_image.py --list-models` for Gemini, and the OpenAI models page (or a failed call's error message) for GPT Image. Never invent an ID.
 
@@ -8,10 +8,10 @@
 
 | Need | First choice | Why / fallback |
 |---|---|---|
-| Photoreal scenes, lifestyle, stock-style photos, environmental depth | Gemini `gemini-3.1-flash-image` (Nano Banana 2) | Strong depth and scene complexity; fast. Final client work at higher detail: `gemini-3-pro-image` (Nano Banana Pro). |
+| Photoreal scenes, lifestyle, stock-style photos, environmental depth | Gemini `gemini-nano-banana-2.1` (Nano Banana 2.1) | Strong depth and scene complexity; fast. Final client work at higher detail: `gemini-3-pro-image` (Nano Banana Pro). |
 | Readable in-image text: posters, OG images with headlines, infographics, pricing cards, UI mockups, multi-script copy | `gpt-image-2` or `gpt-image-2.5-*` | Most reliable typography. Nano Banana Pro also renders text well; check spelling either way. |
 | Many variants of one idea (style exploration, A/B options) | `gpt-image-2` with `--n` up to 10 | Variants share composition and palette. Ask before paying for more than one. |
-| Multi-reference compositing (product into a lifestyle scene, logo onto packaging) | `gpt-image-2` / `gpt-image-2.5-sunburst` edit, or Gemini with several `--image` inputs (Pro accepts up to 14) | Label each input by index and role. |
+| Multi-reference compositing (product into a lifestyle scene, logo onto packaging) | `gpt-image-2` / `gpt-image-2.5-sunburst` edit, or Gemini with several `--image` inputs (Nano Banana 2.1 and Pro accept up to 14) | Label each input by index and role. |
 | Precise edits that must preserve everything else | `gpt-image-2.5-sunburst` edit, or Gemini edit | Repeat invariants every iteration. |
 | **Transparent PNG** (icons, cutouts, stickers) | `gpt-image-1.5` or a `gpt-image-2.5-*` model with `--background transparent` | **`gpt-image-2` cannot do transparency; Gemini returns no alpha.** Alternative: generate on a flat chroma background and cut out locally. |
 | Cheap, fast drafts | `gemini-3.1-flash-lite-image` (Nano Banana 2 Lite) or GPT Image `--quality low` | Promote the winning direction to a stronger model. |
@@ -38,7 +38,7 @@ Keep headlines, buttons, nav and other UI copy in HTML/CSS, not baked into image
 ## Gemini (Nano Banana) specifics
 
 - Endpoint: `POST https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent`, key in the `x-goog-api-key` header. `scripts/gemini_image.py` wraps it with the standard library only.
-- Current image models (per `gemini-api-dev`): `gemini-3.1-flash-image` (Nano Banana 2), `gemini-3-pro-image` (Nano Banana Pro), `gemini-3.1-flash-lite-image` (Nano Banana 2 Lite). `gemini-2.5-*` / `gemini-2.0-*` models are legacy - don't use them.
+- Current image models (per `gemini-api-dev` at `832c8f9`): `gemini-nano-banana-2.1` (Nano Banana 2.1, default; up to 14 reference images, wide `1:4`/`4:1`/`1:8`/`8:1` ratios), `gemini-3-pro-image` (Nano Banana Pro), `gemini-3.1-flash-lite-image` (Nano Banana 2 Lite). `gemini-3.1-flash-image` (Nano Banana 2) is **deprecated and shuts down on 2026-10-29** - replace it with `gemini-nano-banana-2.1` (drop-in model swap). `gemini-2.5-*` / `gemini-2.0-*` models are legacy - don't use them.
 - `generationConfig.imageConfig`: `aspectRatio` (`1:1`, `2:3`, `3:2`, `3:4`, `4:3`, `4:5`, `5:4`, `9:16`, `16:9`, `21:9`, plus extreme `1:4`, `4:1`, `1:8`, `8:1` on some models) and `imageSize` (`1K`, `2K`, `4K`; `512px` on Flash). The script exposes them as `--aspect-ratio` and `--image-size`.
 - Inputs: pass reference or edit images with repeated `--image` (sent as inline base64, ~20 MB request limit). The text prompt says which image is the edit target and which are references.
 - Responses may contain text parts ("Here is your image...") alongside the image; the script prints them as `model_text`. Output has no alpha channel.

@@ -34,7 +34,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 API_ROOT = "https://generativelanguage.googleapis.com/v1beta"
-DEFAULT_MODEL = os.environ.get("IMAGEGEN_GEMINI_MODEL", "gemini-3.1-flash-image")
+DEFAULT_MODEL = os.environ.get("IMAGEGEN_GEMINI_MODEL", "gemini-nano-banana-2.1")
 DEFAULT_OUT = "output/imagegen/gemini.png"
 KNOWN_ASPECT_RATIOS = {
     "1:1", "2:3", "3:2", "3:4", "4:3", "4:5", "5:4", "9:16", "16:9", "21:9",
@@ -194,10 +194,12 @@ def main() -> int:
     cand = candidates[0]
     images, texts = [], []
     for part in (cand.get("content") or {}).get("parts", []):
+        if part.get("thought"):
+            continue  # interim "thinking" text/images are not outputs
         blob = part.get("inlineData") or part.get("inline_data")
         if blob and blob.get("data"):
             images.append((blob.get("mimeType") or blob.get("mime_type") or "image/png", blob["data"]))
-        elif part.get("text") and not part.get("thought"):
+        elif part.get("text"):
             texts.append(part["text"])
     if not images:
         die(f"No image in response (finishReason={cand.get('finishReason')}). Model text: {' '.join(texts)[:1000]}")

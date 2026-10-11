@@ -14,6 +14,11 @@ Batches all replies into a single GraphQL mutation for efficiency.
 Example:
     uv run reply_to_thread.py PRRT_abc "Fixed the issue."
     uv run reply_to_thread.py PRRT_abc "Fixed." PRRT_def "Also fixed."
+
+Modified by ultimate-skills (from getsentry/skills@c2f99a5, Apache-2.0):
+gh exits non-zero when any alias in the batch fails but still prints the
+response, so per-thread results are now read from it instead of reporting
+every reply (including ones that were posted) as failed.
 """
 
 from __future__ import annotations
@@ -61,7 +66,8 @@ def reply_to_threads(pairs: list[tuple[str, str]]) -> list[tuple[str, bool]]:
         )
         if result.returncode != 0:
             print(f"GraphQL error: {result.stderr}", file=sys.stderr)
-            return [(tid, False) for tid, _ in pairs]
+            if not result.stdout.strip():  # no response body: nothing was posted
+                return [(tid, False) for tid, _ in pairs]
 
         # Parse response to detect per-alias GraphQL errors
         try:

@@ -2,7 +2,7 @@
 """
 Quick Ratio Calculator - SaaS growth efficiency metric.
 
-Quick Ratio = (New MRR + Expansion MRR) / (Churned MRR + Contraction MRR)
+Quick Ratio = (New MRR + Expansion MRR + Reactivation MRR) / (Churned MRR + Contraction MRR)
 
 A ratio > 4 indicates healthy, efficient growth.
 A ratio < 1 means you're losing revenue faster than gaining it.
@@ -10,6 +10,7 @@ A ratio < 1 means you're losing revenue faster than gaining it.
 Usage:
     python quick_ratio_calculator.py --new-mrr 10000 --expansion 2000 --churned 3000 --contraction 500
     python quick_ratio_calculator.py --new-mrr 10000 --expansion 2000 --churned 3000 --contraction 500 --json
+    python quick_ratio_calculator.py --new-mrr 10000 --expansion 2000 --reactivation 800 --churned 3000 --json
 """
 
 import json
@@ -17,7 +18,7 @@ import sys
 import argparse
 
 
-def calculate_quick_ratio(new_mrr, expansion_mrr, churned_mrr, contraction_mrr):
+def calculate_quick_ratio(new_mrr, expansion_mrr, churned_mrr, contraction_mrr, reactivation_mrr=0):
     """
     Calculate Quick Ratio and provide interpretation.
     
@@ -26,12 +27,13 @@ def calculate_quick_ratio(new_mrr, expansion_mrr, churned_mrr, contraction_mrr):
         expansion_mrr: Expansion MRR from existing customers (upsells)
         churned_mrr: MRR lost from churned customers
         contraction_mrr: MRR lost from downgrades
+        reactivation_mrr: MRR from previously churned customers who came back
     
     Returns:
         dict with quick ratio and analysis
     """
     # Calculate components
-    growth_mrr = new_mrr + expansion_mrr
+    growth_mrr = new_mrr + expansion_mrr + reactivation_mrr
     lost_mrr = churned_mrr + contraction_mrr
     
     # Quick Ratio
@@ -46,6 +48,11 @@ def calculate_quick_ratio(new_mrr, expansion_mrr, churned_mrr, contraction_mrr):
     if lost_mrr == 0 and growth_mrr > 0:
         status = "EXCELLENT"
         interpretation = "No revenue loss - perfect retention with growth"
+    elif lost_mrr == 0:
+        quick_ratio = None
+        quick_ratio_display = "n/a"
+        status = "N/A"
+        interpretation = "No MRR gained or lost this period - Quick Ratio is undefined"
     elif quick_ratio >= 4:
         status = "EXCELLENT"
         interpretation = "Strong, efficient growth - gaining revenue 4x faster than losing it"
@@ -63,8 +70,9 @@ def calculate_quick_ratio(new_mrr, expansion_mrr, churned_mrr, contraction_mrr):
     if growth_mrr > 0:
         new_pct = (new_mrr / growth_mrr) * 100
         expansion_pct = (expansion_mrr / growth_mrr) * 100
+        reactivation_pct = (reactivation_mrr / growth_mrr) * 100
     else:
-        new_pct = expansion_pct = 0
+        new_pct = expansion_pct = reactivation_pct = 0
     
     if lost_mrr > 0:
         churned_pct = (churned_mrr / lost_mrr) * 100
@@ -73,7 +81,7 @@ def calculate_quick_ratio(new_mrr, expansion_mrr, churned_mrr, contraction_mrr):
         churned_pct = contraction_pct = 0
     
     results = {
-        "quick_ratio": quick_ratio if quick_ratio != float('inf') else None,
+        "quick_ratio": None if quick_ratio in (None, float('inf')) else quick_ratio,
         "quick_ratio_display": quick_ratio_display,
         "status": status,
         "interpretation": interpretation,
@@ -82,12 +90,14 @@ def calculate_quick_ratio(new_mrr, expansion_mrr, churned_mrr, contraction_mrr):
             "lost_mrr": round(lost_mrr, 2),
             "new_mrr": round(new_mrr, 2),
             "expansion_mrr": round(expansion_mrr, 2),
+            "reactivation_mrr": round(reactivation_mrr, 2),
             "churned_mrr": round(churned_mrr, 2),
             "contraction_mrr": round(contraction_mrr, 2),
         },
         "breakdown": {
             "new_mrr_pct": round(new_pct, 1),
             "expansion_mrr_pct": round(expansion_pct, 1),
+            "reactivation_mrr_pct": round(reactivation_pct, 1),
             "churned_mrr_pct": round(churned_pct, 1),
             "contraction_mrr_pct": round(contraction_pct, 1),
         },
@@ -111,9 +121,10 @@ def format_report(results):
     # Components
     comp = results["components"]
     lines.append("\n📊 COMPONENTS")
-    lines.append(f"  Growth MRR (New + Expansion): ${comp['growth_mrr']:,.2f}")
+    lines.append(f"  Growth MRR (New + Expansion + Reactivation): ${comp['growth_mrr']:,.2f}")
     lines.append(f"    • New MRR: ${comp['new_mrr']:,.2f}")
     lines.append(f"    • Expansion MRR: ${comp['expansion_mrr']:,.2f}")
+    lines.append(f"    • Reactivation MRR: ${comp['reactivation_mrr']:,.2f}")
     lines.append(f"  Lost MRR (Churned + Contraction): ${comp['lost_mrr']:,.2f}")
     lines.append(f"    • Churned MRR: ${comp['churned_mrr']:,.2f}")
     lines.append(f"    • Contraction MRR: ${comp['contraction_mrr']:,.2f}")
@@ -123,6 +134,7 @@ def format_report(results):
     lines.append("\n📈 GROWTH BREAKDOWN")
     lines.append(f"  New customers: {bd['new_mrr_pct']:.1f}%")
     lines.append(f"  Expansion: {bd['expansion_mrr_pct']:.1f}%")
+    lines.append(f"  Reactivation: {bd['reactivation_mrr_pct']:.1f}%")
     
     lines.append("\n📉 LOSS BREAKDOWN")
     lines.append(f"  Churn: {bd['churned_mrr_pct']:.1f}%")
@@ -151,6 +163,10 @@ if __name__ == "__main__":
         "--expansion", type=float, default=0, help="Expansion MRR from upsells (default: 0)"
     )
     parser.add_argument(
+        "--reactivation", type=float, default=0,
+        help="Reactivation MRR from returning customers (default: 0)",
+    )
+    parser.add_argument(
         "--churned", type=float, required=True, help="Churned MRR from lost customers"
     )
     parser.add_argument(
@@ -159,12 +175,17 @@ if __name__ == "__main__":
     parser.add_argument("--json", action="store_true", help="Output JSON format")
     
     args = parser.parse_args()
-    
+    for flag in ("new_mrr", "expansion", "reactivation", "churned", "contraction"):
+        if getattr(args, flag) < 0:
+            parser.error(f"--{flag.replace('_', '-')} must be >= 0 "
+                         "(enter churned and contraction MRR as positive amounts)")
+
     results = calculate_quick_ratio(
         new_mrr=args.new_mrr,
         expansion_mrr=args.expansion,
         churned_mrr=args.churned,
         contraction_mrr=args.contraction,
+        reactivation_mrr=args.reactivation,
     )
     
     if args.json:

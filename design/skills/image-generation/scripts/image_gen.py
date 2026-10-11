@@ -18,6 +18,10 @@ Modified by ultimate-skills (2026-09):
     silently repeated; batch mode retries only rate-limit/timeouts
   * default output directory output/imagegen/ kept; dependency hint made
     package-manager neutral
+  * existing outputs are refused before the API call (no paid request when
+    --force is missing); API errors exit with a one-line message, not a
+    traceback; --moderation is dropped for edits (the SDK's edit() rejects it);
+    retry-after parsing fixed
 
 Requires: `pip install openai` (Pillow optional, for --downscale-max-dim).
 Environment: OPENAI_API_KEY (required for live calls, not for --dry-run).
@@ -314,6 +318,16 @@ def _decode_and_write(images: List[str], outputs: List[Path], force: bool) -> No
         print(f"Wrote {out_path}")
 
 
+def _existing_outputs(
+    outputs: List[Path], downscale_max_dim: Optional[int], downscale_suffix: str
+) -> List[Path]:
+    """Targets that already exist (checked before a paid call; --force skips this)."""
+    targets = list(outputs)
+    if downscale_max_dim is not None:
+        targets += [_derive_downscale_path(p, downscale_suffix) for p in outputs]
+    return [p for p in targets if p.exists()]
+
+
 def _derive_downscale_path(path: Path, suffix: str) -> Path:
     if suffix and not suffix.startswith("-") and not suffix.startswith("_"):
         suffix = "-" + suffix
@@ -508,7 +522,7 @@ def _extract_retry_after_seconds(exc: Exception) -> Optional[float]:
         if isinstance(val, (int, float)) and val >= 0:
             return float(val)
     msg = str(exc)
-    m = re.search(r"retry[- ]after[:= ]+([0-9]+(?:\\.[0-9]+)?)", msg, re.IGNORECASE)
+    m = re.search(r"retry[- ]after[:= ]+([0-9]+(?:\.[0-9]+)?)", msg, re.IGNORECASE)
     if m:
         try:
             return float(m.group(1))
@@ -659,6 +673,13 @@ async def _run_generate_batch(args: argparse.Namespace) -> int:
             explicit_out=job.get("out"),
         )
         try:
+            existing = [] if args.force else _existing_outputs(
+                outputs, args.downscale_max_dim, args.downscale_suffix
+            )
+            if existing:
+                raise FileExistsError(
+                    f"Output already exists: {existing[0]} (use --force to overwrite)"
+                )
             async with sem:
                 print(f"{job_label} starting", file=sys.stderr)
                 started = time.time()
@@ -742,6 +763,12 @@ def _generate(args: argparse.Namespace) -> None:
         )
         return
 
+    existing = [] if args.force else _existing_outputs(
+        output_paths, args.downscale_max_dim, args.downscale_suffix
+    )
+    if existing:
+        _die(f"Output already exists: {existing[0]} (use --force to overwrite)")
+
     print(
         "Calling Image API (generation). This can take up to a couple of minutes.",
         file=sys.stderr,
@@ -798,6 +825,9 @@ def _edit(args: argparse.Namespace) -> None:
     if "input_fidelity" in payload and _is_gpt_image_2_base(args.model):
         _warn("gpt-image-2 requires input_fidelity to be omitted; dropping --input-fidelity.")
         payload.pop("input_fidelity")
+    if "moderation" in payload:
+        _warn("--moderation applies to generate only; dropping it for edit.")
+        payload.pop("moderation")
     output_paths = _build_output_paths(args.out, output_format, args.n, args.out_dir)
     downscaled = None
     if args.downscale_max_dim is not None:
@@ -817,6 +847,12 @@ def _edit(args: argparse.Namespace) -> None:
             }
         )
         return
+
+    existing = [] if args.force else _existing_outputs(
+        output_paths, args.downscale_max_dim, args.downscale_suffix
+    )
+    if existing:
+        _die(f"Output already exists: {existing[0]} (use --force to overwrite)")
 
     print(
         f"Calling Image API (edit) with {len(image_paths)} image(s).",
@@ -984,7 +1020,12 @@ def main() -> int:
     _validate_background(args.background)
     _ensure_api_key(args.dry_run)
 
-    args.func(args)
+    try:
+        args.func(args)
+    except Exception as exc:
+        if type(exc).__module__.split(".")[0] != "openai":
+            raise
+        _die(f"OpenAI API request failed (not retried): {exc}")
     return 0
 
 

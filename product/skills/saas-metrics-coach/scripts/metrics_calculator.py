@@ -76,7 +76,7 @@ def calculate(
         missing.append("LTV:CAC — need both LTV and CAC")
 
     # ── Payback ───────────────────────────────────────────────────────────────
-    if r.get("CAC") and arpa and arpa > 0:
+    if r.get("CAC") and arpa and arpa > 0 and gross_margin > 0:
         r["Payback_Months"] = round(r["CAC"] / (arpa * gross_margin), 1)
     else:
         missing.append("Payback Period — need CAC and ARPA")
@@ -90,8 +90,11 @@ def calculate(
         missing.append("NRR (accurate) — using churn-only estimate; provide expansion MRR for full NRR")
 
     # ── Rule of 40 ────────────────────────────────────────────────────────────
-    if r.get("MoM_Growth_Pct") and profit_margin is not None:
-        r["Rule_of_40"] = round(r["MoM_Growth_Pct"] * 12 + profit_margin, 1)
+    # MoM growth is annualized by compounding, (1 + g)^12 - 1; multiplying it by 12
+    # understates growth and overstates decline. 0% growth is a valid input.
+    if "MoM_Growth_Pct" in r and profit_margin is not None:
+        annual_growth_pct = ((mrr / mrr_last) ** 12 - 1) * 100
+        r["Rule_of_40"] = round(annual_growth_pct + profit_margin, 1)
 
     r["_missing"] = missing
     r["_gross_margin"] = gross_margin
@@ -142,7 +145,12 @@ def report(r):
 
 def _ask(prompt, required=False):
     while True:
-        v = input(f"  {prompt}: ").strip()
+        try:
+            v = input(f"  {prompt}: ").strip()
+        except EOFError:
+            print("\nerror: no interactive input (stdin closed); pass values as flags, "
+                  "see --help", file=sys.stderr)
+            sys.exit(2)
         if not v:
             if required:
                 print("    Required — please enter a value.")
@@ -172,9 +180,18 @@ if __name__ == "__main__":
     parser.add_argument("--json", action="store_true", help="Output JSON format")
     
     args = parser.parse_args()
-    
-    # CLI mode
-    if args.mrr is not None:
+
+    # CLI mode whenever any flag is given (partial data is fine: metrics that need a
+    # missing input are listed under "_missing"). Interactive mode only without flags.
+    if len(sys.argv) > 1:
+        for name in ("mrr", "mrr_last", "customers", "churned", "new_customers",
+                     "sm_spend", "expansion_mrr", "churned_mrr", "contraction_mrr"):
+            value = getattr(args, name)
+            if value is not None and value < 0:
+                parser.error(f"--{name.replace('_', '-')} must be >= 0 "
+                             "(enter lost MRR and churned customers as positive numbers)")
+        if not 0 < args.gross_margin <= 100:
+            parser.error("--gross-margin must be greater than 0 and at most 100")
         inputs = {
             "mrr": args.mrr,
             "mrr_last": args.mrr_last,

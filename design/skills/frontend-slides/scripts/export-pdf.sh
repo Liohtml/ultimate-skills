@@ -276,6 +276,11 @@ await page.evaluate(() => document.fonts.ready);
 // Extra wait for animations to settle on the first slide
 await page.waitForTimeout(1500);
 
+// Freeze motion: decks reveal content with CSS transitions/animations (with
+// stagger delays) when a slide becomes .visible, so later slides would be
+// captured mid-fade. With zero durations every slide renders its final state.
+await page.addStyleTag({ content: '*, *::before, *::after { transition-duration: 0s !important; transition-delay: 0s !important; animation-duration: 0s !important; animation-delay: 0s !important; }' });
+
 // Count slides
 const slideCount = await page.evaluate(() => {
   return document.querySelectorAll('.slide').length;
@@ -311,10 +316,10 @@ for (let i = 0; i < slideCount; i++) {
         slide.style.visibility = 'visible';
         slide.style.position = 'relative';
         slide.style.transform = 'none';
-        slide.classList.add('active');
+        slide.classList.add('active', 'visible');
       } else {
         slide.style.display = 'none';
-        slide.classList.remove('active');
+        slide.classList.remove('active', 'visible');
       }
     });
 

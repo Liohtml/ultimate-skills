@@ -1,6 +1,6 @@
 # MCP Server Evaluation Guide
 
-> From [anthropics/skills](https://github.com/anthropics/skills) `skills/mcp-builder/reference/evaluation.md` at commit `34040c9` (Apache-2.0, see `../LICENSE.txt`). **Modified by ultimate-skills:** hard-coded `claude-3-7-sonnet-20250219` model references replaced by `$MCP_EVAL_MODEL` / `-m`.
+> From [anthropics/skills](https://github.com/anthropics/skills) `skills/mcp-builder/reference/evaluation.md` at commit `34040c9` (Apache-2.0, see `../LICENSE.txt`). **Modified by ultimate-skills:** hard-coded `claude-3-7-sonnet-20250219` model references replaced by `$MCP_EVAL_MODEL` / `-m`; manual install pinned to `mcp<2`.
 
 ## Overview
 
@@ -391,7 +391,7 @@ After creating your evaluation file, you can use the provided evaluation harness
 
    Or install manually:
    ```bash
-   pip install anthropic mcp
+   pip install anthropic "mcp<2"
    ```
 
 2. **Set API Key**

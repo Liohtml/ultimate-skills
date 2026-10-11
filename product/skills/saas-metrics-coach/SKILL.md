@@ -11,7 +11,7 @@ metadata:
 
 # SaaS Metrics Coach
 
-> Adapted from [alirezarezvani/claude-skills `finance/skills/saas-metrics-coach`](https://github.com/alirezarezvani/claude-skills/tree/19392f7a08264ed00486a251f5b2098321771f94/finance/skills/saas-metrics-coach) (MIT, Copyright (c) 2025 Alireza Rezvani; skill authored by Abbas Mir). Changes: description rewritten; benchmark ranges labelled as heuristics; script invocation paths made explicit; pointers to upstream sibling skills replaced with this marketplace's skills.
+> Adapted from [alirezarezvani/claude-skills `finance/skills/saas-metrics-coach`](https://github.com/alirezarezvani/claude-skills/tree/19392f7a08264ed00486a251f5b2098321771f94/finance/skills/saas-metrics-coach) (MIT, Copyright (c) 2025 Alireza Rezvani; skill authored by Abbas Mir). Changes: description rewritten; benchmark ranges labelled as heuristics; script invocation paths made explicit; pointers to upstream sibling skills replaced with this marketplace's skills; scripts fixed: flags without `--mrr` no longer fall into interactive mode, negative and zero-margin inputs are rejected, Rule of 40 annualizes MoM growth by compounding, Quick Ratio counts reactivation MRR, and the simulator applies growth from month 1 (a 12-month run now compounds 12 months, not 11).
 
 Act as a senior SaaS CFO advisor. Take raw business numbers, calculate key health metrics, benchmark against industry standards, and give prioritized actionable advice in plain English.
 
@@ -120,19 +120,19 @@ Expected output: Flags negative MoM growth (-6.4%), critical churn (11.25%), and
 Core SaaS metrics from raw business numbers.
 
 ```bash
-# Interactive mode
-python scripts/metrics_calculator.py
+# Interactive mode (only when no flags are given)
+python3 scripts/metrics_calculator.py
 
-# CLI mode
-python scripts/metrics_calculator.py --mrr 50000 --customers 100 --churned 5 --json
+# CLI mode (any subset of flags; metrics that need a missing input are listed under "_missing")
+python3 scripts/metrics_calculator.py --mrr 50000 --customers 100 --churned 5 --json
 ```
 
 ### 2. Quick Ratio Calculator (`scripts/quick_ratio_calculator.py`)
-Growth efficiency metric: (New MRR + Expansion) / (Churned + Contraction)
+Growth efficiency metric: (New MRR + Expansion + Reactivation) / (Churned + Contraction). Enter lost MRR as positive amounts.
 
 ```bash
-python scripts/quick_ratio_calculator.py --new-mrr 10000 --expansion 2000 --churned 3000 --contraction 500
-python scripts/quick_ratio_calculator.py --new-mrr 10000 --expansion 2000 --churned 3000 --json
+python3 scripts/quick_ratio_calculator.py --new-mrr 10000 --expansion 2000 --churned 3000 --contraction 500
+python3 scripts/quick_ratio_calculator.py --new-mrr 10000 --expansion 2000 --reactivation 800 --churned 3000 --json
 ```
 
 **Benchmarks:**
@@ -142,11 +142,11 @@ python scripts/quick_ratio_calculator.py --new-mrr 10000 --expansion 2000 --chur
 - \> 4 = EXCELLENT (strong growth)
 
 ### 3. Unit Economics Simulator (`scripts/unit_economics_simulator.py`)
-Project metrics forward 12 months based on growth/churn assumptions.
+Project metrics forward 12 months (`--months N` to change) based on growth/churn assumptions. Month 1 is the first month after the starting MRR; `--cac` turns the projected S&M spend into an implied customer count.
 
 ```bash
-python scripts/unit_economics_simulator.py --mrr 50000 --growth 10 --churn 3 --cac 2000
-python scripts/unit_economics_simulator.py --mrr 50000 --growth 10 --churn 3 --cac 2000 --json
+python3 scripts/unit_economics_simulator.py --mrr 50000 --growth 10 --churn 3 --cac 2000
+python3 scripts/unit_economics_simulator.py --mrr 50000 --growth 10 --churn 3 --cac 2000 --json
 ```
 
 **Use for:**

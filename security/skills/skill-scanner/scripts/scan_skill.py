@@ -17,8 +17,12 @@ Usage:
 Output: JSON to stdout with structured findings.
 
 Modified by ultimate-skills (Apache-2.0 section 4b): argparse-based --help and
-argument handling, and a JSON error instead of a traceback when PyYAML is
-missing. Scanning logic and output format are unchanged from upstream
+argument handling; a JSON error instead of a traceback when PyYAML is missing;
+frontmatter dates serialized as strings instead of crashing json.dumps; file
+content read only from regular files inside the skill directory (symlinks out
+of it are reported, never followed); secret values masked in evidence; the
+HTTP-request pattern fixed to match urllib.request/http.client/aiohttp calls;
+```! fenced load-time blocks reported. Output keys are unchanged from upstream
 getsentry/skills commit c2f99a5.
 """
 from __future__ import annotations
@@ -87,7 +91,7 @@ SECRET_PATTERNS: list[tuple[str, str, str]] = [
 DANGEROUS_SCRIPT_PATTERNS: list[tuple[str, str, str]] = [
     # (pattern, description, severity)
     # Data exfiltration
-    (r"(?i)(requests\.(get|post|put)|urllib\.request|http\.client|aiohttp)\s*\(", "HTTP request (potential exfiltration)", "medium"),
+    (r"(?i)(requests\.(get|post|put)|urllib\.request|http\.client|aiohttp|\burlopen)[\w.]*\s*\(", "HTTP request (potential exfiltration)", "medium"),
     (r"(?i)(curl|wget)\s+", "Shell HTTP request", "medium"),
     (r"(?i)socket\.(connect|create_connection)", "Raw socket connection", "high"),
     (r"(?i)subprocess.*\b(nc|ncat|netcat)\b", "Netcat usage (potential reverse shell)", "critical"),
@@ -120,6 +124,19 @@ TRUSTED_DOMAINS = {
     "developer.mozilla.org", "stackoverflow.com",
     "agentskills.io",
 }
+
+
+def _readable_inside(path: Path, root: Path) -> bool:
+    """True for a regular file that resolves inside the skill directory.
+
+    Content is only read from such files. A symlink pointing out of the skill (reported
+    separately as "Symlink Detected") would otherwise pull local files such as ~/.ssh keys
+    or .env secrets into the scan output, and a link to /dev/zero or a FIFO would hang.
+    """
+    try:
+        return path.is_file() and path.resolve().is_relative_to(root.resolve())
+    except OSError:
+        return False
 
 
 def parse_frontmatter(content: str) -> tuple[dict[str, Any] | None, str]:
@@ -315,9 +332,11 @@ def check_secrets(content: str, filepath: str) -> list[dict[str, Any]]:
 
     for line_num, line in enumerate(lines, 1):
         for pattern, description, severity in SECRET_PATTERNS:
-            if re.search(pattern, line):
-                # Mask the actual secret in evidence
-                evidence = line.strip()[:200]
+            match = re.search(pattern, line)
+            if match:
+                # Mask the actual secret in evidence (keep an 8-char prefix for triage)
+                masked = line[:match.start()] + match.group()[:8] + "...[REDACTED]" + line[match.end():]
+                evidence = masked.strip()[:200]
                 findings.append({
                     "type": "Secret Detected",
                     "severity": severity,
@@ -437,6 +456,21 @@ def check_structural_attacks(skill_dir: Path, content: str, frontmatter: dict[st
                 "category": "Pre-prompt Injection",
             })
 
+    # 3b. ```! fenced blocks — Claude Code runs their body as a shell command at load time too
+    fence_pattern = re.compile(r"```!\s*\n?([\s\S]*?)\n?```")
+    for match in fence_pattern.finditer(content):
+        line_num = content[:match.start()].count("\n") + 1
+        cmd = match.group(1).strip()
+        findings.append({
+            "type": "Pre-prompt Command",
+            "severity": "high",
+            "location": f"SKILL.md:{line_num}",
+            "description": f"```! fenced block executes at skill load time before the model sees "
+                          f"the prompt. Command: {cmd[:200]}",
+            "evidence": cmd[:200],
+            "category": "Pre-prompt Injection",
+        })
+
     # 4. Test file auto-discovery — conftest.py, test_*.py, *.test.js/ts
     test_patterns = {
         "conftest.py": "pytest auto-imports conftest.py at collection time — code runs before any tests",
@@ -463,6 +497,8 @@ def check_structural_attacks(skill_dir: Path, content: str, frontmatter: dict[st
 
     # 5. npm postinstall — bundled package.json with lifecycle scripts
     for pkg_json in skill_dir.rglob("package.json"):
+        if not _readable_inside(pkg_json, skill_dir):
+            continue
         try:
             pkg = json.loads(pkg_json.read_text(encoding="utf-8", errors="replace"))
         except (json.JSONDecodeError, OSError, ValueError):
@@ -484,6 +520,8 @@ def check_structural_attacks(skill_dir: Path, content: str, frontmatter: dict[st
     # 6. Image metadata — parse PNG chunks properly to find tEXt/iTXt metadata
     import struct
     for img_path in skill_dir.rglob("*.png"):
+        if not _readable_inside(img_path, skill_dir):
+            continue
         try:
             data = img_path.read_bytes()
             # PNG files start with 8-byte signature, then chunks
@@ -550,6 +588,9 @@ def scan_skill(skill_dir: Path) -> dict[str, Any]:
     skill_md = skill_dir / "SKILL.md"
     if not skill_md.exists():
         return {"error": f"No SKILL.md found in {skill_dir}"}
+    if not _readable_inside(skill_md, skill_dir):
+        return {"error": f"SKILL.md in {skill_dir} is not a regular file inside the skill "
+                         f"directory (resolves to {skill_md.resolve()}); not read"}
 
     try:
         content = skill_md.read_text(encoding="utf-8", errors="replace")
@@ -580,7 +621,7 @@ def scan_skill(skill_dir: Path) -> dict[str, Any]:
     refs_dir = skill_dir / "references"
     if refs_dir.is_dir():
         for ref_file in sorted(refs_dir.iterdir()):
-            if ref_file.suffix == ".md":
+            if ref_file.suffix == ".md" and _readable_inside(ref_file, skill_dir):
                 try:
                     ref_content = ref_file.read_text(encoding="utf-8", errors="replace")
                 except OSError:
@@ -596,7 +637,7 @@ def scan_skill(skill_dir: Path) -> dict[str, Any]:
     script_findings: list[dict[str, Any]] = []
     if scripts_dir.is_dir():
         for script_file in sorted(scripts_dir.iterdir()):
-            if script_file.suffix in (".py", ".sh", ".js", ".ts"):
+            if script_file.suffix in (".py", ".sh", ".js", ".ts") and _readable_inside(script_file, skill_dir):
                 sf = check_scripts(script_file)
                 script_findings.extend(sf)
                 try:
@@ -707,7 +748,9 @@ def main(argv: list[str] | None = None):
         sys.exit(1)
 
     result = scan_skill(skill_dir)
-    print(json.dumps(result, indent=2))
+    # default=str: YAML frontmatter may hold dates/datetimes (e.g. `updated: 2026-03-08`),
+    # which json cannot serialize; emit them as ISO strings instead of crashing.
+    print(json.dumps(result, indent=2, default=str))
 
 
 if __name__ == "__main__":
