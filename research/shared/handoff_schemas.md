@@ -33,16 +33,16 @@ Consuming agents should validate input and request re-generation if schema viola
 |-------|------|-------------|
 | `research_question` | string | The finalized research question (single sentence, interrogative form) |
 | `sub_questions` | list[string] | 2-5 decomposed sub-questions |
-| `finer_scores` | object | `{feasible: 1-10, interesting: 1-10, novel: 1-10, ethical: 1-10, relevant: 1-10}` |
+| `finer_scores` | object | `{feasible: 1-5, interesting: 1-5, novel: 1-5, ethical: 1-5, relevant: 1-5}`, the producer's scale (#938); threshold: average >= 3.0, no criterion below 2 |
 | `scope` | object | `{in_scope: list[string], out_of_scope: list[string], domain: string, timeframe: string, geography: string, population: string}` |
-| `methodology_type` | enum | `"qualitative"` / `"quantitative"` / `"mixed"` |
-| `theoretical_framework` | string | Name of the selected or emergent theoretical framework |
-| `keywords` | list[string] | 5-10 search terms for literature search |
 
 ### Optional Fields
 
 | Field | Type | Description |
 |-------|------|-------------|
+| `methodology_type` | enum | `"qualitative"` / `"quantitative"` / `"mixed"`. Optional since #938: the RQ Brief producer does not emit it; `research_architect_agent`'s Methodology Blueprint carries the method decision |
+| `theoretical_framework` | string | Name of the selected or emergent theoretical framework. Optional since #938: the RQ Brief producer does not emit it |
+| `keywords` | list[string] | 5-10 search terms for literature search. Optional since #938: the RQ Brief producer does not emit it; the search keywords live in Schema 2 `search_strategy.keywords` |
 | `socratic_insights` | list[string] | Key insights from Socratic dialogue (if socratic mode) |
 | `hypothesis` | string | Preliminary hypothesis (if applicable) |
 | `exclusion_criteria` | list[string] | What is explicitly out of scope |
@@ -67,7 +67,7 @@ Consuming agents should validate input and request re-generation if schema viola
 2. inherits: same as parent scope — deviations: none
 3. inherits: same as parent scope — deviations: extends population to faculty (user-approved)
 
-**FINER Scores**: Feasible: 8, Interesting: 9, Novel: 7, Ethical: 9, Relevant: 10
+**FINER Scores**: Feasible: 4, Interesting: 5, Novel: 4, Ethical: 5, Relevant: 5
 
 **Scope**:
 - In scope: AI-assisted formative assessment, STEM undergraduate courses, Taiwan HEIs, 2018-2025
@@ -324,6 +324,7 @@ phases: {
       semantic_extraction_coverage: "not_machine_detectable"
     },
     evidence_rows: [EvidenceRow],
+    evidence_source_dir: string | null, // #933: folder of per-source text files; null when no row is source-bound
     claim_strength_drift_findings: {
       schema_version: "claim-strength-drift-findings/1.0",
       artifact_path: string,
@@ -376,8 +377,12 @@ check, MUST NOT manufacture an excerpt, and does not retroactively alter the
 historical verdict or gate result. Current producers may never use the flag.
 
 The full array travels inside the existing Integrity Report handoff. Rendering
-requires the explicit in-memory session source map to replay-validate every
-source-bound persisted row; the default and maximum page size are 25,
+requires the explicit source texts to replay-validate every source-bound
+persisted row. The producer writes them as files named by
+`source_file_name(ref_slug)` into the folder the orchestrator names and records it in
+`evidence_source_dir`, which is `null` when no row is source-bound; the
+checkpoint reads them with `scripts/evidence_rows.py --source-dir`, so a
+producer run as a subagent can still be rendered (#933); the default and maximum page size are 25,
 there is no `--all` mode, and a checkpoint request renders only its requested
 page with deterministic page navigation. There is no total row cap. Rendering
 performs no display-time retrieval, ambient filesystem/network/API/model call,
@@ -730,9 +735,11 @@ conformance, not a manuscript verdict or integrity/checkpoint input. See
 | `literature_corpus` | list[object] | Optional append-friendly literature corpus. Each entry conforms to [`shared/contracts/passport/literature_corpus_entry.schema.json`](contracts/passport/literature_corpus_entry.schema.json). Produced by user-written adapters (see [`academic-pipeline/references/adapters/overview.md`](../skills/academic-pipeline/references/adapters/overview.md)); ARS does not produce these entries itself. Added v3.6.4+. |
 | `audit_artifact` | list[object] | Optional append-only ledger of cross-model audit runs for v3.6.7 downstream-agent deliverables. Each entry conforms to [`shared/contracts/passport/audit_artifact_entry.schema.json`](contracts/passport/audit_artifact_entry.schema.json). Produced by the pipeline orchestrator after Layer 2 + Layer 3 verification of wrapper-emitted proposal entries; only `persisted` entries are stored here. Added v3.6.7+. |
 | `slr_lineage` | boolean | Run-level provenance flag set by `pipeline_orchestrator_agent` at the Stage 1 → Stage 2 handoff. `true` iff any stage in this run history was produced by `deep-research` in systematic-review mode. Consumed by `disclosure` mode renderer (`--policy-anchor=prisma-trAIce` track gate per `policy_anchor_disclosure_protocol.md` §3.1). Absence = `false` = cold-start path (renderer requires explicit `mode=` per §4.3 G2 invariant fallback rule). Added v3.7.4+. See [Run-level lineage signal (v3.7.4)](#run-level-lineage-signal-v374) below. |
-| `experiment_intake_declaration` | object | Passport-level intake decision (#260, D7). `status` ∈ `{experiments_declared, no_experiments_declared, legacy_unknown}` + `declared_at` + `declared_by: scholar`. Set by whichever agent owns Stage 1 intake (the intake/orchestrator layer — NOT the three manifest writers). **Fail-closed**: a passport treated-as-post-#260 (the default — only a `repro_lock.ars_version` proven `< the #260 constant` is `legacy_unknown`) with this field ABSENT is a gate FAIL. Even a literature-only run must carry `{status: no_experiments_declared}`. EP-INV-4 enforces declaration↔provenance symmetry. See [Experiment Provenance Intake (#260)](#experiment-provenance-intake-260) below. |
+| `experiment_intake_declaration` | object | Passport-level intake decision (#260, D7). `status` ∈ `{experiments_declared, no_experiments_declared, legacy_unknown}` + `declared_at` + `declared_by: scholar` + optional `scholar_answer` (the scholar's words, unchanged; a non-empty string when present, #925). Set at intake by the intake/orchestrator layer for that entry path, NOT by the three manifest writers; in pipeline runs the orchestrator asks the scholar after Stage 1 or at a later entry point (`academic-pipeline/agents/pipeline_orchestrator_agent.md` § Experiment Intake Question (#925)). **Fail-closed**: a passport treated-as-post-#260 (the default — only a `repro_lock.ars_version` proven `< the #260 constant` is `legacy_unknown`) with this field ABSENT is a gate FAIL. Even a literature-only run must carry `{status: no_experiments_declared}`. EP-INV-4 enforces declaration↔provenance symmetry. See [Experiment Provenance Intake (#260)](#experiment-provenance-intake-260) below. |
 | `experiment_provenance` | list[object] | Optional scholar-entered ledger of experiments run EXTERNALLY (#260, D1). Each entry conforms to [`shared/contracts/passport/experiment_provenance_entry.schema.json`](contracts/passport/experiment_provenance_entry.schema.json) — `experiment_id` (passport-flat, frozen at intake) + nested `repro_lock` + `planned_vs_executed[]` + `negative_results[]` + `known_limitations[]`. ARS does not run experiments, does not auto-fill provenance, does not judge experiment correctness. Joined from claims via `claim_intent_manifest.planned_experiment_ids[]`. Gated at the integrity verification stage (Stage 2.5/4.5, D6). Added #260. |
 | `experiment_alignment_results` | list[object] | Optional aggregate of claim→experiment alignment verdicts (#260, D4) — the FOURTH ref_slug-less claim-finding aggregate (alongside `uncited_assertions` / `claim_drifts` / `constraint_violations`). Each entry conforms to [`shared/contracts/passport/experiment_alignment_result.schema.json`](contracts/passport/experiment_alignment_result.schema.json); `alignment_verdict` ∈ `{ALIGNED, OVERSTATED, NOT_SUPPORTED_BY_PROVENANCE, PROVENANCE_INSUFFICIENT}`. **Produced by the integrity verification agent AT the gate** (mirrors #261 C3), NOT by the claim-alignment audit agent. EA-INV-1/2 enforce id-uniqueness + reference resolution. Carried forward by `pipeline_orchestrator_agent`'s aggregate hand-off. Added #260. |
+| `standing_constraints` | list[object] | Optional (#927). Run-wide constraints the user stated in their own turn (a word ceiling, a prohibition, a scope narrowing, or other), in the user's words. Entry shape: [`shared/contracts/passport/standing_constraint_entry.schema.json`](contracts/passport/standing_constraint_entry.schema.json); how entries are confirmed and carried: `academic-pipeline/agents/pipeline_orchestrator_agent.md` § Standing Constraints (#927). |
+| `excluded_sources` | list[object] | Optional (#936). References an integrity gate judged `NOT_FOUND`, kept off every later writer dispatch so a revision cannot cite them again; `literature_corpus[]` is not mutated. Entry shape: [`shared/contracts/passport/excluded_source_entry.schema.json`](contracts/passport/excluded_source_entry.schema.json); how entries are recorded, carried, and restored: `academic-pipeline/agents/pipeline_orchestrator_agent.md` § Integrity-Excluded Sources (#936). |
 
 ### Example
 
@@ -820,7 +827,7 @@ See [`academic-pipeline/references/passport_as_reset_boundary.md`](../skills/aca
 
 The optional `literature_corpus[]` field is Schema 9's input port for user-owned literature. Each entry is a bibliographic record conforming to `literature_corpus_entry.schema.json` (CSL-JSON author format, β required set).
 
-ARS does not produce these entries. User-written adapters read their own corpus source (Zotero, Obsidian, folder, Notion, etc.) and emit a passport with `literature_corpus[]` populated. Three reference adapters ship with v3.6.4 under [`scripts/adapters/`](https://github.com/Imbad0202/academic-research-skills/tree/95929c00fc066730b40cf268fd1250b04f00356a/scripts/adapters).
+ARS does not produce these entries. User-written adapters read their own corpus source (Zotero, Obsidian, folder, Notion, etc.) and emit a passport with `literature_corpus[]` populated. Three reference adapters ship with v3.6.4 under [`scripts/adapters/`](https://github.com/Imbad0202/academic-research-skills/tree/ebc21bf2429643fe4c2495aa99e1bbacd926772b/scripts/adapters).
 
 Consumer integration ships in v3.6.5: `bibliography_agent` (deep-research, Phase 1) and `literature_strategist_agent` (academic-paper, Phase 1) read `literature_corpus[]` via the corpus-first, search-fills-gap flow. See [`academic-pipeline/references/literature_corpus_consumers.md`](../skills/academic-pipeline/references/literature_corpus_consumers.md) for the full consumer protocol, the four Iron Rules, and per-consumer reading instructions.
 
@@ -896,7 +903,7 @@ revision stales both. See
 
 Schema 9 gains an optional append-only `audit_artifact[]` ledger recording cross-model audit runs that gate the three v3.6.7 downstream agents (`synthesis_agent`, `research_architect_agent` survey-designer mode, `report_compiler_agent` abstract-only mode). Each entry conforms to [`shared/contracts/passport/audit_artifact_entry.schema.json`](contracts/passport/audit_artifact_entry.schema.json).
 
-The ledger stores only `persisted` entries — those merged by `pipeline_orchestrator_agent` after Layer 2 (JSONL schema) + Layer 3 (sidecar metadata) anti-fake-audit checks pass per the eleven gating checks at [`docs/design/2026-04-30-ars-v3.6.7-step-6-orchestrator-hooks-spec.md`](https://github.com/Imbad0202/academic-research-skills/blob/95929c00fc066730b40cf268fd1250b04f00356a/docs/design/2026-04-30-ars-v3.6.7-step-6-orchestrator-hooks-spec.md) §5.2. Wrapper-emitted `proposal` entries live under `audit_artifacts/<run_id>.audit_artifact_entry.json` until orchestrator consumes them; they never reach the passport.
+The ledger stores only `persisted` entries — those merged by `pipeline_orchestrator_agent` after Layer 2 (JSONL schema) + Layer 3 (sidecar metadata) anti-fake-audit checks pass per the eleven gating checks at [`docs/design/2026-04-30-ars-v3.6.7-step-6-orchestrator-hooks-spec.md`](https://github.com/Imbad0202/academic-research-skills/blob/ebc21bf2429643fe4c2495aa99e1bbacd926772b/docs/design/2026-04-30-ars-v3.6.7-step-6-orchestrator-hooks-spec.md) §5.2. Wrapper-emitted `proposal` entries live under `audit_artifacts/<run_id>.audit_artifact_entry.json` until orchestrator consumes them; they never reach the passport.
 
 ```yaml
 audit_artifact:
@@ -932,9 +939,9 @@ audit_artifact:
 - Multiple entries for the same `(stage, agent, deliverable_sha)` represent multiple audit rounds; orchestrator selects the latest by `verified_at` for verdict reads.
 - If `deliverable_sha` changes (deliverable mutated), prior entries become stale but remain as audit history; orchestrator only honors entries whose `deliverable_sha` matches the current deliverable.
 
-**This mirrors the v3.6.3 `reset_boundary[]` append-only pattern**: history preserved, freshness computed by ledger scan. Deletion or reordering is forbidden; lint at `scripts/check_audit_artifact_consistency.py` enforces the invariant family at [`docs/design/2026-04-30-ars-v3.6.7-step-6-orchestrator-hooks-spec.md`](https://github.com/Imbad0202/academic-research-skills/blob/95929c00fc066730b40cf268fd1250b04f00356a/docs/design/2026-04-30-ars-v3.6.7-step-6-orchestrator-hooks-spec.md) §3.7.
+**This mirrors the v3.6.3 `reset_boundary[]` append-only pattern**: history preserved, freshness computed by ledger scan. Deletion or reordering is forbidden; lint at `scripts/check_audit_artifact_consistency.py` enforces the invariant family at [`docs/design/2026-04-30-ars-v3.6.7-step-6-orchestrator-hooks-spec.md`](https://github.com/Imbad0202/academic-research-skills/blob/ebc21bf2429643fe4c2495aa99e1bbacd926772b/docs/design/2026-04-30-ars-v3.6.7-step-6-orchestrator-hooks-spec.md) §3.7.
 
-For the orchestrator-side gate procedure (Path A latest-by-`verified_at` selection, Path B proposal merge after Layer 2 + Layer 3 verification), the canonical contract is [`docs/design/2026-04-30-ars-v3.6.7-step-6-orchestrator-hooks-spec.md`](https://github.com/Imbad0202/academic-research-skills/blob/95929c00fc066730b40cf268fd1250b04f00356a/docs/design/2026-04-30-ars-v3.6.7-step-6-orchestrator-hooks-spec.md) §5.6 (Path A/B fall-through with the §5.6 A1.5 superseding-proposal preflight) plus §5.2 (eleven Layer 2 + Layer 3 gating checks). Implementation lands as a subsection of `academic-pipeline/agents/pipeline_orchestrator_agent.md` (Phase 6.6 deliverable). For the resume-time re-verification semantics, see [`academic-pipeline/references/passport_as_reset_boundary.md`](../skills/academic-pipeline/references/passport_as_reset_boundary.md).
+For the orchestrator-side gate procedure (Path A latest-by-`verified_at` selection, Path B proposal merge after Layer 2 + Layer 3 verification), the canonical contract is [`docs/design/2026-04-30-ars-v3.6.7-step-6-orchestrator-hooks-spec.md`](https://github.com/Imbad0202/academic-research-skills/blob/ebc21bf2429643fe4c2495aa99e1bbacd926772b/docs/design/2026-04-30-ars-v3.6.7-step-6-orchestrator-hooks-spec.md) §5.6 (Path A/B fall-through with the §5.6 A1.5 superseding-proposal preflight) plus §5.2 (eleven Layer 2 + Layer 3 gating checks). Implementation lands as a subsection of `academic-pipeline/agents/pipeline_orchestrator_agent.md` (Phase 6.6 deliverable). For the resume-time re-verification semantics, see [`academic-pipeline/references/passport_as_reset_boundary.md`](../skills/academic-pipeline/references/passport_as_reset_boundary.md).
 
 ### Experiment Provenance Intake (#260)
 
@@ -942,14 +949,17 @@ Schema 9 gains the **intake + alignment** layer for experiments — NOT an execu
 
 **Three additions** (all under the Optional-Fields table above):
 
-1. `experiment_intake_declaration` (passport-level object) — the Stage 1 intake decision, set by the intake/orchestrator layer (the agent that owns Stage 1 for that entry path), never by the three manifest writers:
+1. `experiment_intake_declaration` (passport-level object) — the intake decision, set by the intake/orchestrator layer (the agent that owns intake for that entry path: after Stage 1, or on entry after Stage 1, #925), never by the three manifest writers:
 
    ```yaml
    experiment_intake_declaration:
      status: experiments_declared        # | no_experiments_declared | legacy_unknown
      declared_at: "2026-06-08T10:00:00Z"
      declared_by: scholar                # always scholar — an intake decision, not an agent emission
+     scholar_answer: "Yes, I ran the ablation runs myself."   # optional (#925): the scholar's words, unchanged
    ```
+
+   In pipeline runs the orchestrator asks the scholar once, after Stage 1 or when a run enters after Stage 1, and records the answer here (`academic-pipeline/agents/pipeline_orchestrator_agent.md` § Experiment Intake Question (#925)). The status comes from the scholar's answer, never from the manuscript.
 
    **Fail-closed legacy boundary (D7).** The default is treat-as-post-#260, NOT treat-as-legacy. A passport is `legacy_unknown` (advisory) ONLY with positive proof it predates #260 — `repro_lock.ars_version` present AND `< the #260 release constant` (frozen in the gate at ship time). Everything else — including a passport with no `repro_lock` or a `repro_lock` with no `ars_version` — is treated as post-#260, so the declaration is REQUIRED and its absence is a gate FAIL. Version-unprovable ≠ legacy. This shuts the back door: a new run cannot dodge the declaration by omitting `repro_lock` to make its version unprovable. Even a pure-literature run (e.g. `deep-research lit-review`) must emit `{status: no_experiments_declared}`.
 
@@ -976,7 +986,7 @@ Schema 9 gains the **intake + alignment** layer for experiments — NOT an execu
 
 **Invariants** (lint-enforced in `scripts/check_claim_audit_consistency.py`): EP-INV-1 (experiment_id unique/passport) · EP-INV-2 (planned_experiment_ids resolve; rename + forward-reference guard) · EP-INV-3 (experiment ids ⟹ empirical; mixed literature+experiment allowed) · EP-INV-4 (declaration↔provenance symmetry) · EA-INV-1 (finding_id unique) · EA-INV-2 (alignment row references resolve; dangling id = structural FAIL, never a verdict). Shape-only validation of a single entry is also available via `scripts/check_experiment_provenance.py`.
 
-See [`docs/design/2026-06-08-260-experiment-provenance-intake-spec.md`](https://github.com/Imbad0202/academic-research-skills/blob/95929c00fc066730b40cf268fd1250b04f00356a/docs/design/2026-06-08-260-experiment-provenance-intake-spec.md) for the full design (7 decisions D1–D7) and [`examples/passport_with_experiment_provenance.yaml`](https://github.com/Imbad0202/academic-research-skills/blob/95929c00fc066730b40cf268fd1250b04f00356a/examples/passport_with_experiment_provenance.yaml) for a worked passport.
+See [`docs/design/2026-06-08-260-experiment-provenance-intake-spec.md`](https://github.com/Imbad0202/academic-research-skills/blob/ebc21bf2429643fe4c2495aa99e1bbacd926772b/docs/design/2026-06-08-260-experiment-provenance-intake-spec.md) for the full design (7 decisions D1–D7) and [`examples/passport_with_experiment_provenance.yaml`](https://github.com/Imbad0202/academic-research-skills/blob/ebc21bf2429643fe4c2495aa99e1bbacd926772b/examples/passport_with_experiment_provenance.yaml) for a worked passport.
 
 ### Run-level lineage signal (v3.7.4)
 
@@ -994,7 +1004,7 @@ slr_lineage: true   # any pipeline stage was deep-research in systematic-review 
 - Backward compat: passports written before v3.7.4 lack the field; renderer treats absence as `false` (cold-start path requiring explicit `mode_param='systematic-review'`). Identical to pre-v3.7.4 behavior.
 - G1 boundary: this is a passport-level (run-level provenance) field, distinct from corpus-entry-level fields. The §4.4 #11 G1 invariant scope is `literature_corpus_entry.schema.json` (corpus entry data schema, frozen by Decision Doc §2.1); passport-schema extensions follow the v3.6.3 / v3.6.4 / v3.6.7 precedent and are permitted per Decision Doc §4.4 #11.
 
-Spec: [`docs/design/2026-05-15-issue-111-slr-lineage-emission-design.md`](https://github.com/Imbad0202/academic-research-skills/blob/95929c00fc066730b40cf268fd1250b04f00356a/docs/design/2026-05-15-issue-111-slr-lineage-emission-design.md). Conformance test: `scripts/test_slr_lineage_emission.py`.
+Spec: [`docs/design/2026-05-15-issue-111-slr-lineage-emission-design.md`](https://github.com/Imbad0202/academic-research-skills/blob/ebc21bf2429643fe4c2495aa99e1bbacd926772b/docs/design/2026-05-15-issue-111-slr-lineage-emission-design.md). Conformance test: `scripts/test_slr_lineage_emission.py`.
 
 ### Claim-Faithfulness Audit Aggregates (v3.8)
 
@@ -1017,7 +1027,7 @@ v3.8 introduces six passport aggregates around the L3 (claim-faithfulness) audit
 
 Cross-field invariants (INV-1..INV-18 / M-INV-1..M-INV-4 / U-INV-1..U-INV-4 / D-INV-1..D-INV-4 / CV-INV-1..CV-INV-4 / S-INV-1..S-INV-4) are lint-enforced by `scripts/check_claim_audit_consistency.py` because the conditional matrix relating judgment / audit_status / defect_stage / ref_retrieval_method exceeds what JSON Schema can express. Audit-side producer: `claim_ref_alignment_audit_agent` (`academic-pipeline/agents/`). Consumer: `formatter_agent` REFUSE rules 6-10 (see v3.8 spec §5 mode flag rationale). Default OFF for v3.8.0 — ramp-on plan deferred to post-calibration evidence.
 
-Spec: [`docs/design/2026-05-15-issue-103-claim-alignment-audit-spec.md`](https://github.com/Imbad0202/academic-research-skills/blob/95929c00fc066730b40cf268fd1250b04f00356a/docs/design/2026-05-15-issue-103-claim-alignment-audit-spec.md) + decision doc [`2026-05-15-issue-103-claim-alignment-audit-decision.md`](https://github.com/Imbad0202/academic-research-skills/blob/95929c00fc066730b40cf268fd1250b04f00356a/docs/design/2026-05-15-issue-103-claim-alignment-audit-decision.md) (D1-D6 settled).
+Spec: [`docs/design/2026-05-15-issue-103-claim-alignment-audit-spec.md`](https://github.com/Imbad0202/academic-research-skills/blob/ebc21bf2429643fe4c2495aa99e1bbacd926772b/docs/design/2026-05-15-issue-103-claim-alignment-audit-spec.md) + decision doc [`2026-05-15-issue-103-claim-alignment-audit-decision.md`](https://github.com/Imbad0202/academic-research-skills/blob/ebc21bf2429643fe4c2495aa99e1bbacd926772b/docs/design/2026-05-15-issue-103-claim-alignment-audit-decision.md) (D1-D6 settled).
 
 ---
 

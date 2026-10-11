@@ -6,7 +6,7 @@ license: MIT
 
 # Subagent-Driven Development
 
-> Adapted from [obra/superpowers `subagent-driven-development`](https://github.com/obra/superpowers/tree/5bf4e78011075bcfc0dc295f0724994cd123ee71/skills/subagent-driven-development) (MIT, Copyright (c) 2025 Jesse Vincent). Changes: decoupled from other superpowers skills (worktree, finishing and code-review skills replaced by this marketplace's skills; the final reviewer prompt is bundled as `final-reviewer-prompt.md`), workspace moved to `.sdd/`, script invocation clarified (run from the project's working tree), example workflow and rationalizations moved to `references/`.
+> Adapted from [obra/superpowers `subagent-driven-development`](https://github.com/obra/superpowers/tree/bb92a77741419a4ab5f06e711a283343f1ada0c3/skills/subagent-driven-development) (MIT, Copyright (c) 2025 Jesse Vincent). Changes: decoupled from other superpowers skills (worktree, finishing and code-review skills replaced by this marketplace's skills; the final reviewer prompt is bundled as `final-reviewer-prompt.md`), workspace moved to `.sdd/`, script invocation clarified (run from the project's working tree), example workflow and rationalizations moved to `references/`.
 
 Execute plan by dispatching a fresh implementer subagent per task, a task review (spec compliance + code quality) after each, and a broad whole-branch review at the end.
 

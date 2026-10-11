@@ -73,8 +73,8 @@ Moved verbatim from SKILL.md sections 'Quality Standards', 'Error Recovery', 'Ag
 
 | Item | Content |
 |------|---------|
-| Skill Version | 3.22.1 |
-| Last Updated | 2026-09-23 |
+| Skill Version | 3.23.0 |
+| Last Updated | 2026-10-03 |
 | Maintainer | Cheng-I Wu |
 | Dependent Skills | deep-research v2.0+, academic-paper v2.0+, academic-paper-reviewer v1.1+ |
 | Role | Full academic research workflow orchestrator |

@@ -1,6 +1,6 @@
 ---
 name: code-review-and-quality
-description: Conducts five-axis code review (correctness, readability, architecture, security, performance) of a diff or pull request before merge, whether written by yourself, another agent, or a human. Use when asked to review a PR, diff or change set, or to assess code quality before it enters the main branch. For in-flight checks of individual decisions use doubt-driven-development; for behavior-preserving cleanup use code-simplification; for responding to review feedback on your own PR use iterate-pr; for a dedicated vulnerability scan use static-vuln-scan; for UI-specific rules use web-interface-review.
+description: Conducts five-axis code review (correctness, readability, architecture, security, performance) of a diff or pull request before merge, whether written by yourself, another agent, or a human. Use when asked to review a PR, diff or change set (even when the diff is pasted inline rather than in a file or branch), or to assess code quality before it enters the main branch. For in-flight checks of individual decisions use doubt-driven-development; for behavior-preserving cleanup use code-simplification; for responding to review feedback on your own PR use iterate-pr; for a dedicated vulnerability scan use static-vuln-scan; for UI-specific rules use web-interface-review.
 ---
 
 # Code Review and Quality
@@ -160,6 +160,8 @@ Tests reveal intent and coverage:
 - Do tests have descriptive names?
 - Would the tests catch a regression if the code changed?
 ```
+
+Answer the last question by experiment, not by reading. Invert one condition the change adds (drop a negation, swap `&&` for `||`), run the suite, then restore the file from a copy. A mutation that stays green is a finding: name the test case that is missing. For a project-wide mutation score, see `constraint-driven-development` (upstream agent-skills, not included here: https://github.com/addyosmani/agent-skills).
 
 ### Step 3: Review the Implementation
 

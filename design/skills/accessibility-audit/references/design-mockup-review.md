@@ -1,4 +1,4 @@
-> From [masuP9/a11y-specialist-skills](https://github.com/masuP9/a11y-specialist-skills) `skills/reviewing-a11y/references/design-review.md` at commit `6615e6e` (MIT, (c) 2025 masuP9). Only the Japanese-version link was removed.
+> From [masuP9/a11y-specialist-skills](https://github.com/masuP9/a11y-specialist-skills) `skills/reviewing-a11y/references/design-review.md` at commit `eeba8df` (MIT, (c) 2025 masuP9). Only the Japanese-version link was removed.
 
 # Accessibility Design Review Guide
 

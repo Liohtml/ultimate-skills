@@ -5,8 +5,12 @@ Copy the block below into `PRD-[product-name].md` and fill it in. Text in
 `[Data]`, `[Research]`, `[Assumption]`, `[TBD: owner]` in the final document so
 readers can see what is known and what is not.
 
-For a **one-pager** keep only sections 1, 3, 4, 7.2 and 8, and cut each to its
-first bullet or table.
+For the **lean version** (the default, about one to two pages) keep all 8
+sections but cut each to its first line or table: one primary metric and one
+guardrail, the first version's Musts with one acceptance criterion each, and no
+Contacts table if you do not know the people. Market segments and value
+propositions always stay. Delete rows you cannot fill rather than leaving
+placeholders, and carry real unknowns into 7.4 or the open questions.
 
 ```markdown
 # PRD: <Product or feature name>
@@ -73,6 +77,8 @@ with vision, strategy and the north-star metric.>
 
 ## 5. Market segment(s)
 
+<Two or three segments at most for the first version.>
+
 - **Primary segment:** <defined by problem or job; size with source>
 - **Secondary segment:** <if any>
 - **Not for:** <who we deliberately do not serve with this release, and why>
@@ -81,10 +87,25 @@ with vision, strategy and the north-star metric.>
 
 ## 6. Value proposition(s)
 
-- **Jobs addressed:** <the customer job in their words>
-- **Gains:** <what they get>
-- **Pains avoided:** <what goes away>
-- **Versus the current alternative:** <including doing nothing; why better>
+<One per segment from section 5, using the 6-part JTBD template. In the lean
+version each part is a line or two; the evidence column is for the full
+version.>
+
+**Segment: <name>**
+
+| Part | Content | Evidence |
+|---|---|---|
+| Who | <the segment from section 5> | |
+| Why | <the job they are trying to get done, and the problem in the way> | <[Research] ...> |
+| What before | <how they do it today, and what hurts about it> | <[Data] ...> |
+| How | <the key capability that gets the job done; features in 7.2> | |
+| What after | <the improved outcome; what becomes possible> | <[Assumption] ...> |
+| Alternatives | <what they would use without us, including doing nothing; why they would choose us> | |
+
+**Value proposition statement:** <one or two sentences>
+
+<Check: 7.2 delivers the How, and the primary metric in section 4 measures the
+What after.>
 
 ## 7. Solution
 

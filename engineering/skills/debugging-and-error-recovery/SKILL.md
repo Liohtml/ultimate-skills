@@ -5,7 +5,7 @@ description: Guides systematic root-cause debugging built on a tight, red-capabl
 
 # Debugging and Error Recovery
 
-> Includes material adapted from [mattpocock/skills `diagnosing-bugs`](https://github.com/mattpocock/skills/tree/c55ee46073ed923f86ce59a5eb3b6d895095d1b7/skills/engineering/diagnosing-bugs) (MIT) and a helper script from [obra/superpowers](https://github.com/obra/superpowers) (MIT).
+> Includes material adapted from [mattpocock/skills `diagnosing-bugs`](https://github.com/mattpocock/skills/tree/49dd158d1076134a641b33efb035946536778336/skills/engineering/diagnosing-bugs) (MIT) and a helper script from [obra/superpowers](https://github.com/obra/superpowers) (MIT).
 
 ## Overview
 
@@ -184,7 +184,7 @@ it('finds tasks with special characters in title', async () => {
 });
 ```
 
-This test will prevent the same bug from recurring. Write it **before the fix**: turn the minimised repro into a failing test, watch it fail, apply the fix, watch it pass, then re-run the Step 1 loop against the original (un-minimised) scenario.
+This test will prevent the same bug from recurring. Write it **before the fix**: turn the minimised repro into a failing test and watch it fail (if you forced the red by mutating code or a fixture, `diff` against a pristine copy to prove the mutation landed before you trust it), then apply the fix, watch it pass, and re-run the Step 1 loop against the original (un-minimised) scenario.
 
 **Only at a correct seam.** A correct seam exercises the real bug pattern as it occurs at the call site. If the only available seam is too shallow (a single-caller test when the bug needs multiple callers, a unit test that can't replicate the chain that triggered it), a test there gives false confidence. **If no correct seam exists, that itself is the finding**: record it, because the architecture is preventing the bug from being locked down.
 

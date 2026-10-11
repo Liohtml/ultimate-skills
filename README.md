@@ -87,7 +87,7 @@ MIT + Apache-2.0 · [plugin README](./product/README.md)
 | `interview-script` | Mom-Test / JTBD customer-discovery interview script. |
 | `user-personas` | Evidence-gated behavioural personas with JTBD and switching forces; proto-persona labelling, validation and refresh. |
 | `prioritization-frameworks` | Pick and apply the right method (RICE, ICE, cost of delay / WSJF, Kano, MoSCoW…) with calibrated scales, worked examples and a session playbook. |
-| `create-prd` | Evidence-first 8-section PRD with metrics and guardrails, MoSCoW acceptance criteria and a rollout plan; also reviews PRDs. |
+| `create-prd` | Evidence-first 8-section PRD, lean by default (1–2 pages, full on request), with 6-part JTBD value propositions per segment, metrics and guardrails, MoSCoW acceptance criteria and a rollout plan; also reviews PRDs. |
 | `intended-vs-implemented` | Audit the gap between intended behavior and shipped code. |
 | `north-star-metric` | Define the NSM and its input-metric constellation by business game. |
 | `saas-metrics-coach` | ARR, churn, CAC, LTV, NRR and payback from raw numbers with scripts; benchmarked health check. |
@@ -119,7 +119,7 @@ MIT + Apache-2.0 · [plugin README](./writing/README.md)
 | Skill | What it does |
 |---|---|
 | `minto-pyramid` | Conclusion-first structure (SCQA) for decision documents, plus a structure audit with a verdict. |
-| `copy-editing` | Seven Sweeps edit of marketing and conversion copy; missing proof is flagged, never invented. |
+| `copy-editing` | Seven Sweeps edit of marketing and conversion copy with an AI-tell check on every edit, plus SERP-gap content refreshes; missing proof is flagged, never invented. |
 | `humanizer` | Final pass that removes AI-sounding patterns without adding or losing facts. |
 
 ### security
@@ -172,4 +172,4 @@ The curation, manifests and docs are MIT. Each skill stays under its upstream li
 ## Maintenance
 
 - `python3 scripts/validate.py` checks frontmatter (name = directory, description ≤ 1024 chars), manifests, relative links, `PROVENANCE.csv` (one base row per skill, and each license must fit its plugin's license) and SKILL.md length. CI also runs `claude plugin validate --strict` on the marketplace and every plugin.
-- `python3 scripts/check_upstream.py [--skill NAME] [--repo OWNER/REPO]` reports every provenance row whose upstream paths changed since the recorded commit. Skills that diverge from upstream on purpose get a `note:` line: `deep-research`, `academic-paper` and `academic-pipeline` were split locally, so map upstream changes with [`research/MERGE_MAPS.md`](./research/MERGE_MAPS.md); `humanizer` must not take upstream's Wikipedia-quoted examples back.
+- `python3 scripts/check_upstream.py [--skill NAME] [--repo OWNER/REPO]` reports every provenance row whose upstream paths changed since the recorded commit. Skills that diverge from upstream on purpose get a `note:` line: `deep-research`, `academic-paper` and `academic-pipeline` were split locally, so map upstream changes with [`research/MERGE_MAPS.md`](./research/MERGE_MAPS.md), which also maps `academic-paper-reviewer` (split in upstream sync 2); `humanizer` must not take upstream's Wikipedia-quoted examples back. After a sync, set the row's `source_commit` to the upstream commit merged.

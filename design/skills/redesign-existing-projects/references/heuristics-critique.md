@@ -1,6 +1,6 @@
 # Heuristic critique (score before you redesign)
 
-> Adapted from [pbakaus/impeccable](https://github.com/pbakaus/impeccable) `skill/reference/critique.md` at commit `e0881d2` (Apache-2.0, Copyright 2025 Paul Bakaus; see [impeccable.LICENSE.txt](impeccable.LICENSE.txt)). **Modified by ultimate-skills:** kept the Nielsen scoring guide, cognitive-load assessment, P0–P3 severity scale and persona tests; removed the dual-sub-agent orchestration, the `impeccable detect` CLI, browser-overlay injection, snapshot persistence and command routing, and wrote the short procedure below. Licensed under the Apache License 2.0; see `LICENSES/` at the repository root.
+> Adapted from [pbakaus/impeccable](https://github.com/pbakaus/impeccable) `skill/reference/critique.md` at commit `c63b8dd` (Apache-2.0, Copyright 2025 Paul Bakaus; see [impeccable.LICENSE.txt](impeccable.LICENSE.txt)). **Modified by ultimate-skills:** kept the Nielsen scoring guide, cognitive-load assessment, P0–P3 severity scale and persona tests; removed the dual-sub-agent orchestration, the `impeccable detect` CLI, browser-overlay injection, snapshot persistence and command routing, and wrote the short procedure below. Licensed under the Apache License 2.0; see `LICENSES/` at the repository root.
 
 Use this at the **Diagnose** step of `redesign-existing-projects` when the user wants a critique, a before/after score, or a prioritized plan instead of an immediate rewrite.
 

@@ -5,7 +5,7 @@ description: Lint-style review of UI code (HTML/CSS/JSX/TSX/Vue/Svelte) against 
 
 # Web Interface Review
 
-> Adapted from [vercel-labs/web-interface-guidelines](https://github.com/vercel-labs/web-interface-guidelines) (MIT, (c) 2025 Vercel Labs), `command.md` pinned at commit `e3d624b`. The upstream `web-design-guidelines` skill fetches these rules at runtime; here they are embedded so the review works offline and reproducibly. Re-pin on upstream updates.
+> Adapted from [vercel-labs/web-interface-guidelines](https://github.com/vercel-labs/web-interface-guidelines) (MIT, (c) 2025 Vercel Labs), `command.md` pinned at commit `434b7f9`. The upstream `web-design-guidelines` skill fetches these rules at runtime; here they are embedded so the review works offline and reproducibly. Re-pin on upstream updates.
 
 A fast, lint-like pass over UI **code**. Every rule below is checkable in source and has an obvious fix. Findings are reported as clickable `file:line` entries - no essays.
 
@@ -120,6 +120,7 @@ A fast, lint-like pass over UI **code**. Every rule below is checkable in source
 - `touch-action: manipulation` (prevents double-tap zoom delay)
 - `-webkit-tap-highlight-color` set intentionally
 - `overscroll-behavior: contain` in modals/drawers/sheets
+- Page rubber-band suppression: `overscroll-behavior: none` on `<html>` inside `@media (pointer: fine)`; keep coarse-pointer page defaults for pull-to-refresh. Test hybrid touch devices: `pointer` describes the primary input, and `none` also disables scroll chaining and native swipe navigation
 - During drag: disable text selection, `inert` on dragged elements
 - Drag/swipe/pinch/path gestures need tap/click and keyboard alternatives unless essential
 - `autoFocus` sparingly—desktop only, single primary input; avoid on mobile

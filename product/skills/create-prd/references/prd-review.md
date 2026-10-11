@@ -12,8 +12,10 @@ feature brief or one-pager.
    - **Bet:** why this solution is expected to move it.
    If any of the three cannot be reconstructed from the document, that is the
    first and most important finding.
-3. Identify the document's purpose and stage. A discovery one-pager is not
-   judged by the standard of a build-ready PRD. Say which standard you apply.
+3. Identify the document's purpose and stage. A lean first PRD is not judged
+   by the standard of a full build-ready PRD: it must leave no gap that blocks
+   a decision about the first version, not answer every question. Say which
+   standard you apply.
 
 ## 2. Section rubric
 
@@ -25,8 +27,8 @@ Rate each section **Missing / Weak / Adequate / Strong**.
 | 2. Contacts | One decision owner; a named owner per function | A list of names with no roles; nobody can say "approved" |
 | 3. Background | Problem stated without the solution; labelled evidence with sources; counter-evidence; why now | "Customers have asked for X"; anecdotes; no dates or n |
 | 4. Objective | One primary metric with definition, baseline, target, time, source; guardrails; 3-5 reasoned non-goals | "Increase engagement"; output goals; no non-goals |
-| 5. Segments | Defined by problem or job; sized; who it is not for | "All users"; demographics only |
-| 6. Value proposition | Compared with the real alternative, including doing nothing | Feature list restated as benefits |
+| 5. Segments | Defined by problem or job; sized; who it is not for; two or three at most for the first version | "All users"; demographics only; every segment at once |
+| 6. Value proposition | A 6-part value proposition (Who, Why, What before, How, What after, Alternatives) per segment, compared with the real alternative including doing nothing; the Solution delivers the How and the primary metric measures the What after | Feature list restated as benefits; no alternatives; nothing in sections 4 or 7 connects to it |
 | 7. Solution | Prioritised stories with testable criteria; states and edge cases; NFRs as constraints; ranked assumptions with validation | Everything a Must; "should be intuitive"; implementation details; no assumptions listed |
 | 8. Release | Smallest release that tests the bet; rollout method, decision rule, rollback triggers; owned open questions | A date and "launch"; no way to tell success from failure |
 
@@ -49,6 +51,8 @@ Rate each section **Missing / Weak / Adequate / Strong**.
 | Orphan requirement | A requirement that serves no stated problem or metric | Cut it or add it to the parking lot |
 | Unowned questions | Open questions with no owner or date | Assign owner, blocking flag, needed-by |
 | Frozen document | Meeting decisions missing; stale dates | Add version and change log; update the decisions |
+| Padded document | Placeholder roles, "TBD" sections, boilerplate; length no decision needs | Name the cuts; move real unknowns into 7.4 or the open questions |
+| Broken spine | The How of the value proposition is missing from the Solution, or no metric measures its What after | Realign sections 4, 6 and 7 first |
 
 ## 4. Output format
 
@@ -56,7 +60,7 @@ Rate each section **Missing / Weak / Adequate / Strong**.
 ## PRD review: <document name>
 
 **Verdict:** Ready for build / Ready with fixes / Needs rework
-**Standard applied:** <discovery one-pager / build-ready PRD>
+**Standard applied:** <lean first PRD / full build-ready PRD>
 
 **Reconstruction**
 - Problem: <one sentence, or "cannot be reconstructed">
@@ -75,6 +79,9 @@ Rate each section **Missing / Weak / Adequate / Strong**.
    Fix: <concrete rewrite, or the question the author must answer>
 2. ...
 
+**What to cut**
+- <sections or passages that could go without losing anything the team needs>
+
 **What is already strong**
 - <specific strengths, so the author keeps them>
 
@@ -85,7 +92,8 @@ Rate each section **Missing / Weak / Adequate / Strong**.
 Guidelines:
 
 - Rank by impact on the decision, not by order in the document. Three issues
-  that change the outcome beat twenty wording nits.
+  that change the outcome beat twenty wording nits. Return the gaps first,
+  then the cuts.
 - Quote the text you criticise; give a rewrite, not just a complaint.
 - Do not invent weaknesses. If a section is sound, say so.
 - If the core doubt is whether the bet is right, recommend `strategy-red-team`;

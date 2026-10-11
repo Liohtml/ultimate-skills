@@ -108,7 +108,7 @@ The `collaboration_depth_agent` observes the user's collaboration pattern with t
 | Mechanism | What it evaluates | Blocking? |
 |---|---|---|
 | `integrity_verification_agent` (Stages 2.5 / 4.5) | Paper content — references, citations, data | Yes (blocking gate) |
-| Stage 6 Collaboration Quality Evaluation (6 dims, 1–100) | AI's self-reflection on its own behaviour | No, but produced once only |
+| Stage 6 Collaboration Quality Evaluation (6 dims, 1–100) | The user's collaboration as the AI assessed it (the AI Self-Reflection Report covers the AI's own behaviour) | No, but produced once only |
 | `collaboration_depth_agent` (this observer) | The **user's** collaboration pattern (delegation intensity, vigilance, reallocation) | **No — never blocks. Advisory only.** |
 
 **Non-blocking guarantees**:

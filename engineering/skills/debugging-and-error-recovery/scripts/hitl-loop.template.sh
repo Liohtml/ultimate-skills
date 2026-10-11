@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Adapted from mattpocock/skills (MIT, Copyright (c) 2026 Matt Pocock),
-# skills/engineering/diagnosing-bugs/scripts/hitl-loop.template.sh @ c55ee46.
+# skills/engineering/diagnosing-bugs/scripts/hitl-loop.template.sh @ 49dd158.
 #
 # Human-in-the-loop reproduction loop.
 # Copy this file, edit the steps below, and run it.

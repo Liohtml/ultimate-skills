@@ -23,7 +23,7 @@ content read only from regular files inside the skill directory (symlinks out
 of it are reported, never followed); secret values masked in evidence; the
 HTTP-request pattern fixed to match urllib.request/http.client/aiohttp calls;
 ```! fenced load-time blocks reported. Output keys are unchanged from upstream
-getsentry/skills commit c2f99a5.
+getsentry/skills commit d18b7aa.
 """
 from __future__ import annotations
 

@@ -5,7 +5,7 @@ description: WCAG 2.2 Level A/AA accessibility audit and remediation for web UI 
 
 # Accessibility Audit (WCAG 2.2 A/AA)
 
-> Adapted from [84emllc/claude-wcag-skill](https://github.com/84emllc/claude-wcag-skill) (MIT, (c) 2026 84EM LLC) at commit `792755f`, with the review/audit split, the "NT instead of guessing" rule and the mockup-review path from [masuP9/a11y-specialist-skills](https://github.com/masuP9/a11y-specialist-skills) (MIT, (c) 2025 masuP9) at commit `6615e6e`. Changes: agency/client and WordPress/Hugo framing moved to [references/stack-notes.md](references/stack-notes.md); the verbatim W3C spec file is **not** bundled (it is under the W3C Document License, not MIT) - link to the official spec instead; masuP9's `npx` CLI and Playwright-MCP tool bindings dropped.
+> Adapted from [84emllc/claude-wcag-skill](https://github.com/84emllc/claude-wcag-skill) (MIT, (c) 2026 84EM LLC) at commit `792755f`, with the review/audit split, the "NT instead of guessing" rule, the mockup-review path, and the axe-coverage gaps, keyboard-reachability, fixed-target spacing and autocomplete-grammar checks from [masuP9/a11y-specialist-skills](https://github.com/masuP9/a11y-specialist-skills) (MIT, (c) 2025 masuP9) at commit `eeba8df`. Changes: agency/client and WordPress/Hugo framing moved to [references/stack-notes.md](references/stack-notes.md); the verbatim W3C spec file is **not** bundled (it is under the W3C Document License, not MIT) - link to the official spec instead; masuP9's `npx` CLI (`@a11y-skills/audit`) and Playwright-MCP tool bindings dropped, and what its checks test is folded into the manual passes below.
 
 ## Overview
 
@@ -43,8 +43,8 @@ If the goal is unclear, ask once: "Do you want an issue list with fixes, or a fo
 
 Run all four. No single pass is sufficient.
 
-1. **Automated scan.** axe-core (axe DevTools, `@axe-core/cli`, `@axe-core/playwright`), Lighthouse, or WAVE. Records the machine-detectable third. Zero violations here is the floor, not the ceiling. If the project has no scanner installed, do not add one as a dependency - inject axe-core into the running page instead. Runnable snippets for a single page, a whole-sitemap run, and validating the harness before trusting its output: [references/running-axe.md](references/running-axe.md). Always report axe's `incomplete` items alongside `violations` - incomplete means "could not decide", not "passed".
-2. **Keyboard-only pass.** No mouse. Tab through the entire flow: every interactive element reachable, visible focus ring at each stop, logical order, no trap, Esc closes overlays, focus not hidden behind sticky headers (2.4.11). Skip link works (2.4.1). Focus moves into and back out of dialogs correctly.
+1. **Automated scan.** axe-core (axe DevTools, `@axe-core/cli`, `@axe-core/playwright`), Lighthouse, or WAVE. Records the machine-detectable third. Zero violations here is the floor, not the ceiling. If the project has no scanner installed, do not add one as a dependency - inject axe-core into the running page instead. Runnable snippets for a single page, a whole-sitemap run, and validating the harness before trusting its output: [references/running-axe.md](references/running-axe.md). Always report axe's `incomplete` items alongside `violations` - incomplete means "could not decide", not "passed". axe has no rule for 1.4.11 Non-text Contrast, and its 2.5.3 Label in Name rule (`label-content-name-mismatch`) is experimental and does not run by default, so a clean scan says nothing about either: both stay with passes 3 and 4.
+2. **Keyboard-only pass.** No mouse. Tab through the entire flow: every interactive element reachable, visible focus ring at each stop, logical order, no trap, Esc closes overlays, focus not hidden behind sticky headers (2.4.11). Skip link works (2.4.1). Focus moves into and back out of dialogs correctly. Inside composite widgets (tabs, toolbars, menus, listboxes, radio groups, grids) items are reached with the arrow keys or exposed through `aria-activedescendant`, not by Tab, so test them that way; open comboboxes and menu buttons with ArrowDown, Enter and Space and step through their options, including nested submenus and content in iframes or Shadow DOM. An element the keyboard cannot reach fails 2.1.1 only when its function is not available another way (another control, a documented shortcut).
 3. **Contrast + zoom.** Text 4.5:1 (large text 3:1) - 1.4.3; UI components and focus indicators 3:1 against adjacent colors - 1.4.11. Reflow at 320 CSS px / 400% zoom with no horizontal scroll (1.4.10). Text-spacing overrides don't clip content (1.4.12). Resize text to 200% (1.4.4).
 4. **Screen-reader / semantics pass.** VoiceOver, NVDA, or Orca where available; otherwise inspect the accessibility tree (browser DevTools) and say so. Correct headings, landmarks, list/button/link semantics; every image has meaningful or empty alt; every control has a programmatic name that includes its visible label (2.5.3); dynamic changes announce via live regions (4.1.3). Semantic HTML first - ARIA only to fill gaps native elements cannot.
 
@@ -62,6 +62,8 @@ WCAG 2.2 added six A/AA criteria over 2.1 and **removed 4.1.1 Parsing** (now alw
 | 3.2.6 | Consistent Help | A | Help mechanisms appear in the same relative order across pages |
 | 3.3.7 | Redundant Entry | A | Don't force re-entering info already given in the same process |
 | 3.3.8 | Accessible Authentication (Minimum) | AA | No cognitive-function test (transcription, memorization, puzzle) as the only auth path; allow paste and password managers |
+
+**2.5.8 with fixed elements.** Judge a `position: fixed` target (fixed header, back-to-top button, chat launcher) against the page's targets at the scroll position where the two sit farthest apart - the top of the page for a fixed header, the bottom for a bottom-anchored button. A link that still sits right under the fixed header there fails the spacing exception; content that merely scrolls past beneath a fixed element does not.
 
 ## Level A / AA criteria checklist (55)
 
@@ -103,6 +105,7 @@ Close with what was **not** verified (NT list) and the passes that ran.
 | Guessing a status without evidence | Use NT and list it; a wrong Pass in an ACR is worse than an honest gap. |
 | Color alone signals state | 1.4.1 fails. Add text/icon/pattern. |
 | Placeholder used as the label | Vanishes on input, fails 3.3.2 Labels or Instructions. Use `<label>`. |
+| "It has an `autocomplete` attribute, so 1.3.5 passes." | The value must follow the HTML autofill grammar (optional `section-*`, then `shipping`/`billing`, then `home`/`work`/`mobile`/`fax`/`pager` for phone, email and IM fields, then the field token, optionally `webauthn`) and match the field's purpose. 1.3.5 only covers fields that collect information about the user, so confirm that before failing an unrecognized value. |
 | `role="button"` on a `<div>` | Loses keyboard + focus for free. Use `<button>`. |
 | Paraphrasing criterion text into a deliverable | Quote the W3C spec verbatim; paraphrase invents normative meaning. |
 | "Focus ring removed for design" | `outline:none` with no replacement fails 2.4.7. Provide a visible `:focus-visible` style. |
